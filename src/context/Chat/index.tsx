@@ -52,7 +52,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 	const [error, setError] = useState<string>(''); //TODO: Remove error, use onError event instead
 	const [user, setUser] = useState({ name: 'test', avatar: '' }); // TODO: Remove
 	// TODO: Rename to signaling
-	const webSocket = useRef<WebSocket>(null);
+	const signaling = useRef<WebSocket>(null);
 	const peerConnections = useRef<PeerConnection>(new Map());
 
 	const onSendEventMessage = (peer, event: Event) => {
@@ -156,7 +156,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 	function gotIceCandidate(event: RTCPeerConnectionIceEvent, peerUuid: string) {
 		if (event.candidate != null) {
 			// TODO: Make send function for websocket
-			webSocket.current?.send(JSON.stringify({ ice: event.candidate, uuid: localUuid, dest: peerUuid }));
+			signaling.current?.send(JSON.stringify({ ice: event.candidate, uuid: localUuid, dest: peerUuid }));
 		}
 	}
 
@@ -166,7 +166,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 			?.pc.setLocalDescription(description)
 			.then(function () {
 				//TODO: Unify structure of data
-				webSocket.current?.send(
+				signaling.current?.send(
 					JSON.stringify({
 						sdp: peerConnections.current.get(peerUuid)?.pc.localDescription,
 						uuid: localUuid,
@@ -184,13 +184,13 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 		const peerUuid = signal.uuid;
 
 		// Ignore messages that are not for us or from ourselves
-		if (peerUuid == localUuid || (signal.dest != localUuid && signal.dest != 'all')) return;
+		if (peerUuid === localUuid || (signal.dest !== localUuid && signal.dest !== 'all')) return;
 
-		if (signal.displayName && signal.dest == 'all') {
+		if (signal.displayName && signal.dest === 'all') {
 			// set up peer connection object for a newcomer peer
 			setUpPeer(peerUuid, signal.displayName);
-			webSocket.current?.send(JSON.stringify({ displayName: localUuid, uuid: localUuid, dest: peerUuid }));
-		} else if (signal.displayName && signal.dest == localUuid) {
+			signaling.current?.send(JSON.stringify({ displayName: localUuid, uuid: localUuid, dest: peerUuid }));
+		} else if (signal.displayName && signal.dest === localUuid) {
 			// initiate call if we are the newcomer peer
 			setUpPeer(peerUuid, signal.displayName, true);
 		} else if (signal.sdp) {
@@ -199,7 +199,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 				?.pc.setRemoteDescription(new RTCSessionDescription(signal.sdp))
 				.then(function () {
 					// Only create answers in response to offers
-					if (signal.sdp.type == 'offer') {
+					if (signal.sdp.type === 'offer') {
 						peerConnections.current
 							.get(peerUuid)
 							?.pc.createAnswer()
@@ -223,10 +223,10 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 		setUser({ name, avatar });
 
 		// TODO: Pull it outside, init?
-		webSocket.current = new WebSocket(signalingServer);
-		webSocket.current.onmessage = gotMessageFromServer;
-		webSocket.current.onopen = () => {
-			webSocket.current?.send(
+		signaling.current.onmessage = gotMessageFromServer;
+		signaling.current = new WebSocket(signalingServer);
+		signaling.current.onopen = () => {
+			signaling.current?.send(
 				JSON.stringify({
 					displayName: name || 'aaa',
 					uuid: localUuid || 'bbb',
@@ -239,7 +239,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 	};
 
 	const onLeaveChat = () => {
-		webSocket.current?.close();
+		signaling.current?.close();
 		peerConnections.current.forEach((connection) => {
 			connection.pc.close();
 		});
