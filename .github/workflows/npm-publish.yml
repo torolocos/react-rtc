@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-    release:
+    publish-npm:
         name: 🚀 publish
         runs-on: ubuntu-latest
         steps:
