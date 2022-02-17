@@ -1,11 +1,13 @@
 {
   "name": "@torolocos/react-rtc",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": false,
+  "homepage": "https://github.com/torolocos/react-rtc#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/torolocos/react-rtc.git"
   },
+  "author": "Torolocos",
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.0.0",
