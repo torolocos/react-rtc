@@ -1,9 +1,9 @@
 {
-  "name": "live-chat",
+  "name": "react-rtc",
   "version": "0.1.0",
   "private": false,
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@BrantalikP"
+    "registry": "https://npm.pkg.github.com/@torolocos"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
