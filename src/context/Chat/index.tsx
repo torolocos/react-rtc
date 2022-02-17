@@ -184,13 +184,13 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 		const peerUuid = signal.uuid;
 
 		// Ignore messages that are not for us or from ourselves
-		if (peerUuid === localUuid || (signal.dest !== localUuid && signal.dest !== 'all')) return;
+		if (peerUuid == localUuid || (signal.dest != localUuid && signal.dest != 'all')) return;
 
-		if (signal.displayName && signal.dest === 'all') {
+		if (signal.displayName && signal.dest == 'all') {
 			// set up peer connection object for a newcomer peer
 			setUpPeer(peerUuid, signal.displayName);
 			signaling.current?.send(JSON.stringify({ displayName: localUuid, uuid: localUuid, dest: peerUuid }));
-		} else if (signal.displayName && signal.dest === localUuid) {
+		} else if (signal.displayName && signal.dest == localUuid) {
 			// initiate call if we are the newcomer peer
 			setUpPeer(peerUuid, signal.displayName, true);
 		} else if (signal.sdp) {
@@ -199,7 +199,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 				?.pc.setRemoteDescription(new RTCSessionDescription(signal.sdp))
 				.then(function () {
 					// Only create answers in response to offers
-					if (signal.sdp.type === 'offer') {
+					if (signal.sdp.type == 'offer') {
 						peerConnections.current
 							.get(peerUuid)
 							?.pc.createAnswer()
@@ -223,8 +223,8 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 		setUser({ name, avatar });
 
 		// TODO: Pull it outside, init?
-		signaling.current.onmessage = gotMessageFromServer;
 		signaling.current = new WebSocket(signalingServer);
+		signaling.current.onmessage = gotMessageFromServer;
 		signaling.current.onopen = () => {
 			signaling.current?.send(
 				JSON.stringify({
