@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
+import React, { createContext, useContext, useState, useRef } from 'react';
 import { v4 as uuid } from 'uuid';
 
 export enum Event {
@@ -20,7 +20,6 @@ interface ContextType {
 	onEnterChat: ({ name, avatar }: { name: string; avatar: string }) => void;
 	onLeaveChat: () => void;
 	state: { isEntered: boolean };
-	userCounter: Number;
 	messageData: MessageData[]; // TODO: types
 	connections: PeerConnection;
 	error: string | null;
@@ -29,7 +28,7 @@ interface ContextType {
 interface Props {
 	children: JSX.Element;
 	signalingServer: string;
-	iceServers: string[];
+	iceServers: { urls: string }[];
 }
 
 type PeerConnection = Map<string, { displayName: string; pc: RTCPeerConnection; dataChannel: RTCDataChannel }>;
@@ -42,36 +41,19 @@ const contextDefaults: ContextType = {
 	connections: new Map(),
 	messageData: [],
 	error: null,
-	userCounter: 0,
 };
-
-// TODO: Move it to props
-const WEBSOCKET_SERVER_IP = 'ws://3.71.110.139:8001/';
-const configuration = {
-	iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
-};
-
-// TODO: Remove
-const DEFAULT_AVATAR =
-	'https://cdn.backstage-api.com?key=backstage-cms-production-uploads/1000x1000/5e0ad1b0-515e-11e9-a7ed-371ac744bd33/profile-images/img/5c55a618-e55a-4c68-85ed-55afa4b8e2fb-image%201@2x.png';
 
 export const ChatContext = createContext<ContextType>(contextDefaults);
 
-export const ChatProvider = ({ children }: Props) => {
+export const ChatProvider = ({ children, signalingServer, iceServers }: Props) => {
 	const [isEntered, setIsEntered] = useState(false); // TODO: Rename, leave there
-	const [userCounter, setUserCounter] = useState(1); // TODO: Remove
 	const [localUuid] = useState(uuid()); // TODO: Check ref, state, or global variable
 	const [messageData, setMessageData] = useState<MessageData[]>([]); // TODO: Leave, check interface, remove: avatar, event, username
 	const [error, setError] = useState<string>(''); //TODO: Remove error, use onError event instead
-	const [user, setUser] = useState({ name: 'test', avatar: DEFAULT_AVATAR }); // TODO: Remove
+	const [user, setUser] = useState({ name: 'test', avatar: '' }); // TODO: Remove
 	// TODO: Rename to signaling
 	const webSocket = useRef<WebSocket>(null);
 	const peerConnections = useRef<PeerConnection>(new Map());
-
-	// TODO: Remove
-	useEffect(() => {
-		setUserCounter(peerConnections.current.size);
-	}, [peerConnections]);
 
 	const onSendEventMessage = (peer, event: Event) => {
 		// FIXME: OHACK
@@ -141,7 +123,7 @@ export const ChatProvider = ({ children }: Props) => {
 
 	function setUpPeer(peerUuid: string, displayName: string, initCall = false) {
 		// TODO: Rename to peer connection
-		const pc = new RTCPeerConnection(configuration);
+		const pc = new RTCPeerConnection({ iceServers });
 		// TODO: Make better naming
 		const dataChannel = pc.createDataChannel('test');
 
@@ -241,7 +223,7 @@ export const ChatProvider = ({ children }: Props) => {
 		setUser({ name, avatar });
 
 		// TODO: Pull it outside, init?
-		webSocket.current = new WebSocket(WEBSOCKET_SERVER_IP);
+		webSocket.current = new WebSocket(signalingServer);
 		webSocket.current.onmessage = gotMessageFromServer;
 		webSocket.current.onopen = () => {
 			webSocket.current?.send(
@@ -270,7 +252,6 @@ export const ChatProvider = ({ children }: Props) => {
 		onEnterChat,
 		onLeaveChat,
 		messageData,
-		userCounter,
 		connections: peerConnections.current,
 		state: { isEntered },
 		error,
