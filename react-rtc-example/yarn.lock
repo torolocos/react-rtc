@@ -1620,6 +1620,25 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
   integrity sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==
 
+"@torolocos/react-rtc@0.1.5":
+  version "0.1.5"
+  resolved "https://npm.pkg.github.com/download/@torolocos/react-rtc/0.1.5/92b84a3debe93c87c85defe23686d4d91915ce8873a45aaf7d415c5996cd7554#aaf08f9d7b3c8f3767f22c361294e371f99759bc"
+  integrity sha512-5pQ9OPrw1KSGgQ0bRhmUakCEL7e0elPNBfqfhPLDkrBysBHWeNWUJSDmPThmwvA+d6zHeWIHOfhQTKjbJKg1OQ==
+  dependencies:
+    "@testing-library/jest-dom" "^5.14.1"
+    "@testing-library/react" "^12.0.0"
+    "@testing-library/user-event" "^13.2.1"
+    "@types/jest" "^27.0.1"
+    "@types/node" "^16.7.13"
+    "@types/react" "^17.0.20"
+    "@types/react-dom" "^17.0.9"
+    react "^17.0.2"
+    react-dom "^17.0.2"
+    react-scripts "5.0.0"
+    typescript "^4.4.2"
+    uuid "^8.3.2"
+    web-vitals "^2.1.0"
+
 "@trysound/sax@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@trysound/sax/-/sax-0.2.0.tgz#cccaab758af56761eb7bf37af6f03f326dd798ad"

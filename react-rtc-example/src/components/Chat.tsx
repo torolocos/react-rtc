@@ -1,44 +1,44 @@
 import { useEffect, useState } from 'react';
-// import { useChat } from 'react-rtc';
+import { useChat } from '@torolocos/react-rtc/src/context/Chat'; //TODO: fix path
 
 import './styles.css';
 
 const Chat = () => {
-  // const { onSend, onEnterChat, onLeaveChat, state, messageData, error } =
-  //   useChat();
-  // const [inputValue, setInputValue] = useState('');
-  // const [chatOpen, setChatOpen] = useState(false);
-  // const { isEntered } = state;
+  const { onSend, onEnterChat, onLeaveChat, state, messageData, error } =
+    useChat();
+  const [inputValue, setInputValue] = useState('');
+  const [chatOpen, setChatOpen] = useState(false);
+  const { isEntered } = state;
 
-  // useEffect(() => {
-  //   return () => {
-  //     onLeaveChat();
-  //   };
-  // }, []);
+  useEffect(() => {
+    return () => {
+      onLeaveChat();
+    };
+  }, []);
 
-  // const onStartChat = () => {
-  //   onEnterChat({ name: 'Placeholder', avatar: '' });
-  //   console.log('onSTART CHAT');
-  //   //TODO: zkontrolovat jestli pripojeni probehlo uspesne
-  //   setChatOpen(true);
-  // };
+  const onStartChat = () => {
+    onEnterChat({ name: 'Placeholder', avatar: '' });
+    console.log('onSTART CHAT');
+    //TODO: zkontrolovat jestli pripojeni probehlo uspesne
+    setChatOpen(true);
+  };
 
-  // const onEndChat = () => {
-  //   onLeaveChat();
-  //   //TODO: zkontrolovat jestli pripojeni probehlo uspesne
-  //   setChatOpen(false);
-  // };
+  const onEndChat = () => {
+    onLeaveChat();
+    //TODO: zkontrolovat jestli pripojeni probehlo uspesne
+    setChatOpen(false);
+  };
 
-  // const onMessageSend = () => {
-  //   onSend(inputValue);
+  const onMessageSend = () => {
+    onSend(inputValue);
 
-  //   setInputValue('');
-  // };
+    setInputValue('');
+  };
 
   return (
     <div>
       <h2>Chat</h2>
-      {/* {error && <div className='errorText'>Something went wrong</div>}
+      {error && <div className='errorText'>Something went wrong</div>}
       <div>
         {messageData.map(({ message, username }) => (
           <div>
@@ -57,7 +57,7 @@ const Chat = () => {
       )}
       <button onClick={!isEntered ? onStartChat : onEndChat}>
         {!isEntered ? 'join' : 'leave chat'}
-      </button> */}
+      </button>
     </div>
   );
 };
