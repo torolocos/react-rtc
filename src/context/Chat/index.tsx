@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useRef } from 'react';
+import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 
 export enum Event {
@@ -47,12 +47,12 @@ export const ChatContext = createContext<ContextType>(contextDefaults);
 
 export const ChatProvider = ({ children, signalingServer, iceServers }: Props) => {
 	const [isEntered, setIsEntered] = useState(false); // TODO: Rename, leave there
-	const [localUuid] = useState(uuid()); // TODO: Check ref, state, or global variable
+	const localUuid = useRef(uuid()).current; // TODO: Remove current
 	const [messageData, setMessageData] = useState<MessageData[]>([]); // TODO: Leave, check interface, remove: avatar, event, username
 	const [error, setError] = useState<string>(''); //TODO: Remove error, use onError event instead
 	const [user, setUser] = useState({ name: 'test', avatar: '' }); // TODO: Remove
-	// TODO: Rename to signaling
-	const signaling = useRef<WebSocket>(null);
+	const signaling = useRef<WebSocket>(new WebSocket(signalingServer));
+
 	const peerConnections = useRef<PeerConnection>(new Map());
 
 	const onSendEventMessage = (peer, event: Event) => {
@@ -155,8 +155,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 
 	function gotIceCandidate(event: RTCPeerConnectionIceEvent, peerUuid: string) {
 		if (event.candidate != null) {
-			// TODO: Make send function for websocket
-			signaling.current?.send(JSON.stringify({ ice: event.candidate, uuid: localUuid, dest: peerUuid }));
+			sendSignalingMessage(peerUuid, { ice: event.candidate });
 		}
 	}
 
@@ -165,14 +164,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 			.get(peerUuid)
 			?.pc.setLocalDescription(description)
 			.then(function () {
-				//TODO: Unify structure of data
-				signaling.current?.send(
-					JSON.stringify({
-						sdp: peerConnections.current.get(peerUuid)?.pc.localDescription,
-						uuid: localUuid,
-						dest: peerUuid,
-					})
-				);
+				sendSignalingMessage(peerUuid, { sdp: peerConnections.current.get(peerUuid)?.pc.localDescription });
 			})
 			// TODO: Add error handler
 			.catch((e) => console.log(e));
@@ -189,7 +181,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 		if (signal.displayName && signal.dest == 'all') {
 			// set up peer connection object for a newcomer peer
 			setUpPeer(peerUuid, signal.displayName);
-			signaling.current?.send(JSON.stringify({ displayName: localUuid, uuid: localUuid, dest: peerUuid }));
+			sendSignalingMessage(peerUuid, { displayName: localUuid, uuid: localUuid });
 		} else if (signal.displayName && signal.dest == localUuid) {
 			// initiate call if we are the newcomer peer
 			setUpPeer(peerUuid, signal.displayName, true);
@@ -222,19 +214,6 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 		setError('');
 		setUser({ name, avatar });
 
-		// TODO: Pull it outside, init?
-		signaling.current = new WebSocket(signalingServer);
-		signaling.current.onmessage = gotMessageFromServer;
-		signaling.current.onopen = () => {
-			signaling.current?.send(
-				JSON.stringify({
-					displayName: name || 'aaa',
-					uuid: localUuid || 'bbb',
-					dest: 'all',
-				})
-			);
-		};
-
 		setIsEntered(true);
 	};
 
@@ -246,6 +225,21 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 		setIsEntered(false);
 		// TODO: Add callback
 	};
+
+	const sendSignalingMessage = (dest: string, data: Record<string, unknown>) => {
+		const message = JSON.stringify({ uuid: localUuid, dest, ...data });
+
+		signaling.current.send(message);
+	};
+
+	const handleSignalingOpen = () => {
+		sendSignalingMessage('all', { displayName: 'aaa' });
+	};
+
+	useEffect(() => {
+		signaling.current.addEventListener('message', gotMessageFromServer);
+		signaling.current.addEventListener('open', handleSignalingOpen);
+	}, [signaling]);
 
 	const chatContext: ContextType = {
 		onSend,
