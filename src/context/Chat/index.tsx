@@ -51,7 +51,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 	const [messageData, setMessageData] = useState<MessageData[]>([]); // TODO: Leave, check interface, remove: avatar, event, username
 	const [error, setError] = useState<string>(''); //TODO: Remove error, use onError event instead
 	const [user, setUser] = useState({ name: 'test', avatar: '' }); // TODO: Remove
-	const signaling = useRef<WebSocket>(new WebSocket(signalingServer));
+	const signaling = useRef<WebSocket>(null);
 
 	const peerConnections = useRef<PeerConnection>(new Map());
 
@@ -210,6 +210,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 
 	// TODO: Remove avatar, rename name to displayName
 	const onEnterChat = async ({ name, avatar }) => {
+		signaling.current = new WebSocket(signalingServer);
 		// TODO: Add callback, notifi user about event, remove setError,
 		setError('');
 		setUser({ name, avatar });
@@ -237,14 +238,15 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 	};
 
 	useEffect(() => {
-		signaling.current.addEventListener('message', gotMessageFromServer);
-		signaling.current.addEventListener('open', handleSignalingOpen);
+		console.log(signaling);
+		signaling.current?.addEventListener('message', gotMessageFromServer);
+		signaling.current?.addEventListener('open', handleSignalingOpen);
 
 		return () => {
-			signaling.current.removeEventListener('message', gotMessageFromServer);
-			signaling.current.removeEventListener('open', handleSignalingOpen);
+			signaling.current?.removeEventListener('message', gotMessageFromServer);
+			signaling.current?.removeEventListener('open', handleSignalingOpen);
 		};
-	}, [signaling]);
+	}, [signaling.current]);
 
 	const chatContext: ContextType = {
 		onSend,
