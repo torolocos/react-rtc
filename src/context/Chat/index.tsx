@@ -239,6 +239,11 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 	useEffect(() => {
 		signaling.current.addEventListener('message', gotMessageFromServer);
 		signaling.current.addEventListener('open', handleSignalingOpen);
+
+		return () => {
+			signaling.current.removeEventListener('message', gotMessageFromServer);
+			signaling.current.removeEventListener('open', handleSignalingOpen);
+		};
 	}, [signaling]);
 
 	const chatContext: ContextType = {
