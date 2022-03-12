@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useChat } from 'react-rtc';
+import { useChat } from '@torolocos/react-rtc';
 
 import './styles.css';
 

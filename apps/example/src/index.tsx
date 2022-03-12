@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ChatProvider } from 'react-rtc';
+import { ChatProvider } from '@torolocos/react-rtc';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
