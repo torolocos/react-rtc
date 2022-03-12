@@ -5,14 +5,15 @@ export enum Event {
 	HAS_JOINED = 'hasJoined',
 	HAS_LEFT = 'hasLeft',
 }
-export interface MessageData {
+
+interface MessageData {
 	message: string;
 	id: string;
 	username: string;
 	senderId: string;
 	timestamp: number;
 	avatar: string;
-	event?: Event;
+	event?: 'hasJoined' | 'hasLeft';
 }
 
 interface ContextType {
