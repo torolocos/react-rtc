@@ -210,7 +210,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 	}
 
 	// TODO: Remove avatar, rename name to displayName
-	const onEnterChat = async ({ name, avatar }) => {
+	const onEnterChat = async ({ name, avatar }: { name: string; avatar: string }) => {
 		signaling.current = new WebSocket(signalingServer);
 		// TODO: Add callback, notifi user about event, remove setError,
 		setError('');
@@ -231,7 +231,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 	const sendSignalingMessage = (dest: string, data: Record<string, unknown>) => {
 		const message = JSON.stringify({ uuid: localUuid, dest, ...data });
 
-		signaling.current.send(message);
+		signaling.current?.send(message);
 	};
 
 	const handleSignalingOpen = () => {
