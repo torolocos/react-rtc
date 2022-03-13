@@ -13,7 +13,7 @@ interface MessageData {
 	senderId: string;
 	timestamp: number;
 	avatar: string;
-	event?: 'hasJoined' | 'hasLeft';
+	event?: Event;
 }
 
 interface ContextType {
