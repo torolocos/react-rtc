@@ -1,6 +1,11 @@
 {
 	"name": "@torolocos/react-rtc",
 	"version": "0.1.5",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/torolocos/react-rtc.git"
+	},
+	"author": "Torolocos",
 	"main": "./dist/cjs/index.js",
 	"module": "./dist/esm/index.js",
 	"types": "./dist/esm/index.d.ts",
