@@ -215,6 +215,8 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 
 	// TODO: Remove avatar, rename name to displayName
 	const onEnterChat = async ({ name, avatar }: { name: string; avatar: string }) => {
+		// TODO: Fix this ignore
+		//@ts-ignore
 		signaling.current = new WebSocket(signalingServer);
 		// TODO: Add callback, notifi user about event, remove setError,
 		setError('');
