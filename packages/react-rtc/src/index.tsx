@@ -56,7 +56,10 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 
 	const peerConnections = useRef<PeerConnection>(new Map());
 
-	const onSendEventMessage = (peer, event: Event) => {
+	const onSendEventMessage = (
+		peer: { pc: RTCPeerConnection; dataChannel: RTCDataChannel; displayName: string },
+		event: Event
+	) => {
 		// FIXME: OHACK
 		// TODO: Remove setter, add callback + metadata?
 		if (peer.displayName.length <= 20) {
@@ -114,10 +117,11 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 
 	function checkPeerDisconnect(peerUuid: string) {
 		const state = peerConnections.current.get(peerUuid)?.pc.iceConnectionState;
+		const peer = peerConnections.current.get(peerUuid);
 
 		// TODO: Make enum, or check native types
-		if (state === 'failed' || state === 'closed' || state === 'disconnected') {
-			onSendEventMessage(peerConnections.current.get(peerUuid), Event.HAS_LEFT);
+		if (peer && (state === 'failed' || state === 'closed' || state === 'disconnected')) {
+			onSendEventMessage(peer, Event.HAS_LEFT);
 			peerConnections.current.delete(peerUuid);
 		}
 	}
@@ -137,8 +141,8 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 			})
 		);
 		pc.addEventListener('connectionstatechange', () => {
-			if (peerConnections.current.get(peerUuid)?.pc.connectionState === 'connected')
-				onSendEventMessage(peerConnections.current.get(peerUuid), Event.HAS_JOINED);
+			const peer = peerConnections.current.get(peerUuid);
+			if (peer && peer.pc.connectionState === 'connected') onSendEventMessage(peer, Event.HAS_JOINED);
 		});
 
 		// TODO: Parse message outside, add try catch, use addMessageData
