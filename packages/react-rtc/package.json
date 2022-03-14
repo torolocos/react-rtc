@@ -5,6 +5,7 @@
 		"type": "git",
 		"url": "https://github.com/torolocos/react-rtc.git"
 	},
+	"homepage": "https://github.com/torolocos/react-rtc",
 	"author": "Torolocos",
 	"main": "./dist/cjs/index.js",
 	"module": "./dist/esm/index.js",
