@@ -13,8 +13,7 @@
 	"license": "MIT",
 	"scripts": {
 		"build": "tsc && tsc --module commonjs --outDir dist/cjs && tsc --outDir dist/types --declaration true --emitDeclarationOnly true",
-		"dev": "tsc --watch",
-		"postinstall": "npm build"
+		"dev": "tsc --watch"
 	},
 	"peerDependencies": {
 		"react": "^17.0.2",
