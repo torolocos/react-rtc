@@ -120,7 +120,6 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 	}
 
 	function setUpPeer(peerUuid: string, displayName: string, initCall = false) {
-		// TODO: Rename to peer connection
 		const peerConnection = new RTCPeerConnection({ iceServers });
 		// TODO: Make better naming
 		const dataChannel = peerConnection.createDataChannel('test');
