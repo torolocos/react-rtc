@@ -206,7 +206,6 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 		}
 	}
 
-	// TODO: Remove avatar, rename name to displayName
 	const onEnterChat = async () => {
 		// TODO: Fix this ignore
 		//@ts-ignore
