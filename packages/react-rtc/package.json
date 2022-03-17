@@ -12,7 +12,7 @@
 	"types": "./dist/types/index.d.ts",
 	"license": "MIT",
 	"scripts": {
-		"build": "tsc && tsc --module commonjs --outDir dist/cjs && tsc --outDir dist/types --declaration true --emitDeclarationOnly true",
+		"build": "tsc && tsc --module commonjs --outDir dist/cjs",
 		"dev": "tsc --watch"
 	},
 	"peerDependencies": {
