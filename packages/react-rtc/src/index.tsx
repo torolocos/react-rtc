@@ -9,8 +9,10 @@ export enum Event {
 interface MessageData {
 	message: string;
 	id: string;
+	username: string;
 	senderId: string;
 	timestamp: number;
+	avatar: string;
 	event?: Event;
 }
 
@@ -49,6 +51,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 	const localUuid = useRef(uuid()).current; // TODO: Remove current
 	const [messageData, setMessageData] = useState<MessageData[]>([]); // TODO: Leave, check interface, remove: avatar, event, username
 	const [error, setError] = useState<string>(''); //TODO: Remove error, use onError event instead
+	const [user, setUser] = useState({ name: 'test', avatar: '' }); // TODO: Remove
 	const signaling = useRef<WebSocket>(null);
 
 	const peerConnections = useRef<PeerConnection>(new Map());
@@ -67,6 +70,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 					senderId: localUuid,
 					username: peer.displayName,
 					timestamp: Date.now(),
+					avatar: user.avatar,
 					message: '',
 					event,
 				},
@@ -87,6 +91,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 					username: 'Me',
 					senderId: localUuid,
 					timestamp: Date.now(),
+					avatar: user.avatar,
 				},
 			]);
 
@@ -95,8 +100,10 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 				const message = JSON.stringify({
 					id: messageId,
 					senderId: localUuid,
+					username: user.name,
 					message: inputValue,
 					timestamp: Date.now(),
+					avatar: user.avatar,
 				});
 
 				connection?.dataChannel?.send(message);
@@ -206,12 +213,14 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 		}
 	}
 
-	const onEnterChat = async () => {
+	// TODO: Remove avatar, rename name to displayName
+	const onEnterChat = async ({ name, avatar }: { name: string; avatar: string }) => {
 		// TODO: Fix this ignore
 		//@ts-ignore
 		signaling.current = new WebSocket(signalingServer);
 		// TODO: Add callback, notifi user about event, remove setError,
 		setError('');
+		setUser({ name, avatar });
 
 		setIsEntered(true);
 	};
