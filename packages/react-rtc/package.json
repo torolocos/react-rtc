@@ -16,8 +16,7 @@
 		"dev": "tsc --watch"
 	},
 	"peerDependencies": {
-		"react": "^17.0.2",
-		"uuid": "^8.3.2"
+		"react": "^17.0.2"
 	},
 	"devDependencies": {
 		"@types/react": "^17.0.37",

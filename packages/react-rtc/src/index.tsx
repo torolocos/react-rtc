@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
-import { v4 as uuid } from 'uuid';
 
 export enum Event {
 	HAS_JOINED = 'hasJoined',
@@ -48,7 +47,7 @@ export const ChatContext = createContext<ContextType>(contextDefaults);
 
 export const ChatProvider = ({ children, signalingServer, iceServers }: Props) => {
 	const [isEntered, setIsEntered] = useState(false); // TODO: Rename, leave there
-	const localUuid = useRef(uuid()).current; // TODO: Remove current
+	const localUuid = useRef(crypto.randomUUID()).current; // TODO: Remove current
 	const [messageData, setMessageData] = useState<MessageData[]>([]); // TODO: Leave, check interface, remove: avatar, event, username
 	const [error, setError] = useState<string>(''); //TODO: Remove error, use onError event instead
 	const [user, setUser] = useState({ name: 'test', avatar: '' }); // TODO: Remove
@@ -66,7 +65,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 			setMessageData((prev) => [
 				...prev,
 				{
-					id: uuid(),
+					id: crypto.randomUUID(),
 					senderId: localUuid,
 					username: peer.displayName,
 					timestamp: Date.now(),
@@ -81,7 +80,7 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 	// TODO: Rename, messageSend, send, ...
 	const onSend = (inputValue: string) => {
 		try {
-			const messageId = uuid();
+			const messageId = crypto.randomUUID();
 			// TODO: Pull out, make it like addMessageData and use setter
 			setMessageData((prev) => [
 				...prev,

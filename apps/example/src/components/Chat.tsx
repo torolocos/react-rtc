@@ -6,7 +6,7 @@ import './styles.css';
 const Chat = () => {
 	const { onSend, onEnterChat, onLeaveChat, state, messageData, error } = useChat();
 	const [inputValue, setInputValue] = useState('');
-	const [chatOpen, setChatOpen] = useState(false);
+	const [, setChatOpen] = useState(false);
 	const { isEntered } = state;
 
 	useEffect(() => {
