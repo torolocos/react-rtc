@@ -127,20 +127,19 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 	}
 
 	function setUpPeer(peerUuid: string, displayName: string, initCall = false) {
-		// TODO: Rename to peer connection
-		const pc = new RTCPeerConnection({ iceServers });
+		const peerConnection = new RTCPeerConnection({ iceServers });
 		// TODO: Make better naming
-		const dataChannel = pc.createDataChannel('test');
+		const dataChannel = peerConnection.createDataChannel('test');
 
 		// TODO: Pull it outside to separate file, use it as handleres
-		pc.onicecandidate = (event) => gotIceCandidate(event, peerUuid);
-		pc.oniceconnectionstatechange = () => checkPeerDisconnect(peerUuid);
-		pc.addEventListener('datachannel', (event) =>
+		peerConnection.onicecandidate = (event) => gotIceCandidate(event, peerUuid);
+		peerConnection.oniceconnectionstatechange = () => checkPeerDisconnect(peerUuid);
+		peerConnection.addEventListener('datachannel', (event) =>
 			Object.defineProperty(peerConnections.current.get(peerUuid), 'dataChannel', {
 				value: event.channel,
 			})
 		);
-		pc.addEventListener('connectionstatechange', () => {
+		peerConnection.addEventListener('connectionstatechange', () => {
 			const peer = peerConnections.current.get(peerUuid);
 			if (peer && peer.pc.connectionState === 'connected') onSendEventMessage(peer, Event.HAS_JOINED);
 		});
@@ -149,13 +148,14 @@ export const ChatProvider = ({ children, signalingServer, iceServers }: Props) =
 		dataChannel.addEventListener('message', (event) => setMessageData((prev) => [...prev, JSON.parse(event.data)]));
 
 		if (initCall) {
-			pc.createOffer()
+			peerConnection
+				.createOffer()
 				.then((description) => createdDescription(description, peerUuid))
 				// TODO: Add error handlerer
 				.catch((e) => console.log({ e }));
 		}
 
-		peerConnections.current.set(peerUuid, { displayName, pc, dataChannel });
+		peerConnections.current.set(peerUuid, { displayName, pc: peerConnection, dataChannel });
 	}
 
 	function gotIceCandidate(event: RTCPeerConnectionIceEvent, peerUuid: string) {
