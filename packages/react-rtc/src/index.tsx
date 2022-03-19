@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
-import { v4 as uuid } from 'uuid';
+import { nanoid as uuid } from 'nanoid';
 
 export enum Event {
 	HAS_JOINED = 'hasJoined',
