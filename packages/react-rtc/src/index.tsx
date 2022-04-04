@@ -1,3 +1,5 @@
+import { MessageData, User, Metadata, ConnectionState, Event } from './types';
+
 import React, {
   createContext,
   useContext,
@@ -6,27 +8,12 @@ import React, {
   useEffect,
 } from 'react';
 
-export enum Event {
-  HAS_JOINED = 'hasJoined',
-  HAS_LEFT = 'hasLeft',
-}
-
-interface MessageData {
-  message: string;
-  id: string;
-  username: string;
-  senderId: string;
-  timestamp: number;
-  avatar: string;
-  event?: Event;
-}
-
 interface ContextType {
-  onSend: (inputValue: string) => void;
-  onEnterChat: ({ name, avatar }: { name: string; avatar: string }) => void;
+  send: (inputValue: string) => void;
+  onEnterChat: (displayName: string, userMetadata?: Metadata) => void;
   onLeaveChat: () => void;
   state: { isEntered: boolean };
-  messageData: MessageData[]; // TODO: types
+  messageData: MessageData[];
   connections: PeerConnection;
   error: string | null;
 }
@@ -43,7 +30,7 @@ type PeerConnection = Map<
 >;
 
 const contextDefaults: ContextType = {
-  onSend: () => {},
+  send: () => {},
   onEnterChat: () => {},
   onLeaveChat: () => {},
   state: { isEntered: false },
@@ -54,12 +41,19 @@ const contextDefaults: ContextType = {
 
 export const ChatContext = createContext<ContextType>(contextDefaults);
 
-export function ChatProvider({ children, signalingServer, iceServers }: Props) {
+export const ChatProvider = ({
+  children,
+  signalingServer,
+  iceServers,
+}: Props) => {
   const [isEntered, setIsEntered] = useState(false); // TODO: Rename, leave there
-  const localUuid = useRef(crypto.randomUUID()).current; // TODO: Remove current
-  const [messageData, setMessageData] = useState<MessageData[]>([]); // TODO: Leave, check interface, remove: avatar, event, username
+  const localUuid = useRef(crypto.randomUUID());
+  const [messageData, setMessageData] = useState<MessageData[]>([]); // TODO: Leave, check interface, remove: avatar, event, displayName
   const [error, setError] = useState<string>(''); // TODO: Remove error, use onError event instead
-  const [user, setUser] = useState({ name: 'test', avatar: '' }); // TODO: Remove
+  const [user, setUser] = useState<User>({
+    displayName: undefined,
+    userMetadata: undefined,
+  });
   const signaling = useRef<WebSocket>(null);
 
   const peerConnections = useRef<PeerConnection>(new Map());
@@ -70,6 +64,7 @@ export function ChatProvider({ children, signalingServer, iceServers }: Props) {
       dataChannel: RTCDataChannel;
       displayName: string;
     },
+
     event: Event
   ) => {
     // FIXME: OHACK
@@ -79,10 +74,10 @@ export function ChatProvider({ children, signalingServer, iceServers }: Props) {
         ...prev,
         {
           id: crypto.randomUUID(),
-          senderId: localUuid,
-          username: peer.displayName,
+
+          senderId: localUuid.current,
+          displayName: peer.displayName,
           timestamp: Date.now(),
-          avatar: user.avatar,
           message: '',
           event,
         },
@@ -91,7 +86,8 @@ export function ChatProvider({ children, signalingServer, iceServers }: Props) {
   };
 
   // TODO: Rename, messageSend, send, ...
-  const onSend = (inputValue: string) => {
+
+  const send = (inputValue: string, metadata?: Metadata) => {
     try {
       const messageId = crypto.randomUUID();
       // TODO: Pull out, make it like addMessageData and use setter
@@ -100,10 +96,11 @@ export function ChatProvider({ children, signalingServer, iceServers }: Props) {
         {
           id: messageId,
           message: inputValue,
-          username: 'Me',
-          senderId: localUuid,
+
+          displayName: user.displayName,
+          senderId: localUuid.current,
           timestamp: Date.now(),
-          avatar: user.avatar,
+          metadata,
         },
       ]);
 
@@ -111,11 +108,12 @@ export function ChatProvider({ children, signalingServer, iceServers }: Props) {
       peerConnections.current.forEach((connection) => {
         const message = JSON.stringify({
           id: messageId,
-          senderId: localUuid,
-          username: user.name,
+
+          senderId: localUuid.current,
+          displayName: user.displayName,
           message: inputValue,
           timestamp: Date.now(),
-          avatar: user.avatar,
+          metadata,
         });
 
         connection?.dataChannel?.send(message);
@@ -131,10 +129,11 @@ export function ChatProvider({ children, signalingServer, iceServers }: Props) {
     const state = peerConnections.current.get(peerUuid)?.pc.iceConnectionState;
     const peer = peerConnections.current.get(peerUuid);
 
-    // TODO: Make enum, or check native types
     if (
       peer &&
-      (state === 'failed' || state === 'closed' || state === 'disconnected')
+      (state === ConnectionState.FAILED ||
+        state === ConnectionState.CLOSED ||
+        state === ConnectionState.DISCONNECT)
     ) {
       onSendEventMessage(peer, Event.HAS_LEFT);
       peerConnections.current.delete(peerUuid);
@@ -161,9 +160,8 @@ export function ChatProvider({ children, signalingServer, iceServers }: Props) {
     );
     peerConnection.addEventListener('connectionstatechange', () => {
       const peer = peerConnections.current.get(peerUuid);
-      if (peer && peer.pc.connectionState === 'connected') {
+      if (peer && peer.pc.connectionState === 'connected')
         onSendEventMessage(peer, Event.HAS_JOINED);
-      }
     });
 
     // TODO: Parse message outside, add try catch, use addMessageData
@@ -194,11 +192,13 @@ export function ChatProvider({ children, signalingServer, iceServers }: Props) {
 
   function createdDescription(
     description: RTCSessionDescriptionInit,
+
     peerUuid: string
   ) {
     peerConnections.current
       .get(peerUuid)
       ?.pc.setLocalDescription(description)
+
       .then(() => {
         sendSignalingMessage(peerUuid, {
           sdp: peerConnections.current.get(peerUuid)?.pc.localDescription,
@@ -215,26 +215,26 @@ export function ChatProvider({ children, signalingServer, iceServers }: Props) {
 
     // Ignore messages that are not for us or from ourselves
     if (
-      peerUuid == localUuid ||
-      (signal.dest != localUuid && signal.dest != 'all')
-    ) {
+      peerUuid == localUuid.current ||
+      (signal.dest != localUuid.current && signal.dest != 'all')
+    )
       return;
-    }
 
     if (signal.displayName && signal.dest == 'all') {
       // set up peer connection object for a newcomer peer
       setUpPeer(peerUuid, signal.displayName);
       sendSignalingMessage(peerUuid, {
-        displayName: localUuid,
-        uuid: localUuid,
+        displayName: localUuid.current,
+        uuid: localUuid.current,
       });
-    } else if (signal.displayName && signal.dest == localUuid) {
+    } else if (signal.displayName && signal.dest == localUuid.current) {
       // initiate call if we are the newcomer peer
       setUpPeer(peerUuid, signal.displayName, true);
     } else if (signal.sdp) {
       peerConnections.current
         .get(peerUuid)
         ?.pc.setRemoteDescription(new RTCSessionDescription(signal.sdp))
+
         .then(() => {
           // Only create answers in response to offers
           if (signal.sdp.type == 'offer') {
@@ -255,19 +255,15 @@ export function ChatProvider({ children, signalingServer, iceServers }: Props) {
   }
 
   // TODO: Remove avatar, rename name to displayName
-  const onEnterChat = async ({
-    name,
-    avatar,
-  }: {
-    name: string;
-    avatar: string;
-  }) => {
+
+  const onEnterChat = async (displayName: string, userMetadata?: Metadata) => {
     // TODO: Fix this ignore
+
     // @ts-ignore
     signaling.current = new WebSocket(signalingServer);
     // TODO: Add callback, notifi user about event, remove setError,
     setError('');
-    setUser({ name, avatar });
+    setUser({ displayName, userMetadata });
 
     setIsEntered(true);
   };
@@ -283,9 +279,10 @@ export function ChatProvider({ children, signalingServer, iceServers }: Props) {
 
   const sendSignalingMessage = (
     dest: string,
+
     data: Record<string, unknown>
   ) => {
-    const message = JSON.stringify({ uuid: localUuid, dest, ...data });
+    const message = JSON.stringify({ uuid: localUuid.current, dest, ...data });
 
     signaling.current?.send(message);
   };
@@ -306,7 +303,8 @@ export function ChatProvider({ children, signalingServer, iceServers }: Props) {
   }, [signaling.current]);
 
   const chatContext: ContextType = {
-    onSend,
+    send,
+
     onEnterChat,
     onLeaveChat,
     messageData,
@@ -317,7 +315,7 @@ export function ChatProvider({ children, signalingServer, iceServers }: Props) {
   return (
     <ChatContext.Provider value={chatContext}>{children}</ChatContext.Provider>
   );
-}
+};
 
 // TODO: Pull it ouside to hook
 export const useChat = () => useContext(ChatContext);
