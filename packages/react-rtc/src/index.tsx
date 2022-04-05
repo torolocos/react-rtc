@@ -49,7 +49,7 @@ export const ChatProvider = ({
   const [isEntered, setIsEntered] = useState(false); // TODO: Rename, leave there
   const localUuid = useRef(crypto.randomUUID());
   const [messageData, setMessageData] = useState<MessageData[]>([]); // TODO: Leave, check interface, remove: avatar, event, displayName
-  const [error, setError] = useState<string>(''); //TODO: Remove error, use onError event instead
+  const [error, setError] = useState<string>(''); // TODO: Remove error, use onError event instead
   const [user, setUser] = useState<User>({
     displayName: undefined,
     userMetadata: undefined,
@@ -64,7 +64,8 @@ export const ChatProvider = ({
       dataChannel: RTCDataChannel;
       displayName: string;
     },
-    event: Event,
+
+    event: Event
   ) => {
     // FIXME: OHACK
     // TODO: Remove setter, add callback + metadata?
@@ -73,6 +74,7 @@ export const ChatProvider = ({
         ...prev,
         {
           id: crypto.randomUUID(),
+
           senderId: localUuid.current,
           displayName: peer.displayName,
           timestamp: Date.now(),
@@ -84,6 +86,7 @@ export const ChatProvider = ({
   };
 
   // TODO: Rename, messageSend, send, ...
+
   const send = (inputValue: string, metadata?: Metadata) => {
     try {
       const messageId = crypto.randomUUID();
@@ -93,6 +96,7 @@ export const ChatProvider = ({
         {
           id: messageId,
           message: inputValue,
+
           displayName: user.displayName,
           senderId: localUuid.current,
           timestamp: Date.now(),
@@ -104,6 +108,7 @@ export const ChatProvider = ({
       peerConnections.current.forEach((connection) => {
         const message = JSON.stringify({
           id: messageId,
+
           senderId: localUuid.current,
           displayName: user.displayName,
           message: inputValue,
@@ -150,8 +155,8 @@ export const ChatProvider = ({
         'dataChannel',
         {
           value: event.channel,
-        },
-      ),
+        }
+      )
     );
     peerConnection.addEventListener('connectionstatechange', () => {
       const peer = peerConnections.current.get(peerUuid);
@@ -161,7 +166,7 @@ export const ChatProvider = ({
 
     // TODO: Parse message outside, add try catch, use addMessageData
     dataChannel.addEventListener('message', (event) =>
-      setMessageData((prev) => [...prev, JSON.parse(event.data)]),
+      setMessageData((prev) => [...prev, JSON.parse(event.data)])
     );
 
     if (initCall) {
@@ -187,12 +192,14 @@ export const ChatProvider = ({
 
   function createdDescription(
     description: RTCSessionDescriptionInit,
-    peerUuid: string,
+
+    peerUuid: string
   ) {
     peerConnections.current
       .get(peerUuid)
       ?.pc.setLocalDescription(description)
-      .then(function () {
+
+      .then(() => {
         sendSignalingMessage(peerUuid, {
           sdp: peerConnections.current.get(peerUuid)?.pc.localDescription,
         });
@@ -227,7 +234,8 @@ export const ChatProvider = ({
       peerConnections.current
         .get(peerUuid)
         ?.pc.setRemoteDescription(new RTCSessionDescription(signal.sdp))
-        .then(function () {
+
+        .then(() => {
           // Only create answers in response to offers
           if (signal.sdp.type == 'offer') {
             peerConnections.current
@@ -247,10 +255,11 @@ export const ChatProvider = ({
   }
 
   // TODO: Remove avatar, rename name to displayName
+
   const onEnterChat = async (displayName: string, userMetadata?: Metadata) => {
     // TODO: Fix this ignore
 
-    //@ts-ignore
+    // @ts-ignore
     signaling.current = new WebSocket(signalingServer);
     // TODO: Add callback, notifi user about event, remove setError,
     setError('');
@@ -270,7 +279,8 @@ export const ChatProvider = ({
 
   const sendSignalingMessage = (
     dest: string,
-    data: Record<string, unknown>,
+
+    data: Record<string, unknown>
   ) => {
     const message = JSON.stringify({ uuid: localUuid.current, dest, ...data });
 
@@ -294,6 +304,7 @@ export const ChatProvider = ({
 
   const chatContext: ContextType = {
     send,
+
     onEnterChat,
     onLeaveChat,
     messageData,

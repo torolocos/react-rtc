@@ -1,0 +1,40 @@
+name: CI-CHECKS
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: 🟢 Use NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - run: yarn install --frozen-lockfile
+      - name: TS Check
+        working-directory: ./packages/react-rtc
+        run: yarn tsc-check
+      - name: Eslint Check
+        working-directory: ./packages/react-rtc
+        run: yarn check-lint
+        env:
+          CI: true

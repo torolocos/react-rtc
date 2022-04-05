@@ -1,4 +1,4 @@
-name: "🚀 publish"
+name: '🚀 publish'
 
 on:
   push:
@@ -6,18 +6,18 @@ on:
       - '*'
 
 jobs:
-    publish-npm:
-        name: 🚀 publish
-        runs-on: ubuntu-latest
-        steps:
-            - name: 📚 checkout
-              uses: actions/checkout@v2
-            - name: 🟢 node
-              uses: actions/setup-node@v2
-              with:
-                  node-version: 16
-                  registry-url: https://registry.npmjs.org
-            - name: 🚀 publish
-              run: npm publish --access=public
-              env:
-                  NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
+  publish-npm:
+    name: 🚀 publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📚 checkout
+        uses: actions/checkout@v2
+      - name: 🟢 node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org
+      - name: 🚀 publish
+        run: npm publish packages/react-rtc --access=public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
