@@ -12,7 +12,7 @@ interface ContextType {
   send: (inputValue: string) => void;
   onEnterChat: (displayName: string, userMetadata?: Metadata) => void;
   onLeaveChat: () => void;
-  state: { isEntered: boolean };
+  state: { isConnected: boolean };
   messageData: MessageData[];
   connections: PeerConnection;
   error: string | null;
@@ -33,7 +33,7 @@ const contextDefaults: ContextType = {
   send: () => {},
   onEnterChat: () => {},
   onLeaveChat: () => {},
-  state: { isEntered: false },
+  state: { isConnected: false },
   connections: new Map(),
   messageData: [],
   error: null,
@@ -46,7 +46,7 @@ export const ChatProvider = ({
   signalingServer,
   iceServers,
 }: Props) => {
-  const [isEntered, setIsEntered] = useState(false); // TODO: Rename, leave there
+  const [isConnected, setIsConnected] = useState(false);
   const localUuid = useRef(crypto.randomUUID());
   const [messageData, setMessageData] = useState<MessageData[]>([]); // TODO: Leave, check interface, remove: avatar, event, displayName
   const [error, setError] = useState<string>(''); // TODO: Remove error, use onError event instead
@@ -265,7 +265,7 @@ export const ChatProvider = ({
     setError('');
     setUser({ displayName, userMetadata });
 
-    setIsEntered(true);
+    setIsConnected(true);
   };
 
   const onLeaveChat = () => {
@@ -273,7 +273,7 @@ export const ChatProvider = ({
     peerConnections.current.forEach((connection) => {
       connection.pc.close();
     });
-    setIsEntered(false);
+    setIsConnected(false);
     // TODO: Add callback
   };
 
@@ -309,7 +309,7 @@ export const ChatProvider = ({
     onLeaveChat,
     messageData,
     connections: peerConnections.current,
-    state: { isEntered },
+    state: { isConnected },
     error,
   };
   return (

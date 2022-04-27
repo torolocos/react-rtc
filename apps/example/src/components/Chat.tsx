@@ -8,7 +8,7 @@ const Chat = () => {
     useChat();
   const [inputValue, setInputValue] = useState('');
   const [, setChatOpen] = useState(false);
-  const { isEntered } = state;
+  const { isConnected } = state;
 
   useEffect(() => {
     return () => {
@@ -46,7 +46,7 @@ const Chat = () => {
           </div>
         ))}
       </div>
-      {isEntered && (
+      {isConnected && (
         <>
           <input
             value={inputValue}
@@ -55,8 +55,8 @@ const Chat = () => {
           <button onClick={onMessageSend}>send</button>
         </>
       )}
-      <button onClick={!isEntered ? onStartChat : onEndChat}>
-        {!isEntered ? 'join' : 'leave chat'}
+      <button onClick={!isConnected ? onStartChat : onEndChat}>
+        {!isConnected ? 'join' : 'leave chat'}
       </button>
     </div>
   );
