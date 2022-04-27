@@ -35,7 +35,6 @@ const Chat = () => {
     setInputValue('');
   };
 
-  console.log({ messageData });
   return (
     <div>
       <h2>Chat</h2>
