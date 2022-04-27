@@ -69,20 +69,18 @@ export const ChatProvider = ({
   ) => {
     // FIXME: OHACK
     // TODO: Remove setter, add callback + metadata?
-    if (peer.displayName.length <= 20) {
-      setMessageData((prev) => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
+    setMessageData((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
 
-          senderId: localUuid.current,
-          displayName: peer.displayName,
-          timestamp: Date.now(),
-          message: '',
-          event,
-        },
-      ]);
-    }
+        senderId: localUuid.current,
+        displayName: peer.displayName,
+        timestamp: Date.now(),
+        message: '',
+        event,
+      },
+    ]);
   };
 
   // TODO: Rename, messageSend, send, ...
@@ -160,7 +158,7 @@ export const ChatProvider = ({
     );
     peerConnection.addEventListener('connectionstatechange', () => {
       const peer = peerConnections.current.get(peerUuid);
-      if (peer && peer.pc.connectionState === 'connected')
+      if (peer && peer.pc.connectionState === 'connected' && !initCall)
         onSendEventMessage(peer, Event.HAS_JOINED);
     });
 
@@ -288,7 +286,7 @@ export const ChatProvider = ({
   };
 
   const handleSignalingOpen = () => {
-    sendSignalingMessage('all', { displayName: 'aaa' });
+    sendSignalingMessage('all', { displayName: user.displayName });
   };
 
   useEffect(() => {
