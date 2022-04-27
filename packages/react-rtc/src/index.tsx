@@ -73,7 +73,6 @@ export const ChatProvider = ({
       ...prev,
       {
         id: crypto.randomUUID(),
-
         senderId: localUuid.current,
         displayName: peer.displayName,
         timestamp: Date.now(),
