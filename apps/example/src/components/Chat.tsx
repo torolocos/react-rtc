@@ -17,8 +17,8 @@ const Chat = () => {
   }, []);
 
   const onStartChat = () => {
-    onEnterChat('Placeholder');
-    console.log('onSTART CHAT');
+    onEnterChat(`${Math.random().toFixed(2)}`); //FIXME: tmp till we create valid Chat Screen
+
     //TODO: zkontrolovat jestli pripojeni probehlo uspesne
     setChatOpen(true);
   };
@@ -40,9 +40,9 @@ const Chat = () => {
       <h2>Chat</h2>
       {error && <div className='errorText'>Something went wrong</div>}
       <div>
-        {messageData.map(({ message, displayName }) => (
+        {messageData.map(({ message, displayName, event }) => (
           <div>
-            {displayName}: {message}
+            {displayName}: {event || message}
           </div>
         ))}
       </div>
