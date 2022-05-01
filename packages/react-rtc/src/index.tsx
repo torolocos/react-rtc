@@ -171,7 +171,7 @@ export const ChatProvider = ({
         .createOffer()
         .then((description) => createdDescription(description, peerUuid))
         // TODO: Add error handlerer
-        .catch((e) => console.log({ e }));
+        .catch((e) => handleError(e));
     }
 
     peerConnections.current.set(peerUuid, {
@@ -179,6 +179,7 @@ export const ChatProvider = ({
       pc: peerConnection,
       dataChannel,
     });
+    setIsEntered(true);
   }
 
   function gotIceCandidate(event: RTCPeerConnectionIceEvent, peerUuid: string) {
@@ -201,8 +202,7 @@ export const ChatProvider = ({
           sdp: peerConnections.current.get(peerUuid)?.pc.localDescription,
         });
       })
-      // TODO: Add error handler
-      .catch((e) => console.log(e));
+      .catch((e) => handleError(e));
   }
 
   // TODO: Check the logic, use better name
@@ -227,6 +227,7 @@ export const ChatProvider = ({
     } else if (signal.displayName && signal.dest == localUuid.current) {
       // initiate call if we are the newcomer peer
       setUpPeer(peerUuid, signal.displayName, true);
+      setIsEntered(true);
     } else if (signal.sdp) {
       peerConnections.current
         .get(peerUuid)
@@ -239,15 +240,15 @@ export const ChatProvider = ({
               .get(peerUuid)
               ?.pc.createAnswer()
               .then((description) => createdDescription(description, peerUuid))
-              .catch((e) => console.error(e));
+              .catch((e) => handleError(e));
           }
         })
-        .catch((e) => console.error(e));
+        .catch((e) => handleError(e));
     } else if (signal.ice) {
       peerConnections.current
         .get(peerUuid)
         ?.pc.addIceCandidate(new RTCIceCandidate(signal.ice))
-        .catch((e) => console.error(e));
+        .catch((e) => handleError(e));
     }
   }
 
@@ -288,8 +289,12 @@ export const ChatProvider = ({
     sendSignalingMessage('all', { displayName: user.displayName });
   };
 
+  const handleError = (error: unknown) => {
+    // TODO: handle errors
+    console.error(error);
+  };
+
   useEffect(() => {
-    console.log(signaling);
     signaling.current?.addEventListener('message', gotMessageFromServer);
     signaling.current?.addEventListener('open', handleSignalingOpen);
 
