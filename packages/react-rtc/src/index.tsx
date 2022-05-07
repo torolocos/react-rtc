@@ -1,4 +1,11 @@
-import { MessageData, User, Metadata, ConnectionState, Event } from './types';
+import {
+  MessageData,
+  User,
+  Metadata,
+  ConnectionState,
+  Event,
+  ConfigData,
+} from './types';
 
 import React, {
   createContext,
@@ -7,6 +14,7 @@ import React, {
   useRef,
   useEffect,
 } from 'react';
+import { defaultConfig } from './utils/defaults';
 
 interface ContextType {
   send: (inputValue: string) => void;
@@ -15,13 +23,13 @@ interface ContextType {
   state: { isEntered: boolean };
   messageData: MessageData[];
   connections: PeerConnection;
-  error: string | null;
 }
 
 interface Props {
   children: JSX.Element;
   signalingServer: string;
   iceServers: { urls: string }[];
+  config: ConfigData;
 }
 
 type PeerConnection = Map<
@@ -36,7 +44,6 @@ const contextDefaults: ContextType = {
   state: { isEntered: false },
   connections: new Map(),
   messageData: [],
-  error: null,
 };
 
 export const ChatContext = createContext<ContextType>(contextDefaults);
@@ -45,17 +52,17 @@ export const ChatProvider = ({
   children,
   signalingServer,
   iceServers,
+  config = defaultConfig,
 }: Props) => {
   const [isEntered, setIsEntered] = useState(false); // TODO: Rename, leave there
   const localUuid = useRef(crypto.randomUUID());
   const [messageData, setMessageData] = useState<MessageData[]>([]); // TODO: Leave, check interface, remove: avatar, event, displayName
-  const [error, setError] = useState<string>(''); // TODO: Remove error, use onError event instead
   const [user, setUser] = useState<User>({
     displayName: undefined,
     userMetadata: undefined,
   });
   const signaling = useRef<WebSocket>(null);
-
+  const { onError } = config;
   const peerConnections = useRef<PeerConnection>(new Map());
 
   const onSendEventMessage = (
@@ -116,9 +123,7 @@ export const ChatProvider = ({
         connection?.dataChannel?.send(message);
       });
     } catch (e) {
-      // TODO: Add error handler
-      setError(e as string);
-      console.warn(e);
+      handleError(e as string);
     }
   };
 
@@ -259,8 +264,8 @@ export const ChatProvider = ({
 
     // @ts-ignore
     signaling.current = new WebSocket(signalingServer);
-    // TODO: Add callback, notifi user about event, remove setError,
-    setError('');
+
+    handleError('');
     setUser({ displayName, userMetadata });
 
     setIsEntered(true);
@@ -289,9 +294,8 @@ export const ChatProvider = ({
     sendSignalingMessage('all', { displayName: user.displayName });
   };
 
-  const handleError = (error: unknown) => {
-    // TODO: handle errors
-    console.error(error);
+  const handleError = (error: string) => {
+    onError(error);
   };
 
   useEffect(() => {
@@ -306,13 +310,11 @@ export const ChatProvider = ({
 
   const chatContext: ContextType = {
     send,
-
     onEnterChat,
     onLeaveChat,
     messageData,
     connections: peerConnections.current,
     state: { isEntered },
-    error,
   };
   return (
     <ChatContext.Provider value={chatContext}>{children}</ChatContext.Provider>

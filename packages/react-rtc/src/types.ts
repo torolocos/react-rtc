@@ -24,3 +24,10 @@ export enum ConnectionState {
   CLOSED = 'closed',
   DISCONNECT = 'disconnected',
 }
+
+export interface ConfigData {
+  onError: (errorMessage?: string) => { errorMessage: string };
+  onSuccess: (
+    data?: Record<string, unknown>
+  ) => Record<string, unknown> | undefined;
+}
