@@ -1,14 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ChatProvider } from '@torolocos/react-rtc';
+import { RtcProvider } from '@torolocos/react-rtc';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
-	<ChatProvider signalingServer="ws://localhost:8001/" iceServers={[{ urls: 'stun:stun.l.google.com:19302' }]}>
+	<RtcProvider signalingServer="ws://localhost:8001/" iceServers={[{ urls: 'stun:stun.l.google.com:19302' }]}>
 		<App />
-	</ChatProvider>,
+	</RtcProvider>,
 	document.getElementById('root')
 );
 

@@ -10,8 +10,8 @@ import React, {
 
 interface ContextType {
   send: (inputValue: string) => void;
-  onEnterChat: (displayName: string, userMetadata?: Metadata) => void;
-  onLeaveChat: () => void;
+  onEnter: (displayName: string, userMetadata?: Metadata) => void;
+  onLeave: () => void;
   state: { isEntered: boolean };
   messageData: MessageData[];
   connections: PeerConnection;
@@ -31,17 +31,17 @@ type PeerConnection = Map<
 
 const contextDefaults: ContextType = {
   send: () => {},
-  onEnterChat: () => {},
-  onLeaveChat: () => {},
+  onEnter: () => {},
+  onLeave: () => {},
   state: { isEntered: false },
   connections: new Map(),
   messageData: [],
   error: null,
 };
 
-export const ChatContext = createContext<ContextType>(contextDefaults);
+export const RtcContext = createContext<ContextType>(contextDefaults);
 
-export const ChatProvider = ({
+export const RtcProvider = ({
   children,
   signalingServer,
   iceServers,
@@ -254,7 +254,7 @@ export const ChatProvider = ({
 
   // TODO: Remove avatar, rename name to displayName
 
-  const onEnterChat = async (displayName: string, userMetadata?: Metadata) => {
+  const onEnter = async (displayName: string, userMetadata?: Metadata) => {
     // TODO: Fix this ignore
 
     // @ts-ignore
@@ -266,7 +266,7 @@ export const ChatProvider = ({
     setIsEntered(true);
   };
 
-  const onLeaveChat = () => {
+  const onLeave = () => {
     signaling.current?.close();
     peerConnections.current.forEach((connection) => {
       connection.pc.close();
@@ -304,20 +304,19 @@ export const ChatProvider = ({
     };
   }, [signaling.current]);
 
-  const chatContext: ContextType = {
+  const rtcContext: ContextType = {
     send,
-
-    onEnterChat,
-    onLeaveChat,
+    onEnter,
+    onLeave,
     messageData,
     connections: peerConnections.current,
     state: { isEntered },
     error,
   };
   return (
-    <ChatContext.Provider value={chatContext}>{children}</ChatContext.Provider>
+    <RtcContext.Provider value={rtcContext}>{children}</RtcContext.Provider>
   );
 };
 
 // TODO: Pull it ouside to hook
-export const useChat = () => useContext(ChatContext);
+export const useRtc = () => useContext(RtcContext);
