@@ -14,7 +14,7 @@
   "scripts": {
     "build": "rollup -c",
     "tsc-check": "tsc --pretty --noEmit",
-    "check-lint": "eslint . --ext ts --ext tsx --ext js",
+    "lint": "eslint . --ext ts --ext tsx",
     "dev": "rollup -c -w ",
     "format": "prettier --write ."
   },

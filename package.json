@@ -7,9 +7,13 @@
 	],
 	"scripts": {
 		"build": "turbo run build",
-		"dev": "turbo run dev --parallel"
+		"dev": "turbo run dev --parallel",
+		"lint": "turbo run lint --parallel",
+		"postinstall": "husky install"
 	},
 	"devDependencies": {
+		"husky": "^7.0.4",
+		"lint-staged": "^12.4.1",
 		"turbo": "latest"
 	},
 	"packageManager": "yarn@1.22.17"
