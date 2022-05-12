@@ -1,45 +1,20 @@
-import { MessageData, User, Metadata, ConnectionState, Event } from './types';
-
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useRef,
-  useEffect,
-} from 'react';
-
-interface ContextType {
-  send: (inputValue: string) => void;
-  onEnter: (displayName: string, userMetadata?: Metadata) => void;
-  onLeave: () => void;
-  state: { isEntered: boolean };
-  messageData: MessageData[];
-  connections: PeerConnection;
-  error: string | null;
-}
+import React, { useState, useRef, useEffect } from 'react';
+import { RtcContext } from './RtcContext';
+import {
+  ConnectionState,
+  Event,
+  type Metadata,
+  type MessageData,
+  type User,
+  type PeerConnection,
+  type ContextType,
+} from './types';
 
 interface Props {
   children: JSX.Element;
   signalingServer: string;
   iceServers: { urls: string }[];
 }
-
-type PeerConnection = Map<
-  string,
-  { displayName: string; pc: RTCPeerConnection; dataChannel: RTCDataChannel }
->;
-
-const contextDefaults: ContextType = {
-  send: () => {},
-  onEnter: () => {},
-  onLeave: () => {},
-  state: { isEntered: false },
-  connections: new Map(),
-  messageData: [],
-  error: null,
-};
-
-export const RtcContext = createContext<ContextType>(contextDefaults);
 
 export const RtcProvider = ({
   children,
@@ -317,6 +292,3 @@ export const RtcProvider = ({
     <RtcContext.Provider value={rtcContext}>{children}</RtcContext.Provider>
   );
 };
-
-// TODO: Pull it ouside to hook
-export const useRtc = () => useContext(RtcContext);
