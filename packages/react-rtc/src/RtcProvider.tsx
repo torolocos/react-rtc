@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+import Message from './models/Message';
 import { RtcContext } from './RtcContext';
 import {
   ConnectionState,
   Event,
   type Metadata,
-  type MessageData,
   type User,
   type PeerConnection,
   type ContextType,
@@ -23,7 +23,7 @@ export const RtcProvider = ({
 }: Props) => {
   const [isEntered, setIsEntered] = useState(false); // TODO: Rename, leave there
   const localUuid = useRef(crypto.randomUUID());
-  const [messageData, setMessageData] = useState<MessageData[]>([]); // TODO: Leave, check interface, remove: avatar, event, displayName
+  const [messageData, setMessageData] = useState<Message[]>([]);
   const [error, setError] = useState<string>(''); // TODO: Remove error, use onError event instead
   const [user, setUser] = useState<User>({
     displayName: undefined,
@@ -42,51 +42,32 @@ export const RtcProvider = ({
 
     event: Event
   ) => {
-    // FIXME: OHACK
-    // TODO: Remove setter, add callback + metadata?
-    setMessageData((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        senderId: localUuid.current,
-        displayName: peer.displayName,
-        timestamp: Date.now(),
-        message: '',
-        event,
-      },
-    ]);
-  };
+    const message = new Message({
+      senderId: localUuid.current,
+      displayName: peer.displayName,
+      timestamp: Date.now(),
+      message: '',
+      metadata: { event },
+    });
 
-  // TODO: Rename, messageSend, send, ...
+    setMessageData((prev) => [...prev, message]);
+  };
 
   const send = (inputValue: string, metadata?: Metadata) => {
     try {
-      const messageId = crypto.randomUUID();
-      // TODO: Pull out, make it like addMessageData and use setter
-      setMessageData((prev) => [
-        ...prev,
-        {
-          id: messageId,
-          message: inputValue,
+      const messageData = new Message({
+        id: crypto.randomUUID(),
+        message: inputValue,
+        displayName: user.displayName,
+        senderId: localUuid.current,
+        timestamp: Date.now(),
+        metadata,
+      });
 
-          displayName: user.displayName,
-          senderId: localUuid.current,
-          timestamp: Date.now(),
-          metadata,
-        },
-      ]);
+      setMessageData((prev) => [...prev, messageData]);
 
-      // TODO: Pull outside
       peerConnections.current.forEach((connection) => {
-        const message = JSON.stringify({
-          id: messageId,
-
-          senderId: localUuid.current,
-          displayName: user.displayName,
-          message: inputValue,
-          timestamp: Date.now(),
-          metadata,
-        });
+        const message = JSON.stringify(messageData);
 
         connection?.dataChannel?.send(message);
       });

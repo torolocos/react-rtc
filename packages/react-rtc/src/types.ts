@@ -1,4 +1,7 @@
-export type Metadata = Record<string, unknown>;
+import Message from './models/Message';
+export interface Metadata extends Record<string, unknown> {
+  event?: Event;
+}
 
 export type PeerConnection = Map<
   string,
@@ -11,7 +14,6 @@ export interface MessageData {
   displayName?: string;
   senderId: string;
   timestamp: number;
-  event?: Event;
   metadata?: Metadata;
 }
 
@@ -20,7 +22,7 @@ export interface ContextType {
   onEnter: (displayName: string, userMetadata?: Metadata) => void;
   onLeave: () => void;
   state: { isEntered: boolean };
-  messageData: MessageData[];
+  messageData: Message[];
   connections: PeerConnection;
   error: string | null;
 }
