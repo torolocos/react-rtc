@@ -39,8 +39,8 @@ const Chat = () => {
 			<h2>Chat</h2>
 			{error && <div className="errorText">Something went wrong</div>}
 			<div>
-				{messageData.map(({ message, displayName, event }) => (
-					<div>
+				{messageData.map(({ id, message, displayName, event }) => (
+					<div key={id}>
 						{displayName}: {event || message}
 					</div>
 				))}
