@@ -61,7 +61,7 @@ export const RtcProvider = ({
         displayName: user.displayName,
         senderId: localUuid.current,
         timestamp: Date.now(),
-        metadata,
+        metadata: { event: 'message', ...metadata },
       });
 
       setMessageData((prev) => [...prev, messageData]);
@@ -88,7 +88,7 @@ export const RtcProvider = ({
         state === ConnectionState.CLOSED ||
         state === ConnectionState.DISCONNECT)
     ) {
-      onSendEventMessage(peer, Event.HAS_LEFT);
+      onSendEventMessage(peer, 'disconnected');
       peerConnections.current.delete(peerUuid);
     }
   }
@@ -114,7 +114,7 @@ export const RtcProvider = ({
     peerConnection.addEventListener('connectionstatechange', () => {
       const peer = peerConnections.current.get(peerUuid);
       if (peer && peer.pc.connectionState === 'connected' && !initCall)
-        onSendEventMessage(peer, Event.HAS_JOINED);
+        onSendEventMessage(peer, 'connected');
     });
 
     // TODO: Parse message outside, add try catch, use addMessageData
