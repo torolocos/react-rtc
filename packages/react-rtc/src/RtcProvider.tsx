@@ -161,49 +161,70 @@ export const RtcProvider = ({
       .catch((e) => handleError(e));
   }
 
-  // TODO: Check the logic, use better name
-  function gotMessageFromServer(message: MessageEvent) {
-    const signal = JSON.parse(message.data);
-    const peerUuid = signal.uuid;
+  interface Signal {
+    uuid: string;
+    displayName: string;
+    dest: 'all' | string;
+    sdp: RTCSessionDescriptionInit;
+    ice: RTCIceCandidateInit | undefined;
+  }
 
+  const sendSignalingMessageToNewcomers = (uuid: string, name: string) => {
+    setUpPeer(uuid, name);
+    sendSignalingMessage(uuid, {
+      displayName: localUuid.current,
+      uuid: localUuid.current,
+    });
+  };
+
+  const setupNewPeer = (uuid, displayName) => {
+    setUpPeer(uuid, displayName, true);
+    setIsEntered(true);
+  };
+
+  // TODO: Check the logic, use better name
+  function handleMessageFromServer(message: MessageEvent) {
+    const signal: Signal = JSON.parse(message.data);
+    const peerUuid = signal.uuid;
+    const peerDisplayName = signal.displayName;
+    const destination = signal.dest;
+    const isSessionDescription = signal.sdp;
+    const isIceCandidate = signal.ice;
+    const isNewcomer = destination == localUuid.current;
     // Ignore messages that are not for us or from ourselves
     if (
       peerUuid == localUuid.current ||
-      (signal.dest != localUuid.current && signal.dest != 'all')
+      (destination != localUuid.current && destination != 'all')
     )
       return;
+    console.log({ peerDisplayName });
+    const currentPeerConnection = peerConnections.current.get(peerUuid)?.pc;
+    if (!currentPeerConnection) return;
 
-    if (signal.displayName && signal.dest == 'all') {
-      // set up peer connection object for a newcomer peer
-      setUpPeer(peerUuid, signal.displayName);
-      sendSignalingMessage(peerUuid, {
-        displayName: localUuid.current,
-        uuid: localUuid.current,
-      });
-    } else if (signal.displayName && signal.dest == localUuid.current) {
+    if (peerDisplayName && destination == 'all') {
+      sendSignalingMessageToNewcomers(peerUuid, peerDisplayName);
+    } else if (peerDisplayName && destination == localUuid.current) {
+      console.log('newcomer');
       // initiate call if we are the newcomer peer
-      setUpPeer(peerUuid, signal.displayName, true);
-      setIsEntered(true);
-    } else if (signal.sdp) {
-      peerConnections.current
-        .get(peerUuid)
-        ?.pc.setRemoteDescription(new RTCSessionDescription(signal.sdp))
-
+      setupNewPeer(peerUuid, peerDisplayName);
+    } else if (isSessionDescription) {
+      console.log('sdp');
+      currentPeerConnection
+        .setRemoteDescription(new RTCSessionDescription(signal.sdp))
         .then(() => {
           // Only create answers in response to offers
           if (signal.sdp.type == 'offer') {
-            peerConnections.current
-              .get(peerUuid)
-              ?.pc.createAnswer()
+            currentPeerConnection
+              .createAnswer()
               .then((description) => createdDescription(description, peerUuid))
               .catch((e) => handleError(e));
           }
         })
         .catch((e) => handleError(e));
-    } else if (signal.ice) {
-      peerConnections.current
-        .get(peerUuid)
-        ?.pc.addIceCandidate(new RTCIceCandidate(signal.ice))
+    } else if (isIceCandidate) {
+      console.log('ice');
+      currentPeerConnection
+        .addIceCandidate(new RTCIceCandidate(signal.ice))
         .catch((e) => handleError(e));
     }
   }
@@ -251,11 +272,14 @@ export const RtcProvider = ({
   };
 
   useEffect(() => {
-    signaling.current?.addEventListener('message', gotMessageFromServer);
+    signaling.current?.addEventListener('message', handleMessageFromServer);
     signaling.current?.addEventListener('open', handleSignalingOpen);
 
     return () => {
-      signaling.current?.removeEventListener('message', gotMessageFromServer);
+      signaling.current?.removeEventListener(
+        'message',
+        handleMessageFromServer
+      );
       signaling.current?.removeEventListener('open', handleSignalingOpen);
     };
   }, [signaling.current]);
