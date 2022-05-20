@@ -8,6 +8,8 @@ export type PeerConnection = Map<
   { displayName: string; pc: RTCPeerConnection; dataChannel: RTCDataChannel }
 >;
 
+export type Event = 'message' | 'connected' | 'disconnected';
+
 export interface MessageData {
   message: string;
   id: string;
@@ -30,11 +32,6 @@ export interface ContextType {
 export interface User {
   displayName?: string;
   userMetadata?: Metadata;
-}
-
-export enum Event {
-  HAS_JOINED = 'hasJoined',
-  HAS_LEFT = 'hasLeft',
 }
 
 export enum ConnectionState {

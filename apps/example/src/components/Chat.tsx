@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useRtc } from '@torolocos/react-rtc';
+import { useRtc, Event } from '@torolocos/react-rtc';
 
 import './styles.css';
 
@@ -34,6 +34,11 @@ const Chat = () => {
     setInputValue('');
   };
 
+  const getMessageFromEvent = (event: Event, message: string) => {
+    if (event !== 'message') return event;
+    return message;
+  };
+
   return (
     <div>
       <h2>Chat</h2>
@@ -42,7 +47,7 @@ const Chat = () => {
         {messageData.map(
           ({ id, message, displayName, metadata: { event } }) => (
             <div key={id}>
-              {displayName}: {event || message}
+              {displayName}: {getMessageFromEvent(event, message)}
             </div>
           ),
         )}
