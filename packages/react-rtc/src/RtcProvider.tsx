@@ -8,6 +8,7 @@ import {
   type User,
   type PeerConnection,
   type ContextType,
+  type Signal,
 } from './types';
 
 interface Props {
@@ -161,28 +162,41 @@ export const RtcProvider = ({
       .catch((e) => handleError(e));
   }
 
-  interface Signal {
-    uuid: string;
-    displayName: string;
-    dest: 'all' | string;
-    sdp: RTCSessionDescriptionInit;
-    ice: RTCIceCandidateInit | undefined;
-  }
-
-  const sendSignalingMessageToNewcomers = (uuid: string, name: string) => {
-    setUpPeer(uuid, name);
+  const sendSignalingMessageToNewcomers = (uuid: string) => {
     sendSignalingMessage(uuid, {
-      displayName: localUuid.current,
+      displayName: localUuid.current, // not sure if this is correct
       uuid: localUuid.current,
     });
   };
 
-  const setupNewPeer = (uuid, displayName) => {
-    setUpPeer(uuid, displayName, true);
-    setIsEntered(true);
+  const sendSessionWithDescription = (
+    peerConnection: RTCPeerConnection,
+    signal: Signal
+  ) => {
+    peerConnection
+      .setRemoteDescription(new RTCSessionDescription(signal.sdp))
+      .then(() => {
+        // Only create answers in response to offers
+        if (signal.sdp.type == 'offer') {
+          peerConnections.current
+            .get(signal.uuid)
+            ?.pc.createAnswer()
+            .then((description) => createdDescription(description, signal.uuid))
+            .catch((e) => handleError(e));
+        }
+      })
+      .catch((e) => handleError(e));
   };
 
-  // TODO: Check the logic, use better name
+  const initIceCandidate = (
+    peerConnection: RTCPeerConnection,
+    signal: Signal
+  ) => {
+    peerConnection
+      .addIceCandidate(new RTCIceCandidate(signal.ice))
+      .catch((e) => handleError(e));
+  };
+
   function handleMessageFromServer(message: MessageEvent) {
     const signal: Signal = JSON.parse(message.data);
     const peerUuid = signal.uuid;
@@ -190,46 +204,33 @@ export const RtcProvider = ({
     const destination = signal.dest;
     const isSessionDescription = signal.sdp;
     const isIceCandidate = signal.ice;
-    const isNewcomer = destination == localUuid.current;
     // Ignore messages that are not for us or from ourselves
     if (
       peerUuid == localUuid.current ||
-      (destination != localUuid.current && destination != 'all')
+      (signal.dest != localUuid.current && signal.dest != 'all')
     )
       return;
-    console.log({ peerDisplayName });
-    const currentPeerConnection = peerConnections.current.get(peerUuid)?.pc;
-    if (!currentPeerConnection) return;
 
-    if (peerDisplayName && destination == 'all') {
-      sendSignalingMessageToNewcomers(peerUuid, peerDisplayName);
-    } else if (peerDisplayName && destination == localUuid.current) {
-      console.log('newcomer');
-      // initiate call if we are the newcomer peer
-      setupNewPeer(peerUuid, peerDisplayName);
-    } else if (isSessionDescription) {
-      console.log('sdp');
-      currentPeerConnection
-        .setRemoteDescription(new RTCSessionDescription(signal.sdp))
-        .then(() => {
-          // Only create answers in response to offers
-          if (signal.sdp.type == 'offer') {
-            currentPeerConnection
-              .createAnswer()
-              .then((description) => createdDescription(description, peerUuid))
-              .catch((e) => handleError(e));
-          }
-        })
-        .catch((e) => handleError(e));
-    } else if (isIceCandidate) {
-      console.log('ice');
-      currentPeerConnection
-        .addIceCandidate(new RTCIceCandidate(signal.ice))
-        .catch((e) => handleError(e));
+    const currentPeerConnection = peerConnections.current.get(peerUuid)?.pc;
+
+    if (currentPeerConnection) {
+      if (isSessionDescription) {
+        sendSessionWithDescription(currentPeerConnection, signal);
+      } else if (isIceCandidate) {
+        initIceCandidate(currentPeerConnection, signal);
+      }
+    }
+
+    if (peerDisplayName) {
+      const isNewcomer = destination === localUuid.current;
+      setUpPeer(peerUuid, peerDisplayName, isNewcomer);
+      if (isNewcomer) {
+        setIsEntered(true);
+      } else {
+        sendSignalingMessageToNewcomers(peerUuid);
+      }
     }
   }
-
-  // TODO: Remove avatar, rename name to displayName
 
   const onEnter = async (displayName: string, userMetadata?: Metadata) => {
     // TODO: Fix this ignore
