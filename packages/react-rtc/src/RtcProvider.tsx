@@ -207,7 +207,7 @@ export const RtcProvider = ({
     // Ignore messages that are not for us or from ourselves
     if (
       peerUuid == localUuid.current ||
-      (signal.dest != localUuid.current && signal.dest != 'all')
+      (destination != localUuid.current && destination != 'all')
     )
       return;
 
