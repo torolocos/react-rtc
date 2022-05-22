@@ -4,68 +4,67 @@ import { useRtc, Event } from '@torolocos/react-rtc';
 import './styles.css';
 
 const Chat = () => {
-  const { send, onEnter, onLeave, state, messageData, error } = useRtc();
-  const [inputValue, setInputValue] = useState('');
-  const [, setChatOpen] = useState(false);
-  const { isEntered } = state;
+	const { send, enter, disconnect, state, onMessage, onSend, onError } = useRtc();
+	const [inputValue, setInputValue] = useState('');
+	const [messageData, setMessageData] = useState([]);
+	const [error, setError] = useState('');
+	const [, setChatOpen] = useState(false);
+	const { isEntered } = state;
 
-  useEffect(() => {
-    return () => {
-      onLeave();
-    };
-  }, []);
+	useEffect(() => {
+		onMessage((event) => setMessageData((messages) => [...messages, event.detail]));
+		onSend((event) => setMessageData((messages) => [...messages, event.detail]));
+		onError(() => setError('Err'));
 
-  const onStartChat = () => {
-    onEnter(`${Math.random().toFixed(2)}`); //FIXME: tmp till we create valid Chat Screen
+		return () => {
+			disconnect();
+		};
+	}, []);
 
-    //TODO: zkontrolovat jestli pripojeni probehlo uspesne
-    setChatOpen(true);
-  };
+	const onStartChat = () => {
+		enter(`${Math.random().toFixed(2)}`); //FIXME: tmp till we create valid Chat Screen
 
-  const onEndChat = () => {
-    onLeave();
-    //TODO: zkontrolovat jestli pripojeni probehlo uspesne
-    setChatOpen(false);
-  };
+		//TODO: zkontrolovat jestli pripojeni probehlo uspesne
+		setChatOpen(true);
+	};
 
-  const onMessageSend = () => {
-    send(inputValue);
+	const onEndChat = () => {
+		disconnect();
+		//TODO: zkontrolovat jestli pripojeni probehlo uspesne
+		setChatOpen(false);
+	};
 
-    setInputValue('');
-  };
+	const onMessageSend = () => {
+		send(inputValue);
 
-  const getMessageFromEvent = (event: Event, message: string) => {
-    if (event !== 'message') return event;
-    return message;
-  };
+		setInputValue('');
+	};
 
-  return (
-    <div>
-      <h2>Chat</h2>
-      {error && <div className='errorText'>Something went wrong</div>}
-      <div>
-        {messageData.map(
-          ({ id, message, displayName, metadata: { event } }) => (
-            <div key={id}>
-              {displayName}: {getMessageFromEvent(event, message)}
-            </div>
-          ),
-        )}
-      </div>
-      {isEntered && (
-        <>
-          <input
-            value={inputValue}
-            onChange={({ target: { value } }) => setInputValue(value)}
-          />
-          <button onClick={onMessageSend}>send</button>
-        </>
-      )}
-      <button onClick={!isEntered ? onStartChat : onEndChat}>
-        {!isEntered ? 'join' : 'leave chat'}
-      </button>
-    </div>
-  );
+	const getMessageFromEvent = (event: Event, message: string) => {
+		if (event !== 'message') return event;
+		return message;
+	};
+
+	return (
+		<div>
+			<h2>Chat</h2>
+			{error && <div className="errorText">Something went wrong</div>}
+			<div>
+				{messageData.map(({ id, message, displayName, metadata: { event } = { event: null } }) => (
+					<div key={id}>
+						{displayName}: {getMessageFromEvent(event, message)}
+					</div>
+				))}
+			</div>
+			{isEntered && (
+				<>
+					<input value={inputValue} onChange={({ target: { value } }) => setInputValue(value)} />
+					<button onClick={onMessageSend}>send</button>
+				</>
+			)}
+			<button onClick={!isEntered ? onStartChat : onEndChat}>{!isEntered ? 'join' : 'leave chat'}</button>
+		</div>
+	);
 };
 
 export default Chat;

@@ -1,4 +1,5 @@
 import Message from './models/Message';
+
 export interface Metadata extends Record<string, unknown> {
   event?: Event;
 }
@@ -21,12 +22,12 @@ export interface MessageData {
 
 export interface ContextType {
   send: (inputValue: string) => void;
-  onEnter: (displayName: string, userMetadata?: Metadata) => void;
-  onLeave: () => void;
+  enter: (displayName: string, userMetadata?: Metadata) => void;
+  disconnect: () => void;
   state: { isEntered: boolean };
-  messageData: Message[];
-  connections: PeerConnection;
-  error: string | null;
+  onMessage?: (handler: (event: CustomEvent<Message>) => void) => void;
+  onSend?: (handler: (event: CustomEvent<Message>) => void) => void;
+  onError?: (handler: (event: CustomEvent<unknown>) => void) => void;
 }
 
 export interface User {

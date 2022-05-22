@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Message from './models/Message';
 import { RtcContext } from './RtcContext';
+import { isCustomEvent } from '@guards';
 import {
   ConnectionState,
   Event,
@@ -8,7 +9,7 @@ import {
   type User,
   type PeerConnection,
   type ContextType,
-} from './types';
+} from '@types';
 
 interface Props {
   children: JSX.Element;
@@ -23,15 +24,13 @@ export const RtcProvider = ({
 }: Props) => {
   const [isEntered, setIsEntered] = useState(false); // TODO: Rename, leave there
   const localUuid = useRef(crypto.randomUUID());
-  const [messageData, setMessageData] = useState<Message[]>([]);
-  const [error, setError] = useState<string>(''); // TODO: Remove error, use onError event instead
   const [user, setUser] = useState<User>({
     displayName: undefined,
     userMetadata: undefined,
   });
   const signaling = useRef<WebSocket>(null);
-
   const peerConnections = useRef<PeerConnection>(new Map());
+  const rtcPublisher = useRef(new EventTarget());
 
   const onSendEventMessage = (
     peer: {
@@ -50,7 +49,9 @@ export const RtcProvider = ({
       metadata: { event },
     });
 
-    setMessageData((prev) => [...prev, message]);
+    rtcPublisher.current.dispatchEvent(
+      new CustomEvent('message', { detail: message })
+    );
   };
 
   const send = (inputValue: string, metadata?: Metadata) => {
@@ -64,17 +65,17 @@ export const RtcProvider = ({
         metadata: { event: 'message', ...metadata },
       });
 
-      setMessageData((prev) => [...prev, messageData]);
-
       peerConnections.current.forEach((connection) => {
         const message = JSON.stringify(messageData);
 
         connection?.dataChannel?.send(message);
       });
-    } catch (e) {
-      // TODO: Add error handler
-      setError(e as string);
-      console.warn(e);
+
+      rtcPublisher.current.dispatchEvent(
+        new CustomEvent('send', { detail: messageData })
+      );
+    } catch (error) {
+      handleError(error);
     }
   };
 
@@ -119,7 +120,9 @@ export const RtcProvider = ({
 
     // TODO: Parse message outside, add try catch, use addMessageData
     dataChannel.addEventListener('message', (event) =>
-      setMessageData((prev) => [...prev, JSON.parse(event.data)])
+      rtcPublisher.current.dispatchEvent(
+        new CustomEvent('message', { detail: JSON.parse(event.data) })
+      )
     );
 
     if (initCall) {
@@ -210,19 +213,17 @@ export const RtcProvider = ({
 
   // TODO: Remove avatar, rename name to displayName
 
-  const onEnter = async (displayName: string, userMetadata?: Metadata) => {
+  const enter = (displayName: string, userMetadata?: Metadata) => {
     // TODO: Fix this ignore
 
     // @ts-ignore
     signaling.current = new WebSocket(signalingServer);
-    // TODO: Add callback, notifi user about event, remove setError,
-    setError('');
     setUser({ displayName, userMetadata });
 
     setIsEntered(true);
   };
 
-  const onLeave = () => {
+  const disconnect = () => {
     signaling.current?.close();
     peerConnections.current.forEach((connection) => {
       connection.pc.close();
@@ -246,9 +247,25 @@ export const RtcProvider = ({
   };
 
   const handleError = (error: unknown) => {
-    // TODO: handle errors
-    console.error(error);
+    rtcPublisher.current.dispatchEvent(
+      new CustomEvent('error', { detail: error })
+    );
   };
+
+  const onMessage = (handler: (event: CustomEvent<Message>) => void) =>
+    rtcPublisher.current.addEventListener('message', (event) => {
+      if (isCustomEvent<Message>(event)) handler(event);
+    });
+
+  const onSend = (handler: (event: CustomEvent<Message>) => void) =>
+    rtcPublisher.current.addEventListener('send', (event) => {
+      if (isCustomEvent<Message>(event)) handler(event);
+    });
+
+  const onError = (handler: (event: CustomEvent<unknown>) => void) =>
+    rtcPublisher.current.addEventListener('error', (event) => {
+      if (isCustomEvent<unknown>(event)) handler(event);
+    });
 
   useEffect(() => {
     signaling.current?.addEventListener('message', gotMessageFromServer);
@@ -262,12 +279,12 @@ export const RtcProvider = ({
 
   const rtcContext: ContextType = {
     send,
-    onEnter,
-    onLeave,
-    messageData,
-    connections: peerConnections.current,
     state: { isEntered },
-    error,
+    disconnect,
+    enter,
+    onMessage,
+    onSend,
+    onError,
   };
   return (
     <RtcContext.Provider value={rtcContext}>{children}</RtcContext.Provider>

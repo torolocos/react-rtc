@@ -3,10 +3,9 @@ import type { ContextType } from './types';
 
 export const RtcContext = createContext<ContextType>({
   send: () => {},
-  onEnter: () => {},
-  onLeave: () => {},
+  disconnect: () => {},
+  enter: () => {},
   state: { isEntered: false },
-  connections: new Map(),
-  messageData: [],
-  error: null,
+  onMessage: () => undefined,
+  onSend: () => undefined,
 });
