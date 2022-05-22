@@ -213,6 +213,7 @@ export const RtcProvider = ({
   const onEnter = async (displayName: string, userMetadata?: Metadata) => {
     // TODO: Fix this ignore
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     signaling.current = new WebSocket(signalingServer);
     // TODO: Add callback, notifi user about event, remove setError,
