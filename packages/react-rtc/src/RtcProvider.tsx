@@ -8,6 +8,7 @@ import {
   type User,
   type PeerConnection,
   type ContextType,
+  type Signal,
 } from './types';
 
 interface Props {
@@ -161,54 +162,75 @@ export const RtcProvider = ({
       .catch((e) => handleError(e));
   }
 
-  // TODO: Check the logic, use better name
-  function gotMessageFromServer(message: MessageEvent) {
-    const signal = JSON.parse(message.data);
-    const peerUuid = signal.uuid;
+  const sendSignalingMessageToNewcomers = (uuid: string) => {
+    sendSignalingMessage(uuid, {
+      displayName: localUuid.current, // not sure if this is correct
+      uuid: localUuid.current,
+    });
+  };
 
+  const sendSessionWithDescription = (
+    peerConnection: RTCPeerConnection,
+    signal: Signal
+  ) => {
+    peerConnection
+      .setRemoteDescription(new RTCSessionDescription(signal.sdp))
+      .then(() => {
+        // Only create answers in response to offers
+        if (signal.sdp.type == 'offer') {
+          peerConnections.current
+            .get(signal.uuid)
+            ?.pc.createAnswer()
+            .then((description) => createdDescription(description, signal.uuid))
+            .catch((e) => handleError(e));
+        }
+      })
+      .catch((e) => handleError(e));
+  };
+
+  const initIceCandidate = (
+    peerConnection: RTCPeerConnection,
+    signal: Signal
+  ) => {
+    peerConnection
+      .addIceCandidate(new RTCIceCandidate(signal.ice))
+      .catch((e) => handleError(e));
+  };
+
+  function handleMessageFromServer(message: MessageEvent) {
+    const signal: Signal = JSON.parse(message.data);
+    const peerUuid = signal.uuid;
+    const peerDisplayName = signal.displayName;
+    const destination = signal.dest;
+    const isSessionDescription = signal.sdp;
+    const isIceCandidate = signal.ice;
     // Ignore messages that are not for us or from ourselves
     if (
       peerUuid == localUuid.current ||
-      (signal.dest != localUuid.current && signal.dest != 'all')
+      (destination != localUuid.current && destination != 'all')
     )
       return;
 
-    if (signal.displayName && signal.dest == 'all') {
-      // set up peer connection object for a newcomer peer
-      setUpPeer(peerUuid, signal.displayName);
-      sendSignalingMessage(peerUuid, {
-        displayName: localUuid.current,
-        uuid: localUuid.current,
-      });
-    } else if (signal.displayName && signal.dest == localUuid.current) {
-      // initiate call if we are the newcomer peer
-      setUpPeer(peerUuid, signal.displayName, true);
-      setIsEntered(true);
-    } else if (signal.sdp) {
-      peerConnections.current
-        .get(peerUuid)
-        ?.pc.setRemoteDescription(new RTCSessionDescription(signal.sdp))
+    const currentPeerConnection = peerConnections.current.get(peerUuid)?.pc;
 
-        .then(() => {
-          // Only create answers in response to offers
-          if (signal.sdp.type == 'offer') {
-            peerConnections.current
-              .get(peerUuid)
-              ?.pc.createAnswer()
-              .then((description) => createdDescription(description, peerUuid))
-              .catch((e) => handleError(e));
-          }
-        })
-        .catch((e) => handleError(e));
-    } else if (signal.ice) {
-      peerConnections.current
-        .get(peerUuid)
-        ?.pc.addIceCandidate(new RTCIceCandidate(signal.ice))
-        .catch((e) => handleError(e));
+    if (currentPeerConnection) {
+      if (isSessionDescription) {
+        sendSessionWithDescription(currentPeerConnection, signal);
+      } else if (isIceCandidate) {
+        initIceCandidate(currentPeerConnection, signal);
+      }
+    }
+
+    if (peerDisplayName) {
+      const isNewcomer = destination === localUuid.current;
+      setUpPeer(peerUuid, peerDisplayName, isNewcomer);
+      if (isNewcomer) {
+        setIsEntered(true);
+      } else {
+        sendSignalingMessageToNewcomers(peerUuid);
+      }
     }
   }
-
-  // TODO: Remove avatar, rename name to displayName
 
   const onEnter = async (displayName: string, userMetadata?: Metadata) => {
     // TODO: Fix this ignore
@@ -252,11 +274,14 @@ export const RtcProvider = ({
   };
 
   useEffect(() => {
-    signaling.current?.addEventListener('message', gotMessageFromServer);
+    signaling.current?.addEventListener('message', handleMessageFromServer);
     signaling.current?.addEventListener('open', handleSignalingOpen);
 
     return () => {
-      signaling.current?.removeEventListener('message', gotMessageFromServer);
+      signaling.current?.removeEventListener(
+        'message',
+        handleMessageFromServer
+      );
       signaling.current?.removeEventListener('open', handleSignalingOpen);
     };
   }, [signaling.current]);
