@@ -20,14 +20,21 @@ export interface MessageData {
   metadata?: Metadata;
 }
 
+export interface Events {
+  message: (event: CustomEvent<Message>) => void;
+  send: (event: CustomEvent<Message>) => void;
+  error: (event: CustomEvent<unknown>) => void;
+}
+
 export interface ContextType {
   send: (inputValue: string) => void;
   enter: (displayName: string, userMetadata?: Metadata) => void;
   disconnect: () => void;
   state: { isEntered: boolean };
-  onMessage?: (handler: (event: CustomEvent<Message>) => void) => void;
-  onSend?: (handler: (event: CustomEvent<Message>) => void) => void;
-  onError?: (handler: (event: CustomEvent<unknown>) => void) => void;
+  on?: <Type extends keyof Events>(
+    type: Type,
+    handler: (event: Events[Type]) => void
+  ) => void;
 }
 
 export interface User {

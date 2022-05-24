@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Message from './models/Message';
 import { RtcContext } from './RtcContext';
-import { isCustomEvent } from '@guards';
 import {
   ConnectionState,
   Event,
@@ -10,6 +9,7 @@ import {
   type PeerConnection,
   type ContextType,
   type Signal,
+  type Events,
 } from '@types';
 
 interface Props {
@@ -275,20 +275,10 @@ export const RtcProvider = ({
     );
   };
 
-  const onMessage = (handler: (event: CustomEvent<Message>) => void) =>
-    rtcPublisher.current.addEventListener('message', (event) => {
-      if (isCustomEvent<Message>(event)) handler(event);
-    });
-
-  const onSend = (handler: (event: CustomEvent<Message>) => void) =>
-    rtcPublisher.current.addEventListener('send', (event) => {
-      if (isCustomEvent<Message>(event)) handler(event);
-    });
-
-  const onError = (handler: (event: CustomEvent<unknown>) => void) =>
-    rtcPublisher.current.addEventListener('error', (event) => {
-      if (isCustomEvent<unknown>(event)) handler(event);
-    });
+  const on = <Type extends keyof Events>(
+    type: Type,
+    handler: EventListenerOrEventListenerObject & Events[Type]
+  ) => rtcPublisher.current.addEventListener(type, handler);
 
   useEffect(() => {
     signaling.current?.addEventListener('message', handleMessageFromServer);
@@ -308,9 +298,7 @@ export const RtcProvider = ({
     state: { isEntered },
     disconnect,
     enter,
-    onMessage,
-    onSend,
-    onError,
+    on,
   };
   return (
     <RtcContext.Provider value={rtcContext}>{children}</RtcContext.Provider>

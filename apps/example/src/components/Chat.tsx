@@ -4,7 +4,7 @@ import { useRtc, Event } from '@torolocos/react-rtc';
 import './styles.css';
 
 const Chat = () => {
-	const { send, enter, disconnect, state, onMessage, onSend, onError } = useRtc();
+	const { send, enter, disconnect, state, on } = useRtc();
 	const [inputValue, setInputValue] = useState('');
 	const [messageData, setMessageData] = useState([]);
 	const [error, setError] = useState('');
@@ -12,9 +12,9 @@ const Chat = () => {
 	const { isEntered } = state;
 
 	useEffect(() => {
-		onMessage((event) => setMessageData((messages) => [...messages, event.detail]));
-		onSend((event) => setMessageData((messages) => [...messages, event.detail]));
-		onError(() => setError('Err'));
+		on('message', (event) => setMessageData((messages) => [...messages, event.detail]));
+		on('send', (event) => setMessageData((messages) => [...messages, event.detail]));
+		on('error', () => setError('Err'));
 
 		return () => {
 			disconnect();
