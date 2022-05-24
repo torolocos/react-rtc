@@ -40,3 +40,11 @@ export enum ConnectionState {
   CLOSED = 'closed',
   DISCONNECT = 'disconnected',
 }
+
+export interface Signal {
+  uuid: string;
+  displayName: string;
+  dest: 'all' | string;
+  sdp: RTCSessionDescriptionInit;
+  ice: RTCIceCandidateInit | undefined;
+}
