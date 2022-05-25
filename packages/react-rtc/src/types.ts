@@ -33,7 +33,7 @@ export interface ContextType {
   state: { isEntered: boolean };
   on?: <Type extends keyof Events>(
     type: Type,
-    handler: (event: Events[Type]) => void
+    handler: (event: EventListenerOrEventListenerObject & Events[Type]) => void
   ) => void;
 }
 
