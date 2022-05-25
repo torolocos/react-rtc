@@ -7,7 +7,6 @@ import {
   type Metadata,
   type User,
   type PeerConnection,
-  type ContextType,
   type Signal,
   type Events,
 } from '@types';
@@ -293,14 +292,17 @@ export const RtcProvider = ({
     };
   }, [signaling.current]);
 
-  const rtcContext: ContextType = {
-    send,
-    state: { isEntered },
-    disconnect,
-    enter,
-    on,
-  };
   return (
-    <RtcContext.Provider value={rtcContext}>{children}</RtcContext.Provider>
+    <RtcContext.Provider
+      value={{
+        send,
+        state: { isEntered },
+        disconnect,
+        enter,
+        on,
+      }}
+    >
+      {children}
+    </RtcContext.Provider>
   );
 };
