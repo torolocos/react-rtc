@@ -1,16 +1,11 @@
-import typescript from '@rollup/plugin-typescript';
+import esbuild from 'rollup-plugin-esbuild';
 import dts from 'rollup-plugin-dts';
 
 export default [
   {
-    plugins: [typescript()],
+    plugins: [esbuild()],
     input: './src/index.ts',
     output: [
-      {
-        file: 'dist/cjs/index.js',
-        format: 'cjs',
-        sourcemap: true,
-      },
       {
         file: 'dist/esm/index.mjs',
         format: 'es',
@@ -19,7 +14,7 @@ export default [
     ],
   },
   {
-    plugins: [dts()],
+    plugins: [esbuild(), dts()],
     input: './src/index.ts',
     output: {
       file: 'dist/types/index.d.ts',
