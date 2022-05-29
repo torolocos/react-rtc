@@ -94,8 +94,7 @@ export const RtcProvider = ({
     }
   }
 
-  // string
-  function setUpPeer(peerUuid: number, displayName: string, initCall = false) {
+  function setUpPeer(peerUuid: string, displayName: string, initCall = false) {
     const peerConnection = new RTCPeerConnection({ iceServers });
     // TODO: Make better naming
     const dataChannel = peerConnection.createDataChannel('test');
