@@ -9,7 +9,7 @@ import {
   type PeerConnection,
   type Signal,
   type Events,
-} from '@types';
+} from './types';
 
 interface Props {
   children: JSX.Element;
@@ -274,11 +274,18 @@ export const RtcProvider = ({
     );
   };
 
-  const on = <Type extends keyof Events>(
+  const on = <
+    Type extends keyof Events,
+    Handler extends Events[Type] & EventListenerOrEventListenerObject
+  >(
     type: Type,
-    handler: EventListenerOrEventListenerObject & Events[Type]
+    handler: Handler
   ) => rtcPublisher.current.addEventListener(type, handler);
 
+  /*
+  const off = (type, handler) =>
+    rtcPublisher.current.removeEventListener(type, handler);
+*/
   useEffect(() => {
     signaling.current?.addEventListener('message', handleMessageFromServer);
     signaling.current?.addEventListener('open', handleSignalingOpen);
