@@ -20,4 +20,9 @@ jobs:
       - name: 🚀 publish
         run: npm publish packages/react-rtc --access=public
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: slack message
+        run: |
+          curl -X POST -H 'Content-type: application/json'
+          --data '{"text":"New release #{{ github.event.release.tag_name }} is out, <${{ github.event.release.html_url }}|check it out now.>"}'
+          ${{ secrets.SLACK_WEBHOOK }}
