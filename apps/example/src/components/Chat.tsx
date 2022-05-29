@@ -1,24 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { useRtc, Event } from "@torolocos/react-rtc";
-
-import "./styles.css";
+import React, { useEffect, useState } from 'react';
+import { useRtc, Event } from '@torolocos/react-rtc';
+import './styles.css';
 
 const Chat = () => {
   const { send, enter, disconnect, state, on } = useRtc();
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
   const [messageData, setMessageData] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [, setChatOpen] = useState(false);
   const { isEntered } = state;
 
   useEffect(() => {
-    on("message", (event) =>
+    on('message', (event) =>
       setMessageData((messages) => [...messages, event.detail])
     );
-    on("send", (event) =>
+    on('send', (event) =>
       setMessageData((messages) => [...messages, event.detail])
     );
-    on("error", () => setError("Err"));
+    on('error', () => setError('Err'));
 
     return () => {
       disconnect();
@@ -41,11 +40,11 @@ const Chat = () => {
   const onMessageSend = () => {
     send(inputValue);
 
-    setInputValue("");
+    setInputValue('');
   };
 
   const getMessageFromEvent = (event: Event, message: string) => {
-    if (event !== "message") return event;
+    if (event !== 'message') return event;
     return message;
   };
 
@@ -77,7 +76,7 @@ const Chat = () => {
         </>
       )}
       <button onClick={!isEntered ? onStartChat : onEndChat}>
-        {!isEntered ? "join" : "leave chat"}
+        {!isEntered ? 'join' : 'leave chat'}
       </button>
     </div>
   );
