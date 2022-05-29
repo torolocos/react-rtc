@@ -27,13 +27,16 @@ export interface Events {
 }
 
 export interface ContextType {
-  send: (inputValue: string) => void;
-  enter: (displayName: string, userMetadata?: Metadata) => void;
-  disconnect: () => void;
-  state: { isEntered: boolean };
-  on?: <Type extends keyof Events>(
+  send?: (inputValue: string) => void;
+  enter?: (displayName: string, userMetadata?: Metadata) => void;
+  disconnect?: () => void;
+  state?: { isEntered: boolean };
+  on?: <
+    Type extends keyof Events,
+    Handler extends Events[Type] & EventListenerOrEventListenerObject
+  >(
     type: Type,
-    handler: (event: EventListenerOrEventListenerObject & Events[Type]) => void
+    handler: Handler
   ) => void;
 }
 
