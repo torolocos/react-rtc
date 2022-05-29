@@ -1,4 +1,4 @@
-import { MessageData } from '@types';
+import { MessageData } from '../types';
 
 class Message {
   id: MessageData['id'] | undefined;
