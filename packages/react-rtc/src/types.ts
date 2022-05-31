@@ -11,6 +11,23 @@ export type PeerConnection = Map<
 
 export type Event = 'message' | 'connected' | 'disconnected';
 
+export type On = <Type extends keyof EventsDetail>(
+  type: Type,
+  handler: EventHandler<Type> & EventListenerOrEventListenerObject
+) => void;
+
+export type Off = On;
+
+export type EventHandler<Type extends keyof EventsDetail> = (
+  event: CustomEvent<EventsDetail[Type]>
+) => void;
+
+export interface EventsDetail {
+  message: Message;
+  send: Message;
+  error: unknown;
+}
+
 export interface MessageData {
   message: string;
   id: string;
@@ -20,24 +37,13 @@ export interface MessageData {
   metadata?: Metadata;
 }
 
-export interface Events {
-  message: (event: CustomEvent<Message>) => void;
-  send: (event: CustomEvent<Message>) => void;
-  error: (event: CustomEvent<unknown>) => void;
-}
-
 export interface ContextType {
   send?: (inputValue: string) => void;
   enter?: (displayName: string, userMetadata?: Metadata) => void;
   disconnect?: () => void;
   state?: { isEntered: boolean };
-  on?: <
-    Type extends keyof Events,
-    Handler extends Events[Type] & EventListenerOrEventListenerObject
-  >(
-    type: Type,
-    handler: Handler
-  ) => void;
+  on?: On;
+  off?: Off;
 }
 
 export interface User {

@@ -1,29 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useRtc, Event } from '@torolocos/react-rtc';
+import { useRtc, Event, type EventHandler } from '@torolocos/react-rtc';
 
 import './styles.css';
 
 const Chat = () => {
-  const { send, enter, disconnect, state, on } = useRtc();
+  const { send, enter, disconnect, state, on, off } = useRtc();
   const [inputValue, setInputValue] = useState('');
   const [messageData, setMessageData] = useState([]);
   const [error, setError] = useState('');
   const [, setChatOpen] = useState(false);
   const { isEntered } = state;
-
-  useEffect(() => {
-    on('message', (event) =>
-      setMessageData((messages) => [...messages, event.detail])
-    );
-    on('send', (event) =>
-      setMessageData((messages) => [...messages, event.detail])
-    );
-    on('error', () => setError('Err'));
-
-    return () => {
-      disconnect();
-    };
-  }, []);
 
   const onStartChat = () => {
     enter(`${Math.random().toFixed(2)}`); //FIXME: tmp till we create valid Chat Screen
@@ -48,6 +34,27 @@ const Chat = () => {
     if (event !== 'message') return event;
     return message;
   };
+
+  const handleMessage: EventHandler<'message'> = (event) =>
+    setMessageData((messages) => [...messages, event.detail]);
+
+  const handleMessageSend: EventHandler<'send'> = (event) =>
+    setMessageData((messages) => [...messages, event.detail]);
+
+  const handleError: EventHandler<'error'> = () => setError('Err');
+
+  useEffect(() => {
+    on('message', handleMessage);
+    on('send', handleMessageSend);
+    on('error', handleError);
+
+    return () => {
+      off('message', handleMessage);
+      off('send', handleMessageSend);
+      off('error', handleError);
+      disconnect();
+    };
+  }, []);
 
   return (
     <div>

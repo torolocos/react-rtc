@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import Message from './models/Message';
+import Message from '../models/Message';
 import { RtcContext } from './RtcContext';
 import {
   ConnectionState,
@@ -8,8 +8,8 @@ import {
   type User,
   type PeerConnection,
   type Signal,
-  type Events,
-} from './types';
+} from '../types';
+import { usePubSub } from '../hooks/usePubSub';
 
 interface Props {
   children: JSX.Element;
@@ -30,7 +30,7 @@ export const RtcProvider = ({
   });
   const signaling = useRef<WebSocket>(null);
   const peerConnections = useRef<PeerConnection>(new Map());
-  const rtcPublisher = useRef(new EventTarget());
+  const { dispatchEvent, on, off } = usePubSub();
 
   const onSendEventMessage = (
     peer: {
@@ -49,9 +49,7 @@ export const RtcProvider = ({
       metadata: { event },
     });
 
-    rtcPublisher.current.dispatchEvent(
-      new CustomEvent('message', { detail: message })
-    );
+    dispatchEvent('message', message);
   };
 
   const send = (inputValue: string, metadata?: Metadata) => {
@@ -71,9 +69,7 @@ export const RtcProvider = ({
         connection?.dataChannel?.send(message);
       });
 
-      rtcPublisher.current.dispatchEvent(
-        new CustomEvent('send', { detail: messageData })
-      );
+      dispatchEvent('send', messageData);
     } catch (error) {
       handleError(error);
     }
@@ -120,9 +116,7 @@ export const RtcProvider = ({
 
     // TODO: Parse message outside, add try catch, use addMessageData
     dataChannel.addEventListener('message', (event) =>
-      rtcPublisher.current.dispatchEvent(
-        new CustomEvent('message', { detail: JSON.parse(event.data) })
-      )
+      dispatchEvent('message', JSON.parse(event.data))
     );
 
     if (initCall) {
@@ -268,24 +262,8 @@ export const RtcProvider = ({
     sendSignalingMessage('all', { displayName: user.displayName });
   };
 
-  const handleError = (error: unknown) => {
-    rtcPublisher.current.dispatchEvent(
-      new CustomEvent('error', { detail: error })
-    );
-  };
+  const handleError = (error: unknown) => dispatchEvent('error', error);
 
-  const on = <
-    Type extends keyof Events,
-    Handler extends Events[Type] & EventListenerOrEventListenerObject
-  >(
-    type: Type,
-    handler: Handler
-  ) => rtcPublisher.current.addEventListener(type, handler);
-
-  /*
-  const off = (type, handler) =>
-    rtcPublisher.current.removeEventListener(type, handler);
-*/
   useEffect(() => {
     signaling.current?.addEventListener('message', handleMessageFromServer);
     signaling.current?.addEventListener('open', handleSignalingOpen);
@@ -307,6 +285,7 @@ export const RtcProvider = ({
         disconnect,
         enter,
         on,
+        off,
       }}
     >
       {children}

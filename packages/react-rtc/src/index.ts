@@ -1,3 +1,3 @@
-export { RtcProvider } from './RtcProvider';
+export { RtcProvider } from './contexts/RtcProvider';
 export * from './types';
-export * from './useRtc';
+export * from './hooks/useRtc';
