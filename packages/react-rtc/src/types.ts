@@ -1,15 +1,12 @@
 import Message from './models/Message';
 
-export interface Metadata extends Record<string, unknown> {
-  event?: Event;
-}
+export type Metadata = Record<string, unknown>;
 
-export type PeerConnection = Map<
-  string,
-  { displayName: string; pc: RTCPeerConnection; dataChannel: RTCDataChannel }
->;
-
-export type Event = 'message' | 'connected' | 'disconnected';
+export type Peer = {
+  displayName: string;
+  pc: RTCPeerConnection;
+  dataChannel: RTCDataChannel;
+};
 
 export type On = <Type extends keyof EventsDetail>(
   type: Type,
@@ -26,6 +23,8 @@ export interface EventsDetail {
   message: Message;
   send: Message;
   error: unknown;
+  peerConnected: Peer;
+  peerDisconnected: Peer;
 }
 
 export interface MessageData {
