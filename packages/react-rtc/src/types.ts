@@ -13,14 +13,14 @@ export type Event = 'message' | 'connected' | 'disconnected';
 
 export type On = <Type extends keyof EventsDetail>(
   type: Type,
-  handler: EventHandler<Type> & EventListenerOrEventListenerObject
+  handler: EventHandler<Type>
 ) => void;
 
 export type Off = On;
 
-export type EventHandler<Type extends keyof EventsDetail> = (
-  event: CustomEvent<EventsDetail[Type]>
-) => void;
+export type EventHandler<Type extends keyof EventsDetail> =
+  EventListenerOrEventListenerObject &
+    ((event: CustomEvent<EventsDetail[Type]>) => void);
 
 export interface EventsDetail {
   message: Message;
