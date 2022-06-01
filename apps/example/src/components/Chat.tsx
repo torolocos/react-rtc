@@ -54,6 +54,8 @@ const Chat = () => {
     return () => {
       off('message', handleMessage);
       off('send', handleMessageSend);
+      off('peerConnected', handlePeerConnected);
+      off('peerDisconnected', handlePeerDisconnected);
       off('error', handleError);
       disconnect();
     };
