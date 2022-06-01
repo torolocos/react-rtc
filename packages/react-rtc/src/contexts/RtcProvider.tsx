@@ -3,10 +3,9 @@ import Message from '../models/Message';
 import { RtcContext } from './RtcContext';
 import {
   ConnectionState,
-  Event,
   type Metadata,
   type User,
-  type PeerConnection,
+  type Peer,
   type Signal,
 } from '../types';
 import { usePubSub } from '../hooks/usePubSub';
@@ -26,31 +25,10 @@ export const RtcProvider = ({
   const localUuid = useRef(crypto.randomUUID());
   const [user, setUser] = useState<User>({
     displayName: undefined,
-    userMetadata: undefined,
   });
   const signaling = useRef<WebSocket>(null);
-  const peerConnections = useRef<PeerConnection>(new Map());
+  const peerConnections = useRef<Map<string, Peer>>(new Map());
   const { dispatchEvent, on, off } = usePubSub();
-
-  const onSendEventMessage = (
-    peer: {
-      pc: RTCPeerConnection;
-      dataChannel: RTCDataChannel;
-      displayName: string;
-    },
-
-    event: Event
-  ) => {
-    const message = new Message({
-      senderId: localUuid.current,
-      displayName: peer.displayName,
-      timestamp: Date.now(),
-      message: '',
-      metadata: { event },
-    });
-
-    dispatchEvent('message', message);
-  };
 
   const send = (inputValue: string, metadata?: Metadata) => {
     try {
@@ -60,7 +38,7 @@ export const RtcProvider = ({
         displayName: user.displayName,
         senderId: localUuid.current,
         timestamp: Date.now(),
-        metadata: { event: 'message', ...metadata },
+        metadata: metadata,
       });
 
       peerConnections.current.forEach((connection) => {
@@ -85,7 +63,7 @@ export const RtcProvider = ({
         state === ConnectionState.CLOSED ||
         state === ConnectionState.DISCONNECT)
     ) {
-      onSendEventMessage(peer, 'disconnected');
+      dispatchEvent('peerDisconnected', peer);
       peerConnections.current.delete(peerUuid);
     }
   }
@@ -111,7 +89,7 @@ export const RtcProvider = ({
     peerConnection.addEventListener('connectionstatechange', () => {
       const peer = peerConnections.current.get(peerUuid);
       if (peer && peer.pc.connectionState === 'connected' && !initCall)
-        onSendEventMessage(peer, 'connected');
+        dispatchEvent('peerConnected', peer);
     });
 
     // TODO: Parse message outside, add try catch, use addMessageData
