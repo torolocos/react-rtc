@@ -61,27 +61,6 @@ const Chat = () => {
     };
   }, []);
 
-  const handleMessage: EventHandler<'message'> = (event) =>
-    setMessageData((messages) => [...messages, event.detail]);
-
-  const handleMessageSend: EventHandler<'send'> = (event) =>
-    setMessageData((messages) => [...messages, event.detail]);
-
-  const handleError: EventHandler<'error'> = () => setError('Err');
-
-  useEffect(() => {
-    on('message', handleMessage);
-    on('send', handleMessageSend);
-    on('error', handleError);
-
-    return () => {
-      off('message', handleMessage);
-      off('send', handleMessageSend);
-      off('error', handleError);
-      disconnect();
-    };
-  }, []);
-
   return (
     <div>
       <h2>Chat</h2>
