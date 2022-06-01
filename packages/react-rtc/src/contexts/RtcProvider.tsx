@@ -1,15 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import Message from './models/Message';
+import Message from '../models/Message';
 import { RtcContext } from './RtcContext';
 import {
   ConnectionState,
-  Event,
   type Metadata,
   type User,
-  type PeerConnection,
-  type ContextType,
+  type Peer,
   type Signal,
-} from './types';
+} from '../types';
+import { usePubSub } from '../hooks/usePubSub';
 
 interface Props {
   children: JSX.Element;
@@ -24,35 +23,12 @@ export const RtcProvider = ({
 }: Props) => {
   const [isEntered, setIsEntered] = useState(false); // TODO: Rename, leave there
   const localUuid = useRef(crypto.randomUUID());
-  const [messageData, setMessageData] = useState<Message[]>([]);
-  const [error, setError] = useState<string>(''); // TODO: Remove error, use onError event instead
   const [user, setUser] = useState<User>({
     displayName: undefined,
-    userMetadata: undefined,
   });
   const signaling = useRef<WebSocket>(null);
-
-  const peerConnections = useRef<PeerConnection>(new Map());
-
-  const onSendEventMessage = (
-    peer: {
-      pc: RTCPeerConnection;
-      dataChannel: RTCDataChannel;
-      displayName: string;
-    },
-
-    event: Event
-  ) => {
-    const message = new Message({
-      senderId: localUuid.current,
-      displayName: peer.displayName,
-      timestamp: Date.now(),
-      message: '',
-      metadata: { event },
-    });
-
-    setMessageData((prev) => [...prev, message]);
-  };
+  const peerConnections = useRef<Map<string, Peer>>(new Map());
+  const { dispatchEvent, on, off } = usePubSub();
 
   const send = (inputValue: string, metadata?: Metadata) => {
     try {
@@ -62,20 +38,18 @@ export const RtcProvider = ({
         displayName: user.displayName,
         senderId: localUuid.current,
         timestamp: Date.now(),
-        metadata: { event: 'message', ...metadata },
+        metadata: metadata,
       });
-
-      setMessageData((prev) => [...prev, messageData]);
 
       peerConnections.current.forEach((connection) => {
         const message = JSON.stringify(messageData);
 
         connection?.dataChannel?.send(message);
       });
-    } catch (e) {
-      // TODO: Add error handler
-      setError(e as string);
-      console.warn(e);
+
+      dispatchEvent('send', messageData);
+    } catch (error) {
+      handleError(error);
     }
   };
 
@@ -89,7 +63,7 @@ export const RtcProvider = ({
         state === ConnectionState.CLOSED ||
         state === ConnectionState.DISCONNECT)
     ) {
-      onSendEventMessage(peer, 'disconnected');
+      dispatchEvent('peerDisconnected', peer);
       peerConnections.current.delete(peerUuid);
     }
   }
@@ -115,12 +89,12 @@ export const RtcProvider = ({
     peerConnection.addEventListener('connectionstatechange', () => {
       const peer = peerConnections.current.get(peerUuid);
       if (peer && peer.pc.connectionState === 'connected' && !initCall)
-        onSendEventMessage(peer, 'connected');
+        dispatchEvent('peerConnected', peer);
     });
 
     // TODO: Parse message outside, add try catch, use addMessageData
     dataChannel.addEventListener('message', (event) =>
-      setMessageData((prev) => [...prev, JSON.parse(event.data)])
+      dispatchEvent('message', JSON.parse(event.data))
     );
 
     if (initCall) {
@@ -232,20 +206,18 @@ export const RtcProvider = ({
     }
   }
 
-  const onEnter = async (displayName: string, userMetadata?: Metadata) => {
+  const enter = (displayName: string, userMetadata?: Metadata) => {
     // TODO: Fix this ignore
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     signaling.current = new WebSocket(signalingServer);
-    // TODO: Add callback, notifi user about event, remove setError,
-    setError('');
     setUser({ displayName, userMetadata });
 
     setIsEntered(true);
   };
 
-  const onLeave = () => {
+  const disconnect = () => {
     signaling.current?.close();
     peerConnections.current.forEach((connection) => {
       connection.pc.close();
@@ -268,10 +240,7 @@ export const RtcProvider = ({
     sendSignalingMessage('all', { displayName: user.displayName });
   };
 
-  const handleError = (error: unknown) => {
-    // TODO: handle errors
-    console.error(error);
-  };
+  const handleError = (error: unknown) => dispatchEvent('error', error);
 
   useEffect(() => {
     signaling.current?.addEventListener('message', handleMessageFromServer);
@@ -286,16 +255,18 @@ export const RtcProvider = ({
     };
   }, [signaling.current]);
 
-  const rtcContext: ContextType = {
-    send,
-    onEnter,
-    onLeave,
-    messageData,
-    connections: peerConnections.current,
-    state: { isEntered },
-    error,
-  };
   return (
-    <RtcContext.Provider value={rtcContext}>{children}</RtcContext.Provider>
+    <RtcContext.Provider
+      value={{
+        send,
+        state: { isEntered },
+        disconnect,
+        enter,
+        on,
+        off,
+      }}
+    >
+      {children}
+    </RtcContext.Provider>
   );
 };

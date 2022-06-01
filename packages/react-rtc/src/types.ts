@@ -1,14 +1,29 @@
 import Message from './models/Message';
-export interface Metadata extends Record<string, unknown> {
-  event?: Event;
+
+export type Metadata = Record<string, unknown>;
+
+export type Peer = {
+  displayName: string;
+  pc: RTCPeerConnection;
+  dataChannel: RTCDataChannel;
+};
+
+export type EventListener = <Type extends keyof EventsDetail>(
+  type: Type,
+  handler: EventHandler<Type>
+) => void;
+
+export type EventHandler<Type extends keyof EventsDetail> =
+  EventListenerOrEventListenerObject &
+    ((event: CustomEvent<EventsDetail[Type]>) => void);
+
+export interface EventsDetail {
+  message: Message;
+  send: Message;
+  error: unknown;
+  peerConnected: Peer;
+  peerDisconnected: Peer;
 }
-
-export type PeerConnection = Map<
-  string,
-  { displayName: string; pc: RTCPeerConnection; dataChannel: RTCDataChannel }
->;
-
-export type Event = 'message' | 'connected' | 'disconnected';
 
 export interface MessageData {
   message: string;
@@ -20,13 +35,12 @@ export interface MessageData {
 }
 
 export interface ContextType {
-  send: (inputValue: string) => void;
-  onEnter: (displayName: string, userMetadata?: Metadata) => void;
-  onLeave: () => void;
-  state: { isEntered: boolean };
-  messageData: Message[];
-  connections: PeerConnection;
-  error: string | null;
+  send?: (inputValue: string) => void;
+  enter?: (displayName: string, userMetadata?: Metadata) => void;
+  disconnect?: () => void;
+  state?: { isEntered: boolean };
+  on?: EventListener;
+  off?: EventListener;
 }
 
 export interface User {
