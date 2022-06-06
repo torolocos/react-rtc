@@ -12,12 +12,17 @@ export const usePubSub = () => {
   const on: EventListener = (type, handler) =>
     eventTarget.current.addEventListener(type, handler);
 
+  const once: EventListener = (type, handler) => {
+    eventTarget.current.addEventListener(type, handler, { once: true });
+  };
+
   const off: EventListener = (type, handler) =>
     eventTarget.current.removeEventListener(type, handler);
 
   return {
     dispatchEvent,
     on,
+    once,
     off,
   };
 };
