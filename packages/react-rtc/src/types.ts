@@ -40,6 +40,7 @@ export interface ContextType {
   disconnect?: () => void;
   state?: { isEntered: boolean };
   on?: EventListener;
+  once?: EventListener;
   off?: EventListener;
 }
 
