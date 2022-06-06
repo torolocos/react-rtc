@@ -28,7 +28,7 @@ export const RtcProvider = ({
   });
   const signaling = useRef<WebSocket>(null);
   const peerConnections = useRef<Map<string, Peer>>(new Map());
-  const { dispatchEvent, on, off } = usePubSub();
+  const { dispatchEvent, on, once, off } = usePubSub();
 
   const send = (inputValue: string, metadata?: Metadata) => {
     try {
@@ -263,6 +263,7 @@ export const RtcProvider = ({
         disconnect,
         enter,
         on,
+        once,
         off,
       }}
     >
