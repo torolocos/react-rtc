@@ -4,7 +4,7 @@ import { useRtc, type EventHandler } from '@torolocos/react-rtc';
 import './styles.css';
 
 const Chat = () => {
-  const { send, enter, disconnect, state, on, off } = useRtc();
+  const { send, enter, disconnect, state, on, once, off } = useRtc();
   const [inputValue, setInputValue] = useState('');
   const [messageData, setMessageData] = useState([]);
   const [error, setError] = useState('');
@@ -47,6 +47,7 @@ const Chat = () => {
   useEffect(() => {
     on('message', handleMessage);
     on('send', handleMessageSend);
+    once('send', () => console.log('first message sended'));
     on('peerConnected', handlePeerConnected);
     on('peerDisconnected', handlePeerDisconnected);
     on('error', handleError);
