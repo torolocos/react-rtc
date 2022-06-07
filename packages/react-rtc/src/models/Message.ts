@@ -1,22 +1,27 @@
-import { MessageData } from '../types';
+import { Metadata } from '../types';
 
 class Message {
-  id: MessageData['id'] | undefined;
-  message: MessageData['message'];
-  displayName: MessageData['displayName'];
-  senderId: MessageData['senderId'];
-  timestamp: MessageData['timestamp'];
-  metadata: MessageData['metadata'];
+  id: string;
+  senderId?: string;
+  message: string;
+  displayName?: string;
+  timestamp: number;
+  metadata?: Metadata;
 
   constructor({
-    id = crypto.randomUUID(),
     message,
     displayName,
     senderId,
     timestamp,
     metadata,
-  }: Omit<MessageData, 'id'> & { id?: string }) {
-    this.id = id;
+  }: {
+    message: string;
+    displayName?: string;
+    senderId: string;
+    timestamp: number;
+    metadata?: Metadata;
+  }) {
+    this.id = crypto.randomUUID();
     this.message = message;
     this.displayName = displayName;
     this.senderId = senderId;
