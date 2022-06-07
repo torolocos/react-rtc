@@ -47,6 +47,7 @@ const Chat = () => {
   useEffect(() => {
     on('message', handleMessage);
     on('send', handleMessageSend);
+    on('send', () => console.log('first message sended'), { once: true });
     on('peerConnected', handlePeerConnected);
     on('peerDisconnected', handlePeerDisconnected);
     on('error', handleError);
