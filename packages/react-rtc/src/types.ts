@@ -8,9 +8,16 @@ export type Peer = {
   dataChannel: RTCDataChannel;
 };
 
-export type EventListener = <Type extends keyof EventsDetail>(
+export type AddEventListener = <Type extends keyof EventsDetail>(
   type: Type,
-  handler: EventHandler<Type>
+  handler: EventHandler<Type>,
+  options?: AddEventListenerOptions
+) => void;
+
+export type RemoveEventListener = <Type extends keyof EventsDetail>(
+  type: Type,
+  handler: EventHandler<Type>,
+  options?: EventListenerOptions
 ) => void;
 
 export type EventHandler<Type extends keyof EventsDetail> =
@@ -30,8 +37,8 @@ export interface ContextType {
   enter?: (displayName: string, userMetadata?: Metadata) => void;
   disconnect?: () => void;
   state?: { isEntered: boolean };
-  on?: EventListener;
-  off?: EventListener;
+  on?: AddEventListener;
+  off?: RemoveEventListener;
 }
 
 export interface User {
