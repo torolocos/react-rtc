@@ -1,14 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Message from '../models/Message';
 import { RtcContext } from './RtcContext';
-import {
-  ConnectionState,
-  type Metadata,
-  type User,
-  type Peer,
-  type Signal,
-} from '../types';
+import { type Metadata, type User, type Signal } from '../types';
 import { usePubSub } from '../hooks/usePubSub';
+import { useSignaling } from '../hooks/useSignaling';
+import { usePeerConnection } from '../hooks/usePeerConection';
 
 interface Props {
   children: JSX.Element;
@@ -26,9 +22,15 @@ export const RtcProvider = ({
   const [user, setUser] = useState<User>({
     displayName: undefined,
   });
-  const signaling = useRef<WebSocket>(null);
-  const peerConnections = useRef<Map<string, Peer>>(new Map());
+
+  const handleError = (error: unknown) => dispatchEvent('error', error);
+
   const { dispatchEvent, on, off } = usePubSub();
+  const { sendSignalingMessage, signaling } = useSignaling(localUuid.current);
+  const { peerConnections, setUpPeer, initIceCandidate } = usePeerConnection(
+    iceServers,
+    handleError
+  );
 
   const send = (inputValue: string, metadata?: Metadata) => {
     try {
@@ -51,72 +53,6 @@ export const RtcProvider = ({
       handleError(error);
     }
   };
-
-  function checkPeerDisconnect(peerUuid: string) {
-    const state = peerConnections.current.get(peerUuid)?.pc.iceConnectionState;
-    const peer = peerConnections.current.get(peerUuid);
-
-    if (
-      peer &&
-      (state === ConnectionState.FAILED ||
-        state === ConnectionState.CLOSED ||
-        state === ConnectionState.DISCONNECT)
-    ) {
-      dispatchEvent('peerDisconnected', peer);
-      peerConnections.current.delete(peerUuid);
-    }
-  }
-
-  function setUpPeer(peerUuid: string, displayName: string, initCall = false) {
-    const peerConnection = new RTCPeerConnection({ iceServers });
-    // TODO: Make better naming
-    const dataChannel = peerConnection.createDataChannel('test');
-
-    // TODO: Pull it outside to separate file, use it as handleres
-    peerConnection.onicecandidate = (event) => gotIceCandidate(event, peerUuid);
-    peerConnection.oniceconnectionstatechange = () =>
-      checkPeerDisconnect(peerUuid);
-    peerConnection.addEventListener('datachannel', (event) =>
-      Object.defineProperty(
-        peerConnections.current.get(peerUuid),
-        'dataChannel',
-        {
-          value: event.channel,
-        }
-      )
-    );
-    peerConnection.addEventListener('connectionstatechange', () => {
-      const peer = peerConnections.current.get(peerUuid);
-      if (peer && peer.pc.connectionState === 'connected' && !initCall)
-        dispatchEvent('peerConnected', peer);
-    });
-
-    // TODO: Parse message outside, add try catch, use addMessageData
-    dataChannel.addEventListener('message', (event) =>
-      dispatchEvent('message', JSON.parse(event.data))
-    );
-
-    if (initCall) {
-      peerConnection
-        .createOffer()
-        .then((description) => createdDescription(description, peerUuid))
-        // TODO: Add error handlerer
-        .catch((e) => handleError(e));
-    }
-
-    peerConnections.current.set(peerUuid, {
-      displayName,
-      pc: peerConnection,
-      dataChannel,
-    });
-    setIsEntered(true);
-  }
-
-  function gotIceCandidate(event: RTCPeerConnectionIceEvent, peerUuid: string) {
-    if (event.candidate != null) {
-      sendSignalingMessage(peerUuid, { ice: event.candidate });
-    }
-  }
 
   function createdDescription(
     description: RTCSessionDescriptionInit,
@@ -158,15 +94,6 @@ export const RtcProvider = ({
             .catch((e) => handleError(e));
         }
       })
-      .catch((e) => handleError(e));
-  };
-
-  const initIceCandidate = (
-    peerConnection: RTCPeerConnection,
-    signal: Signal
-  ) => {
-    peerConnection
-      .addIceCandidate(new RTCIceCandidate(signal.ice))
       .catch((e) => handleError(e));
   };
 
@@ -225,32 +152,14 @@ export const RtcProvider = ({
     // TODO: Add callback
   };
 
-  const sendSignalingMessage = (
-    dest: string,
-
-    data: Record<string, unknown>
-  ) => {
-    const message = JSON.stringify({ uuid: localUuid.current, dest, ...data });
-
-    signaling.current?.send(message);
-  };
-
-  const handleSignalingOpen = () => {
-    sendSignalingMessage('all', { displayName: user.displayName });
-  };
-
-  const handleError = (error: unknown) => dispatchEvent('error', error);
-
   useEffect(() => {
     signaling.current?.addEventListener('message', handleMessageFromServer);
-    signaling.current?.addEventListener('open', handleSignalingOpen);
 
     return () => {
       signaling.current?.removeEventListener(
         'message',
         handleMessageFromServer
       );
-      signaling.current?.removeEventListener('open', handleSignalingOpen);
     };
   }, [signaling.current]);
 

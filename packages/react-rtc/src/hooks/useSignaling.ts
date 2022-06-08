@@ -3,7 +3,10 @@ import { useRef, useEffect } from 'react';
 export const useSignaling = (uuid: string) => {
   const signaling = useRef<WebSocket>();
 
-  const send = (destination: string, data: Record<string, unknown>) => {
+  const sendSignalingMessage = (
+    destination: string,
+    data: Record<string, unknown>
+  ) => {
     const message = JSON.stringify({
       uuid,
       dest: destination,
@@ -14,7 +17,7 @@ export const useSignaling = (uuid: string) => {
   };
 
   const handleSignalingOpen = () => {
-    send('all', { displayName: uuid });
+    sendSignalingMessage('all', { displayName: uuid });
   };
 
   useEffect(() => {
@@ -25,5 +28,5 @@ export const useSignaling = (uuid: string) => {
     };
   }, [signaling.current]);
 
-  return { send, signaling };
+  return { sendSignalingMessage, signaling };
 };
