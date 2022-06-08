@@ -32,15 +32,6 @@ export interface EventsDetail {
   peerDisconnected: Peer;
 }
 
-export interface MessageData {
-  message: string;
-  id: string;
-  displayName?: string;
-  senderId: string;
-  timestamp: number;
-  metadata?: Metadata;
-}
-
 export interface ContextType {
   send?: (inputValue: string) => void;
   enter?: (displayName: string, userMetadata?: Metadata) => void;
