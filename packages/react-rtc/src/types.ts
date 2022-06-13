@@ -1,12 +1,7 @@
 import Message from './models/Message';
+import Peer from './models/Peer';
 
 export type Metadata = Record<string, unknown>;
-
-export type Peer = {
-  displayName: string;
-  pc: RTCPeerConnection;
-  dataChannel: RTCDataChannel;
-};
 
 export type AddEventListener = <Type extends keyof EventsDetail>(
   type: Type,
