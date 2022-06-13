@@ -33,7 +33,6 @@ export const RtcProvider = ({
   const send = (inputValue: string, metadata?: Metadata) => {
     try {
       const messageData = new Message({
-        id: crypto.randomUUID(),
         message: inputValue,
         displayName: user.displayName,
         senderId: localUuid.current,
