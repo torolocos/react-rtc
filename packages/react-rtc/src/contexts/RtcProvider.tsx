@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Message from '../models/Message';
+import Peer from '../models/Peer';
 import { RtcContext } from './RtcContext';
 import {
   ConnectionState,
   type Metadata,
   type User,
-  type Peer,
   type Signal,
 } from '../types';
 import { usePubSub } from '../hooks/usePubSub';
@@ -69,8 +69,7 @@ export const RtcProvider = ({
 
   function setUpPeer(peerUuid: string, displayName: string, initCall = false) {
     const peerConnection = new RTCPeerConnection({ iceServers });
-    // TODO: Make better naming
-    const dataChannel = peerConnection.createDataChannel('test');
+    const dataChannel = peerConnection.createDataChannel(crypto.randomUUID());
 
     // TODO: Pull it outside to separate file, use it as handleres
     peerConnection.onicecandidate = (event) => gotIceCandidate(event, peerUuid);
@@ -104,11 +103,10 @@ export const RtcProvider = ({
         .catch((e) => handleError(e));
     }
 
-    peerConnections.current.set(peerUuid, {
-      displayName,
-      pc: peerConnection,
-      dataChannel,
-    });
+    peerConnections.current.set(
+      peerUuid,
+      new Peer({ peerConnection, dataChannel, displayName })
+    );
     setIsEntered(true);
   }
 
