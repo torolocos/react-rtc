@@ -23,7 +23,7 @@ export const RtcProvider = ({
 }: Props) => {
   const [isEntered, setIsEntered] = useState(false); // TODO: Rename, leave there
   const localUuid = useRef(crypto.randomUUID());
-  const [user, setUser] = useState<User>({
+  const [, setUser] = useState<User>({
     displayName: undefined,
   });
   const signaling = useRef<WebSocket>(null);
@@ -34,7 +34,7 @@ export const RtcProvider = ({
     try {
       const messageData = new Message({
         message: inputValue,
-        displayName: user.displayName,
+        displayName: '',
         senderId: localUuid.current,
         timestamp: Date.now(),
         metadata: metadata,
@@ -105,7 +105,7 @@ export const RtcProvider = ({
 
     peerConnections.current.set(
       peerUuid,
-      new Peer({ peerConnection, dataChannel, displayName })
+      new Peer({ peerConnection, dataChannel, displayName: localUuid.current })
     );
     setIsEntered(true);
   }
@@ -234,7 +234,7 @@ export const RtcProvider = ({
   };
 
   const handleSignalingOpen = () => {
-    sendSignalingMessage('all', { displayName: user.displayName });
+    sendSignalingMessage('all', { displayName: localUuid.current });
   };
 
   const handleError = (error: unknown) => dispatchEvent('error', error);
