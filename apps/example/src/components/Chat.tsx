@@ -12,7 +12,7 @@ const Chat = () => {
   const { isEntered } = state;
 
   const onStartChat = () => {
-    enter(`${Math.random().toFixed(2)}`); //FIXME: tmp till we create valid Chat Screen
+    enter(); //FIXME: tmp till we create valid Chat Screen
 
     //TODO: zkontrolovat jestli pripojeni probehlo uspesne
     setChatOpen(true);
@@ -37,10 +37,10 @@ const Chat = () => {
     setMessageData((messages) => [...messages, event.detail]);
 
   const handlePeerConnected: EventHandler<'peerConnected'> = (event) =>
-    console.log('Peer connected', event.detail.displayName);
+    console.log('Peer connected', event.detail.uuid);
 
   const handlePeerDisconnected: EventHandler<'peerDisconnected'> = (event) =>
-    console.log('Peer disconnected', event.detail.displayName);
+    console.log('Peer disconnected', event.detail.uuid);
 
   const handleError: EventHandler<'error'> = () => setError('Err');
 
@@ -67,9 +67,9 @@ const Chat = () => {
       <h2>Chat</h2>
       {error && <div className="errorText">Something went wrong</div>}
       <div>
-        {messageData.map(({ id, message, displayName }) => (
+        {messageData.map(({ id, senderId, message }) => (
           <div key={id}>
-            {displayName}: {message}
+            {senderId}: {message}
           </div>
         ))}
       </div>

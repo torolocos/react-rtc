@@ -29,7 +29,7 @@ export interface EventsDetail {
 
 export interface ContextType {
   send?: (inputValue: string) => void;
-  enter?: (displayName: string, userMetadata?: Metadata) => void;
+  enter?: (userMetadata?: Metadata) => void;
   disconnect?: () => void;
   state?: { isEntered: boolean };
   on?: AddEventListener;
@@ -37,7 +37,6 @@ export interface ContextType {
 }
 
 export interface User {
-  displayName?: string;
   userMetadata?: Metadata;
 }
 

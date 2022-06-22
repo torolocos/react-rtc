@@ -34,7 +34,6 @@ export const RtcProvider = ({
     try {
       const messageData = new Message({
         message: inputValue,
-        displayName: '',
         senderId: localUuid.current,
         timestamp: Date.now(),
         metadata: metadata,
@@ -67,7 +66,7 @@ export const RtcProvider = ({
     }
   }
 
-  function setUpPeer(peerUuid: string, displayName: string, initCall = false) {
+  function setUpPeer(peerUuid: string, initCall = false) {
     const peerConnection = new RTCPeerConnection({ iceServers });
     const dataChannel = peerConnection.createDataChannel(crypto.randomUUID());
 
@@ -105,7 +104,7 @@ export const RtcProvider = ({
 
     peerConnections.current.set(
       peerUuid,
-      new Peer({ peerConnection, dataChannel, displayName: localUuid.current })
+      new Peer({ uuid: peerUuid, peerConnection, dataChannel })
     );
     setIsEntered(true);
   }
@@ -194,7 +193,7 @@ export const RtcProvider = ({
 
     if (peerDisplayName) {
       const isNewcomer = destination === localUuid.current;
-      setUpPeer(peerUuid, peerDisplayName, isNewcomer);
+      setUpPeer(peerUuid, isNewcomer);
       if (isNewcomer) {
         setIsEntered(true);
       } else {
@@ -203,13 +202,13 @@ export const RtcProvider = ({
     }
   }
 
-  const enter = (displayName: string, userMetadata?: Metadata) => {
+  const enter = (userMetadata?: Metadata) => {
     // TODO: Fix this ignore
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     signaling.current = new WebSocket(signalingServer);
-    setUser({ displayName, userMetadata });
+    setUser({ userMetadata });
 
     setIsEntered(true);
   };
