@@ -2,12 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Message from '../models/Message';
 import Peer from '../models/Peer';
 import { RtcContext } from './RtcContext';
-import {
-  ConnectionState,
-  type Metadata,
-  type User,
-  type Signal,
-} from '../types';
+import { ConnectionState, type Metadata, type Signal } from '../types';
 import { usePubSub } from '../hooks/usePubSub';
 
 interface Props {
@@ -23,9 +18,6 @@ export const RtcProvider = ({
 }: Props) => {
   const [isEntered, setIsEntered] = useState(false); // TODO: Rename, leave there
   const localUuid = useRef(crypto.randomUUID());
-  const [, setUser] = useState<User>({
-    displayName: undefined,
-  });
   const signaling = useRef<WebSocket>(null);
   const peerConnections = useRef<Map<string, Peer>>(new Map());
   const { dispatchEvent, on, off } = usePubSub();
@@ -134,8 +126,7 @@ export const RtcProvider = ({
 
   const sendSignalingMessageToNewcomers = (uuid: string) => {
     sendSignalingMessage(uuid, {
-      displayName: localUuid.current, // not sure if this is correct
-      uuid: localUuid.current,
+      newPeer: true,
     });
   };
 
@@ -143,19 +134,22 @@ export const RtcProvider = ({
     peerConnection: RTCPeerConnection,
     signal: Signal
   ) => {
-    peerConnection
-      .setRemoteDescription(new RTCSessionDescription(signal.sdp))
-      .then(() => {
-        // Only create answers in response to offers
-        if (signal.sdp.type == 'offer') {
-          peerConnections.current
-            .get(signal.uuid)
-            ?.pc.createAnswer()
-            .then((description) => createdDescription(description, signal.uuid))
-            .catch((e) => handleError(e));
-        }
-      })
-      .catch((e) => handleError(e));
+    if (signal.sdp)
+      peerConnection
+        .setRemoteDescription(new RTCSessionDescription(signal.sdp))
+        .then(() => {
+          // Only create answers in response to offers
+          if (signal.sdp?.type == 'offer') {
+            peerConnections.current
+              .get(signal.uuid)
+              ?.pc.createAnswer()
+              .then((description) =>
+                createdDescription(description, signal.uuid)
+              )
+              .catch((e) => handleError(e));
+          }
+        })
+        .catch((e) => handleError(e));
   };
 
   const initIceCandidate = (
@@ -170,7 +164,6 @@ export const RtcProvider = ({
   function handleMessageFromServer(message: MessageEvent) {
     const signal: Signal = JSON.parse(message.data);
     const peerUuid = signal.uuid;
-    const peerDisplayName = signal.displayName;
     const destination = signal.dest;
     const isSessionDescription = signal.sdp;
     const isIceCandidate = signal.ice;
@@ -191,7 +184,7 @@ export const RtcProvider = ({
       }
     }
 
-    if (peerDisplayName) {
+    if (signal.newPeer) {
       const isNewcomer = destination === localUuid.current;
       setUpPeer(peerUuid, isNewcomer);
       if (isNewcomer) {
@@ -202,13 +195,12 @@ export const RtcProvider = ({
     }
   }
 
-  const enter = (userMetadata?: Metadata) => {
+  const enter = () => {
     // TODO: Fix this ignore
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     signaling.current = new WebSocket(signalingServer);
-    setUser({ userMetadata });
 
     setIsEntered(true);
   };
@@ -224,7 +216,6 @@ export const RtcProvider = ({
 
   const sendSignalingMessage = (
     dest: string,
-
     data: Record<string, unknown>
   ) => {
     const message = JSON.stringify({ uuid: localUuid.current, dest, ...data });
@@ -233,7 +224,7 @@ export const RtcProvider = ({
   };
 
   const handleSignalingOpen = () => {
-    sendSignalingMessage('all', { displayName: localUuid.current });
+    sendSignalingMessage('all', { newPeer: true });
   };
 
   const handleError = (error: unknown) => dispatchEvent('error', error);

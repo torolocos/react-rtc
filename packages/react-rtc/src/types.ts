@@ -36,10 +36,6 @@ export interface ContextType {
   off?: RemoveEventListener;
 }
 
-export interface User {
-  userMetadata?: Metadata;
-}
-
 export enum ConnectionState {
   FAILED = 'failed',
   CLOSED = 'closed',
@@ -48,8 +44,8 @@ export enum ConnectionState {
 
 export interface Signal {
   uuid: string;
-  displayName: string;
   dest: 'all' | string;
-  sdp: RTCSessionDescriptionInit;
-  ice: RTCIceCandidateInit | undefined;
+  sdp?: RTCSessionDescriptionInit;
+  ice?: RTCIceCandidateInit | undefined;
+  newPeer?: boolean;
 }
