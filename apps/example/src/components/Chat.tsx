@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRtc, type EventHandler } from '@torolocos/react-rtc';
-
 import './styles.css';
 
 const Chat = () => {
