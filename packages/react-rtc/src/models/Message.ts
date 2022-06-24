@@ -1,11 +1,11 @@
-import { Metadata } from '../types';
-
-class Message {
+class Message<
+  MetadaType extends Record<string, unknown> = Record<string, never>
+> {
   id: string;
   senderId?: string;
   message: string;
   timestamp: number;
-  metadata?: Metadata;
+  metadata?: MetadaType;
 
   constructor({
     message,
@@ -16,7 +16,7 @@ class Message {
     message: string;
     senderId: string;
     timestamp: number;
-    metadata?: Metadata;
+    metadata?: MetadaType;
   }) {
     this.id = crypto.randomUUID();
     this.message = message;

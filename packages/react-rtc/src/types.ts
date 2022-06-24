@@ -1,8 +1,6 @@
 import Message from './models/Message';
 import Peer from './models/Peer';
 
-export type Metadata = Record<string, unknown>;
-
 export type AddEventListener = <Type extends keyof EventsDetail>(
   type: Type,
   handler: EventHandler<Type>,
@@ -28,8 +26,13 @@ export interface EventsDetail {
 }
 
 export interface ContextType {
-  send?: (inputValue: string) => void;
-  enter?: (userMetadata?: Metadata) => void;
+  send?: <MetadataType extends Record<string, unknown>>(
+    inputValue: string,
+    metadata?: MetadataType
+  ) => void;
+  enter?: <MetadataType extends Record<string, never>>(
+    userMetadata?: MetadataType
+  ) => void;
   disconnect?: () => void;
   state?: { isEntered: boolean };
   on?: AddEventListener;

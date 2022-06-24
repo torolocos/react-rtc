@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useRtc, type EventHandler } from '@torolocos/react-rtc';
+import { useRtc, type EventHandler, type Message } from '@torolocos/react-rtc';
 import './styles.css';
 
 const Chat = () => {
   const { send, enter, disconnect, state, on, off } = useRtc();
   const [inputValue, setInputValue] = useState('');
-  const [messageData, setMessageData] = useState([]);
+  const [user] = useState({ username: Math.random().toFixed(3) });
+  const [messageData, setMessageData] = useState<
+    Message<{ username: string }>[]
+  >([]);
   const [error, setError] = useState('');
   const [, setChatOpen] = useState(false);
   const { isEntered } = state;
@@ -24,15 +27,17 @@ const Chat = () => {
   };
 
   const onMessageSend = () => {
-    send(inputValue);
+    send(inputValue, { username: user.username });
 
     setInputValue('');
   };
 
   const handleMessage: EventHandler<'message'> = (event) =>
+    // @ts-ignore
     setMessageData((messages) => [...messages, event.detail]);
 
   const handleMessageSend: EventHandler<'send'> = (event) =>
+    // @ts-ignore
     setMessageData((messages) => [...messages, event.detail]);
 
   const handlePeerConnected: EventHandler<'peerConnected'> = (event) =>
@@ -66,9 +71,9 @@ const Chat = () => {
       <h2>Chat</h2>
       {error && <div className="errorText">Something went wrong</div>}
       <div>
-        {messageData.map(({ id, senderId, message }) => (
+        {messageData.map(({ id, message, metadata }) => (
           <div key={id}>
-            {senderId}: {message}
+            {metadata.username}: {message}
           </div>
         ))}
       </div>

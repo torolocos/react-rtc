@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Message from '../models/Message';
 import Peer from '../models/Peer';
 import { RtcContext } from './RtcContext';
-import { ConnectionState, type Metadata, type Signal } from '../types';
+import { ConnectionState, type Signal } from '../types';
 import { usePubSub } from '../hooks/usePubSub';
 
 interface Props {
@@ -22,7 +22,10 @@ export const RtcProvider = ({
   const peerConnections = useRef<Map<string, Peer>>(new Map());
   const { dispatchEvent, on, off } = usePubSub();
 
-  const send = (inputValue: string, metadata?: Metadata) => {
+  const send = <MetadataType extends Record<string, unknown>>(
+    inputValue: string,
+    metadata?: MetadataType
+  ) => {
     try {
       const messageData = new Message({
         message: inputValue,
