@@ -17,7 +17,6 @@ export const RtcProvider = ({
   signalingServer,
   iceServers,
 }: Props) => {
-  const [isEntered, setIsEntered] = useState(false); // TODO: Rename, leave there
   const localUuid = useRef(crypto.randomUUID());
   const [user, setUser] = useState<User>({
     displayName: undefined,
@@ -125,7 +124,6 @@ export const RtcProvider = ({
       const isNewcomer = destination === localUuid.current;
       setUpPeer(peerUuid, peerDisplayName, isNewcomer);
       if (isNewcomer) {
-        setIsEntered(true);
       } else {
         sendSignalingMessageToNewcomers(peerUuid);
       }
@@ -139,8 +137,6 @@ export const RtcProvider = ({
     // @ts-ignore
     signaling.current = new WebSocket(signalingServer);
     setUser({ displayName, userMetadata });
-
-    setIsEntered(true);
   };
 
   const disconnect = () => {
@@ -148,7 +144,7 @@ export const RtcProvider = ({
     peerConnections.current.forEach((connection) => {
       connection.pc.close();
     });
-    setIsEntered(false);
+
     // TODO: Add callback
   };
 
@@ -167,7 +163,6 @@ export const RtcProvider = ({
     <RtcContext.Provider
       value={{
         send,
-        state: { isEntered },
         disconnect,
         enter,
         on,

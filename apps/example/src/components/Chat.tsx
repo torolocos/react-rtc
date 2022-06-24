@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRtc, type EventHandler } from '@torolocos/react-rtc';
-
 import './styles.css';
 
 const Chat = () => {
@@ -8,8 +7,7 @@ const Chat = () => {
   const [inputValue, setInputValue] = useState('');
   const [messageData, setMessageData] = useState([]);
   const [error, setError] = useState('');
-  const [, setChatOpen] = useState(false);
-  const { isEntered } = state;
+  const [isChatOpen, setChatOpen] = useState(false);
 
   const onStartChat = () => {
     enter(`${Math.random().toFixed(2)}`); //FIXME: tmp till we create valid Chat Screen
@@ -73,7 +71,7 @@ const Chat = () => {
           </div>
         ))}
       </div>
-      {isEntered && (
+      {isChatOpen && (
         <>
           <input
             value={inputValue}
@@ -82,8 +80,8 @@ const Chat = () => {
           <button onClick={onMessageSend}>send</button>
         </>
       )}
-      <button onClick={!isEntered ? onStartChat : onEndChat}>
-        {!isEntered ? 'join' : 'leave chat'}
+      <button onClick={!isChatOpen ? onStartChat : onEndChat}>
+        {!isChatOpen ? 'join' : 'leave chat'}
       </button>
     </div>
   );

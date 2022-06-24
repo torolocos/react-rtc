@@ -1,5 +1,6 @@
 import { useRef } from 'react';
-import { ConnectionState, Peer, Signal } from '../types';
+import { ConnectionState, Signal } from '../types';
+import Peer from '../models/Peer';
 import { usePubSub } from './usePubSub';
 import { useSignaling } from './useSignaling';
 
@@ -96,12 +97,10 @@ export const usePeerConnection = (
         .catch((e) => handleError(e));
     }
 
-    peerConnections.current.set(peerUuid, {
-      displayName,
-      pc: peerConnection,
-      dataChannel,
-    });
-    // setIsEntered(true); // this will be probably removed
+    peerConnections.current.set(
+      peerUuid,
+      new Peer({ peerConnection, dataChannel, displayName })
+    );
   }
   return { peerConnections, setUpPeer, initIceCandidate };
 };
