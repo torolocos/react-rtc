@@ -1,7 +1,23 @@
 import { useRef, useEffect } from 'react';
+import Peer from '../models/Peer';
 
-export const useSignaling = (uuid: string) => {
+export const useSignaling = (
+  uuid: string,
+  signalingServer: string,
+  peerConnections: React.MutableRefObject<Map<string, Peer>>
+) => {
   const signaling = useRef<WebSocket>();
+
+  const onConnect = () => {
+    signaling.current = new WebSocket(signalingServer);
+  };
+
+  const onDisconnect = () => {
+    signaling.current?.close();
+    peerConnections.current.forEach((connection) => {
+      connection.pc.close();
+    });
+  };
 
   const sendSignalingMessage = (
     destination: string,
@@ -28,5 +44,5 @@ export const useSignaling = (uuid: string) => {
     };
   }, [signaling.current]);
 
-  return { sendSignalingMessage, signaling };
+  return { sendSignalingMessage, signaling, onConnect, onDisconnect };
 };
