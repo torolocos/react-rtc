@@ -9,6 +9,7 @@ import {
   type Signal,
 } from '../types';
 import { usePubSub } from '../hooks/usePubSub';
+import { useSignaling } from '../hooks/useSignaling';
 
 interface Props {
   children: JSX.Element;
@@ -21,14 +22,14 @@ export const RtcProvider = ({
   signalingServer,
   iceServers,
 }: Props) => {
-  const [isEntered, setIsEntered] = useState(false); // TODO: Rename, leave there
   const localUuid = useRef(crypto.randomUUID());
   const [user, setUser] = useState<User>({
     displayName: undefined,
   });
-  const signaling = useRef<WebSocket>(null);
+
   const peerConnections = useRef<Map<string, Peer>>(new Map());
   const { dispatchEvent, on, off } = usePubSub();
+  const { sendSignalingMessage, signaling } = useSignaling(localUuid.current);
 
   const send = (inputValue: string, metadata?: Metadata) => {
     try {
@@ -107,7 +108,6 @@ export const RtcProvider = ({
       peerUuid,
       new Peer({ peerConnection, dataChannel, displayName })
     );
-    setIsEntered(true);
   }
 
   function gotIceCandidate(event: RTCPeerConnectionIceEvent, peerUuid: string) {
@@ -196,7 +196,6 @@ export const RtcProvider = ({
       const isNewcomer = destination === localUuid.current;
       setUpPeer(peerUuid, peerDisplayName, isNewcomer);
       if (isNewcomer) {
-        setIsEntered(true);
       } else {
         sendSignalingMessageToNewcomers(peerUuid);
       }
@@ -210,8 +209,6 @@ export const RtcProvider = ({
     // @ts-ignore
     signaling.current = new WebSocket(signalingServer);
     setUser({ displayName, userMetadata });
-
-    setIsEntered(true);
   };
 
   const disconnect = () => {
@@ -219,36 +216,20 @@ export const RtcProvider = ({
     peerConnections.current.forEach((connection) => {
       connection.pc.close();
     });
-    setIsEntered(false);
+
     // TODO: Add callback
-  };
-
-  const sendSignalingMessage = (
-    dest: string,
-
-    data: Record<string, unknown>
-  ) => {
-    const message = JSON.stringify({ uuid: localUuid.current, dest, ...data });
-
-    signaling.current?.send(message);
-  };
-
-  const handleSignalingOpen = () => {
-    sendSignalingMessage('all', { displayName: user.displayName });
   };
 
   const handleError = (error: unknown) => dispatchEvent('error', error);
 
   useEffect(() => {
     signaling.current?.addEventListener('message', handleMessageFromServer);
-    signaling.current?.addEventListener('open', handleSignalingOpen);
 
     return () => {
       signaling.current?.removeEventListener(
         'message',
         handleMessageFromServer
       );
-      signaling.current?.removeEventListener('open', handleSignalingOpen);
     };
   }, [signaling.current]);
 
@@ -256,7 +237,6 @@ export const RtcProvider = ({
     <RtcContext.Provider
       value={{
         send,
-        state: { isEntered },
         disconnect,
         enter,
         on,
