@@ -32,9 +32,8 @@ export const useSignaling = (
     signaling.current?.send(message);
   };
 
-  const handleSignalingOpen = () => {
+  const handleSignalingOpen = () => 
     sendSignalingMessage('all', { displayName: uuid });
-  };
 
   useEffect(() => {
     signaling.current?.addEventListener('open', handleSignalingOpen);
