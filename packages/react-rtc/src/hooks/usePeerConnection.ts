@@ -23,7 +23,7 @@ export const usePeerConnection = (
     }
   }
 
-  function setUpPeer(peerUuid: string, displayName: string, initCall = false) {
+  function setUpPeer(peerUuid: string, initCall = false) {
     const peerConnection = new RTCPeerConnection({ iceServers });
     const dataChannel = peerConnection.createDataChannel(crypto.randomUUID());
 
@@ -59,7 +59,7 @@ export const usePeerConnection = (
 
     peerConnections.current.set(
       peerUuid,
-      new Peer({ peerConnection, dataChannel, displayName })
+      new Peer({ uuid: peerUuid, peerConnection, dataChannel })
     );
   }
 
@@ -118,7 +118,6 @@ export const usePeerConnection = (
   function handleMessageFromServer(message: MessageEvent) {
     const signal: Signal = JSON.parse(message.data);
     const peerUuid = signal.uuid;
-    const peerDisplayName = signal.displayName;
     const destination = signal.dest;
     const isSessionDescription = signal.sdp;
     const isIceCandidate = signal.ice;
@@ -141,7 +140,7 @@ export const usePeerConnection = (
 
     if (signal.newPeer) {
       const isNewcomer = destination === localUuid.current;
-      setUpPeer(peerUuid, peerDisplayName, isNewcomer);
+      setUpPeer(peerUuid, isNewcomer);
       if (isNewcomer) {
       } else {
         sendSignalingMessageToNewcomers(peerUuid);

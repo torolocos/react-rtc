@@ -1,19 +1,19 @@
 export default class Peer {
+  uuid: string;
   pc: RTCPeerConnection;
   dataChannel: RTCDataChannel;
-  displayName: string;
 
   constructor({
+    uuid,
     peerConnection,
     dataChannel,
-    displayName,
   }: {
+    uuid: string;
     peerConnection: RTCPeerConnection;
     dataChannel: RTCDataChannel;
-    displayName: string;
   }) {
+    this.uuid = uuid;
     this.pc = peerConnection;
     this.dataChannel = dataChannel;
-    this.displayName = displayName;
   }
 }
