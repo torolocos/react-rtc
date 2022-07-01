@@ -50,7 +50,6 @@ export const RtcProvider = ({
 
   const enter = () => {
     onConnect();
-    // setUser({});
   };
 
   const disconnect = (callback?: () => void) => {
