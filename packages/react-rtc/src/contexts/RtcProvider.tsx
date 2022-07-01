@@ -16,7 +16,7 @@ export const RtcProvider = ({
   signalingServer,
   iceServers,
 }: Props) => {
-  const [user, setUser] = useState<User>({
+  const [, setUser] = useState<User>({
     displayName: undefined,
   });
   const handleError = (error: unknown) => dispatchEvent('error', error);
@@ -34,7 +34,6 @@ export const RtcProvider = ({
     try {
       const messageData = new Message({
         message: inputValue,
-        displayName: user.displayName,
         senderId: id,
         timestamp: Date.now(),
         metadata: metadata,

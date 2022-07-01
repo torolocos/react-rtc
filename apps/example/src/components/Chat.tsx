@@ -35,10 +35,10 @@ const Chat = () => {
     setMessageData((messages) => [...messages, event.detail]);
 
   const handlePeerConnected: EventHandler<'peerConnected'> = (event) =>
-    console.log('Peer connected', event.detail.displayName);
+    console.log('Peer connected', event.detail.uuid);
 
   const handlePeerDisconnected: EventHandler<'peerDisconnected'> = (event) =>
-    console.log('Peer disconnected', event.detail.displayName);
+    console.log('Peer disconnected', event.detail.uuid);
 
   const handleError: EventHandler<'error'> = () => setError('Err');
 
