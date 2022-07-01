@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
-import { useRtc, type EventHandler } from '@torolocos/react-rtc';
+import { useRtc, type EventHandler, type Message } from '@torolocos/react-rtc';
 import './styles.css';
 
 const Chat = () => {
   const { send, enter, disconnect, on, off } = useRtc();
   const [inputValue, setInputValue] = useState('');
-  const [messageData, setMessageData] = useState([]);
+  const [messageData, setMessageData] = useState<Message[]>([]);
   const [error, setError] = useState('');
   const [isChatOpen, setChatOpen] = useState(false);
 
   const onStartChat = () => {
-    enter(`${Math.random().toFixed(2)}`); //FIXME: tmp till we create valid Chat Screen
+    enter();
 
     //TODO: zkontrolovat jestli pripojeni probehlo uspesne
     setChatOpen(true);
@@ -65,9 +65,9 @@ const Chat = () => {
       <h2>Chat</h2>
       {error && <div className="errorText">Something went wrong</div>}
       <div>
-        {messageData.map(({ id, message, displayName }) => (
+        {messageData.map(({ id, message, senderId }) => (
           <div key={id}>
-            {displayName}: {message}
+            {senderId}: {message}
           </div>
         ))}
       </div>

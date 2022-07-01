@@ -91,19 +91,22 @@ export const usePeerConnection = (
     peerConnection: RTCPeerConnection,
     signal: Signal
   ) => {
-    peerConnection
-      .setRemoteDescription(new RTCSessionDescription(signal.sdp))
-      .then(() => {
-        // Only create answers in response to offers
-        if (signal.sdp.type == 'offer') {
-          peerConnections.current
-            .get(signal.uuid)
-            ?.pc.createAnswer()
-            .then((description) => createdDescription(description, signal.uuid))
-            .catch((e) => handleError(e));
-        }
-      })
-      .catch((e) => handleError(e));
+    if (signal.sdp)
+      peerConnection
+        .setRemoteDescription(new RTCSessionDescription(signal.sdp))
+        .then(() => {
+          // Only create answers in response to offers
+          if (signal.sdp?.type == 'offer') {
+            peerConnections.current
+              .get(signal.uuid)
+              ?.pc.createAnswer()
+              .then((description) =>
+                createdDescription(description, signal.uuid)
+              )
+              .catch((e) => handleError(e));
+          }
+        })
+        .catch((e) => handleError(e));
   };
 
   const initIceCandidate = (
@@ -164,15 +167,12 @@ export const usePeerConnection = (
   }
 
   useEffect(() => {
-    signaling.current?.addEventListener('message', handleMessageFromServer);
+    signaling?.addEventListener('message', handleMessageFromServer);
 
     return () => {
-      signaling.current?.removeEventListener(
-        'message',
-        handleMessageFromServer
-      );
+      signaling?.removeEventListener('message', handleMessageFromServer);
     };
-  }, [signaling.current]);
+  }, [signaling]);
 
   return {
     peerConnections,

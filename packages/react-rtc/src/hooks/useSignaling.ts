@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Peer from '../models/Peer';
 
 export const useSignaling = (
@@ -6,14 +6,14 @@ export const useSignaling = (
   signalingServer: string,
   peerConnections: React.MutableRefObject<Map<string, Peer>>
 ) => {
-  const signaling = useRef<WebSocket>();
+  const [signaling, setSignaling] = useState<WebSocket | undefined>();
 
   const onConnect = () => {
-    signaling.current = new WebSocket(signalingServer);
+    setSignaling(new WebSocket(signalingServer));
   };
 
   const onDisconnect = () => {
-    signaling.current?.close();
+    signaling?.close();
     peerConnections.current.forEach((connection) => {
       connection.pc.close();
     });
@@ -29,19 +29,19 @@ export const useSignaling = (
       ...data,
     });
 
-    signaling.current?.send(message);
+    signaling?.send(message);
   };
 
   const handleSignalingOpen = () =>
     sendSignalingMessage('all', { newPeer: true });
 
   useEffect(() => {
-    signaling.current?.addEventListener('open', handleSignalingOpen);
+    signaling?.addEventListener('open', handleSignalingOpen);
 
     return () => {
-      signaling.current?.removeEventListener('open', handleSignalingOpen);
+      signaling?.removeEventListener('open', handleSignalingOpen);
     };
-  }, [signaling.current]);
+  }, [signaling]);
 
   return { sendSignalingMessage, signaling, onConnect, onDisconnect };
 };

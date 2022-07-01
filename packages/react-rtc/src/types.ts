@@ -1,5 +1,5 @@
-import Message from './models/Message';
-import Peer from './models/Peer';
+import type Message from './models/Message';
+import type Peer from './models/Peer';
 
 export type Metadata = Record<string, unknown>;
 
@@ -29,16 +29,11 @@ export interface EventsDetail {
 
 export interface ContextType {
   send?: (inputValue: string) => void;
-  enter?: (displayName: string, userMetadata?: Metadata) => void;
+  enter?: () => void;
   disconnect?: () => void;
   state?: { isEntered: boolean };
   on?: AddEventListener;
   off?: RemoveEventListener;
-}
-
-export interface User {
-  displayName?: string;
-  userMetadata?: Metadata;
 }
 
 export enum ConnectionState {
@@ -49,8 +44,8 @@ export enum ConnectionState {
 
 export interface Signal {
   uuid: string;
-  displayName: string;
   dest: 'all' | string;
-  sdp: RTCSessionDescriptionInit;
-  ice: RTCIceCandidateInit | undefined;
+  sdp?: RTCSessionDescriptionInit;
+  ice?: RTCIceCandidateInit | undefined;
+  newPeer?: boolean;
 }
