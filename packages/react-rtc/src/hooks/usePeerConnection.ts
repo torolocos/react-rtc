@@ -65,7 +65,7 @@ export const usePeerConnection = (
 
   const sendSignalingMessageToNewcomers = (uuid: string) => {
     sendSignalingMessage(uuid, {
-      displayName: localUuid.current, // not sure if this is correct
+      newPeer: true, // not sure if this is correct
       uuid: localUuid.current,
     });
   };
@@ -139,7 +139,7 @@ export const usePeerConnection = (
       }
     }
 
-    if (peerDisplayName) {
+    if (signal.newPeer) {
       const isNewcomer = destination === localUuid.current;
       setUpPeer(peerUuid, peerDisplayName, isNewcomer);
       if (isNewcomer) {
