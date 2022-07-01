@@ -20,17 +20,17 @@ export const RtcProvider = ({
 
   const { dispatchEvent, on, off } = usePubSub();
 
-  const { peerConnections, onDisconnect, id, onConnect } = usePeerConnection(
+  const { peerConnections, disconnect, id, connect } = usePeerConnection(
     dispatchEvent,
     signalingServer,
     iceServers,
     handleError
   );
 
-  const send = (inputValue: string, metadata?: Metadata) => {
+  const send = (message: string, metadata?: Metadata) => {
     try {
       const messageData = new Message({
-        message: inputValue,
+        message,
         senderId: id,
         timestamp: Date.now(),
         metadata: metadata,
@@ -48,21 +48,19 @@ export const RtcProvider = ({
     }
   };
 
-  const enter = () => {
-    onConnect();
-  };
+  const enter = () => connect();
 
-  const disconnect = (callback?: () => void) => {
-    onDisconnect();
+  const leave = (callback?: () => void) => {
+    disconnect();
     if (callback) callback();
   };
 
   return (
     <RtcContext.Provider
       value={{
-        send,
-        disconnect,
         enter,
+        leave,
+        send,
         on,
         off,
       }}
