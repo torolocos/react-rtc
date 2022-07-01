@@ -65,7 +65,7 @@ export const usePeerConnection = (
 
   const sendSignalingMessageToNewcomers = (uuid: string) => {
     sendSignalingMessage(uuid, {
-      newPeer: true, // not sure if this is correct
+      newPeer: true,
       uuid: localUuid.current,
     });
   };
