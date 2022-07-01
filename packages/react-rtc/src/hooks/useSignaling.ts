@@ -8,15 +8,11 @@ export const useSignaling = (
 ) => {
   const [signaling, setSignaling] = useState<WebSocket | undefined>();
 
-  const onConnect = () => {
-    setSignaling(new WebSocket(signalingServer));
-  };
+  const connect = () => setSignaling(new WebSocket(signalingServer));
 
-  const onDisconnect = () => {
+  const disconnect = () => {
     signaling?.close();
-    peerConnections.current.forEach((connection) => {
-      connection.pc.close();
-    });
+    peerConnections.current.forEach((connection) => connection.pc.close());
   };
 
   const sendSignalingMessage = (
@@ -43,5 +39,5 @@ export const useSignaling = (
     };
   }, [signaling]);
 
-  return { sendSignalingMessage, signaling, onConnect, onDisconnect };
+  return { sendSignalingMessage, signaling, connect, disconnect };
 };
