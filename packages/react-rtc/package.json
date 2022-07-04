@@ -9,6 +9,9 @@
   "author": "torolocos",
   "main": "./dist/esm/index.mjs",
   "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "license": "MIT",
   "scripts": {
     "build": "rollup -c",
