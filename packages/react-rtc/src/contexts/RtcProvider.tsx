@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Message from '../models/Message';
 import { RtcContext } from './RtcContext';
-import { type Metadata, type User } from '../types';
+import { type Metadata } from '../types';
 import { usePubSub } from '../hooks/usePubSub';
 import { usePeerConnection } from '../hooks/usePeerConnection';
 
@@ -16,9 +16,6 @@ export const RtcProvider = ({
   signalingServer,
   iceServers,
 }: Props) => {
-  const [user, setUser] = useState<User>({
-    displayName: undefined,
-  });
   const handleError = (error: unknown) => dispatchEvent('error', error);
 
   const { dispatchEvent, on, off } = usePubSub();
@@ -34,7 +31,6 @@ export const RtcProvider = ({
     try {
       const messageData = new Message({
         message: inputValue,
-        displayName: user.displayName,
         senderId: id,
         timestamp: Date.now(),
         metadata: metadata,
@@ -52,9 +48,8 @@ export const RtcProvider = ({
     }
   };
 
-  const enter = (displayName: string, userMetadata?: Metadata) => {
+  const enter = () => {
     onConnect();
-    setUser({ displayName, userMetadata });
   };
 
   const disconnect = (callback?: () => void) => {
