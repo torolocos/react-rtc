@@ -28,9 +28,10 @@ export interface EventsDetail {
 }
 
 export interface ContextType {
+  send?: (inputValue: string) => void;
   enter?: () => void;
   leave?: () => void;
-  send?: (message: string, metadata?: Metadata) => void;
+  state?: { isEntered: boolean };
   on?: AddEventListener;
   off?: RemoveEventListener;
 }
