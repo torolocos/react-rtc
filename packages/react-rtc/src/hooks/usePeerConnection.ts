@@ -28,7 +28,7 @@ export const usePeerConnection = (
       sendSignalingMessage(peerUuid, { ice: event.candidate });
   };
 
-  const addNewUpPeer = (peerUuid: string, initCall = false) => {
+  const addNewPeer = (peerUuid: string, initCall = false) => {
     const peerConnection = new RTCPeerConnection({ iceServers });
     const dataChannel = peerConnection.createDataChannel(crypto.randomUUID());
 
