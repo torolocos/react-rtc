@@ -154,7 +154,7 @@ export const usePeerConnection = (
 
     if (signal.newPeer) {
       const isNewcomer = destination === localUuid.current;
-      addNewUpPeer(peerUuid, isNewcomer);
+      addNewPeer(peerUuid, isNewcomer);
       if (isNewcomer) {
       } else {
         sendSignalingMessageToNewcomers(peerUuid);
