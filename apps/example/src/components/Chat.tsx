@@ -3,7 +3,7 @@ import { useRtc, type EventHandler, type Message } from '@torolocos/react-rtc';
 import './styles.css';
 
 const Chat = () => {
-  const { send, enter, disconnect, on, off } = useRtc();
+  const { send, enter, leave, on, off } = useRtc();
   const [inputValue, setInputValue] = useState('');
   const [messageData, setMessageData] = useState<Message[]>([]);
   const [error, setError] = useState('');
@@ -17,7 +17,7 @@ const Chat = () => {
   };
 
   const onEndChat = () => {
-    disconnect();
+    leave();
     //TODO: zkontrolovat jestli pripojeni probehlo uspesne
     setChatOpen(false);
   };
@@ -56,7 +56,7 @@ const Chat = () => {
       off('peerConnected', handlePeerConnected);
       off('peerDisconnected', handlePeerDisconnected);
       off('error', handleError);
-      disconnect();
+      leave();
     };
   }, []);
 
