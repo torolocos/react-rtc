@@ -1,22 +1,24 @@
 {
-	"name": "signaling-server",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"dependencies": {
-		"ws": "^8.7.0"
-	},
-	"devDependencies": {
-		"@types/node": "^17.0.40",
-		"@types/ws": "^8.2.2",
-		"ts-node": "^10.8.1",
-		"typescript": "^4.7.3"
-	},
-	"scripts": {
-		"build": "tsc",
-		"dev": "ts-node src/index.ts --watch"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC"
+  "name": "signaling-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "ws": "^8.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.40",
+    "@types/ws": "^8.2.2",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.3",
+    "eslint-config-custom": "*"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts --watch",
+    "lint": "eslint . --ext ts --ext tsx"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
