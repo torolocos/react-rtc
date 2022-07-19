@@ -10,20 +10,20 @@ const Chat = () => {
   const [isChatOpen, setChatOpen] = useState(false);
 
   const onStartChat = () => {
-    enter();
+    if (enter) enter();
 
-    //TODO: zkontrolovat jestli pripojeni probehlo uspesne
+    // TODO: zkontrolovat jestli pripojeni probehlo uspesne
     setChatOpen(true);
   };
 
   const onEndChat = () => {
-    leave();
-    //TODO: zkontrolovat jestli pripojeni probehlo uspesne
+    if (leave) leave();
+    // TODO: zkontrolovat jestli pripojeni probehlo uspesne
     setChatOpen(false);
   };
 
   const onMessageSend = () => {
-    send(inputValue);
+    if (send) send(inputValue);
 
     setInputValue('');
   };
@@ -43,20 +43,24 @@ const Chat = () => {
   const handleError: EventHandler<'error'> = () => setError('Err');
 
   useEffect(() => {
-    on('message', handleMessage);
-    on('send', handleMessageSend);
-    on('send', () => console.log('first message sended'), { once: true });
-    on('peerConnected', handlePeerConnected);
-    on('peerDisconnected', handlePeerDisconnected);
-    on('error', handleError);
+    if (on) {
+      on('message', handleMessage);
+      on('send', handleMessageSend);
+      on('send', () => console.log('first message sended'), { once: true });
+      on('peerConnected', handlePeerConnected);
+      on('peerDisconnected', handlePeerDisconnected);
+      on('error', handleError);
+    }
 
     return () => {
-      off('message', handleMessage);
-      off('send', handleMessageSend);
-      off('peerConnected', handlePeerConnected);
-      off('peerDisconnected', handlePeerDisconnected);
-      off('error', handleError);
-      leave();
+      if (off) {
+        off('message', handleMessage);
+        off('send', handleMessageSend);
+        off('peerConnected', handlePeerConnected);
+        off('peerDisconnected', handlePeerDisconnected);
+        off('error', handleError);
+      }
+      if (leave) leave();
     };
   }, []);
 
