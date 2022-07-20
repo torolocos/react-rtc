@@ -1,8 +1,13 @@
 {
-  "name": "eslint-config-custom",
+  "name": "@torolocos/eslint-config",
   "version": "0.0.0",
-  "main": "index.js",
+  "author": "torolocos",
+  "main": "index.json",
   "license": "MIT",
+  "keywords": [
+    "eslint",
+    "eslintconfig"
+  ],
   "dependencies": {
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^8.5.0",
@@ -11,7 +16,7 @@
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.3.0"
   },
-  "publishConfig": {
-    "access": "public"
+  "peerDependencies": {
+    "eslint": ">= 8"
   }
 }

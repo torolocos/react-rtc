@@ -1,4 +1,3 @@
-import React from 'react';
 import Message from '../models/Message';
 import { RtcContext } from './RtcContext';
 import { type Metadata } from '../types';
