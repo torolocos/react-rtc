@@ -31,10 +31,8 @@ jobs:
           node-version: 16
       - run: yarn install --frozen-lockfile
       - name: TS Check
-        working-directory: ./packages/react-rtc
         run: yarn tsc:check
       - name: Eslint Check
-        working-directory: ./packages/react-rtc
         run: yarn lint
         env:
           CI: true
