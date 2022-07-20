@@ -9,6 +9,7 @@
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint --parallel",
+    "tsc:check": "turbo run lint --parallel",
     "postinstall": "husky install"
   },
   "devDependencies": {

@@ -15,19 +15,17 @@
   "license": "MIT",
   "scripts": {
     "build": "rollup -c",
-    "tsc-check": "tsc --pretty --noEmit",
+    "tsc:check": "tsc --pretty --noEmit",
     "lint": "eslint . --ext ts --ext tsx",
     "dev": "rollup -c -w ",
     "format": "prettier --write ."
   },
   "peerDependencies": {
-    "react": "^18.1.0"
+    "react": "^18.2.0"
   },
   "devDependencies": {
     "@torolocos/eslint-config": "*",
     "@types/react": "^18.0.12",
-    "@typescript-eslint/eslint-plugin": "^5.27.1",
-    "@typescript-eslint/parser": "^5.27.1",
     "esbuild": "^0.14.42",
     "rollup": "^2.75.5",
     "rollup-plugin-dts": "^4.2.2",

@@ -16,7 +16,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "ts-node src/index.ts --watch",
-    "lint": "eslint . --ext ts --ext tsx"
+    "lint": "eslint . --ext ts --ext tsx",
+    "tsc:check": "tsc --pretty --noEmit"
   },
   "keywords": [],
   "author": "",
