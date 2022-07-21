@@ -65,7 +65,7 @@ const Chat = () => {
   }, []);
 
   return (
-    <div>
+    <>
       <h2>Chat</h2>
       {error && <div className="errorText">Something went wrong</div>}
       <div>
@@ -87,7 +87,7 @@ const Chat = () => {
       <button onClick={!isChatOpen ? onStartChat : onEndChat}>
         {!isChatOpen ? 'join' : 'leave chat'}
       </button>
-    </div>
+    </>
   );
 };
 
