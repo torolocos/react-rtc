@@ -1,6 +1,5 @@
 import { RtcProvider } from '@torolocos/react-rtc';
 import Chat from './components/Chat';
-import './App.css';
 
 function App() {
   return (
@@ -8,9 +7,7 @@ function App() {
       signalingServer="ws://localhost:8001/"
       iceServers={[{ urls: 'stun:stun.l.google.com:19302' }]}
     >
-      <div className="App">
-        <Chat />
-      </div>
+      <Chat />
     </RtcProvider>
   );
 }

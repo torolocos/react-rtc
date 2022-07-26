@@ -9,12 +9,14 @@
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint --parallel",
+    "tsc:check": "turbo run lint --parallel",
     "postinstall": "husky install"
   },
   "devDependencies": {
     "husky": "^8.0.1",
     "lint-staged": "^13.0.0",
     "prettier": "^2.6.2",
+    "eslint": "^8.17.0",
     "turbo": "^1.2.16"
   },
   "packageManager": "yarn@1.22.17"
