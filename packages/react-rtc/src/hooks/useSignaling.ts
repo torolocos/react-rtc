@@ -1,19 +1,11 @@
 import { useState, useEffect } from 'react';
-import Peer from '../models/Peer';
 
-export const useSignaling = (
-  uuid: string,
-  signalingServer: string,
-  peerConnections: React.MutableRefObject<Map<string, Peer>>
-) => {
+export const useSignaling = (uuid: string, signalingServer: string) => {
   const [signaling, setSignaling] = useState<WebSocket | undefined>();
 
   const connect = () => setSignaling(new WebSocket(signalingServer));
 
-  const disconnect = () => {
-    signaling?.close();
-    peerConnections.current.forEach((connection) => connection.pc.close());
-  };
+  const disconnect = () => signaling?.close();
 
   const sendSignalingMessage = (
     destination: string,
