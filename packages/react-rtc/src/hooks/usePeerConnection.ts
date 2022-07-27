@@ -14,11 +14,19 @@ export const usePeerConnection = (
 ) => {
   const localUuid = useRef(crypto.randomUUID());
   const peerConnections = useRef<Map<string, Peer>>(new Map());
-  const { sendSignalingMessage, signaling, connect, disconnect } = useSignaling(
-    localUuid.current,
-    signalingServer,
-    peerConnections
-  );
+  const {
+    sendSignalingMessage,
+    signaling,
+    connect: connectToSginaling,
+    disconnect: disconnectFromSignaling,
+  } = useSignaling(localUuid.current, signalingServer);
+
+  const connect = connectToSginaling;
+
+  const disconnect = () => {
+    disconnectFromSignaling();
+    peerConnections.current.forEach((connection) => connection.pc.close());
+  };
 
   const onIceCandidate = (
     event: RTCPeerConnectionIceEvent,
