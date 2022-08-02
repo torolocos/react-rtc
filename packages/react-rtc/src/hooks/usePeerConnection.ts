@@ -1,15 +1,12 @@
 import { useEffect, useRef } from 'react';
 import Peer from '../models/Peer';
-import { type Signal, ConnectionState, type EventsDetail } from '../types';
+import { ConnectionState, type Signal, type DispatchEvent } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 import { useSignaling } from './useSignaling';
 
 export const usePeerConnection = (
   localUuid: string,
-  dispatchEvent: <Type extends keyof EventsDetail>(
-    type: Type,
-    detail: EventsDetail[Type]
-  ) => boolean,
+  dispatchEvent: DispatchEvent,
   signalingServer: string,
   iceServers: { urls: string }[]
 ) => {
