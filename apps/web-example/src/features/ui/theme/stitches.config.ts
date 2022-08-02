@@ -7,9 +7,6 @@ const stitches = createStitches({
         '"Maison Neue", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif',
       Rift: 'Rift, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif',
       monospace: '"Maison Neue Mono", "Consolas", "SF Mono", monospace',
-      // aliases
-      body: '$MaisonNeue',
-      title: '$Rift',
     },
     colors: {
       primary: '#286dfe',
@@ -20,6 +17,7 @@ const stitches = createStitches({
       body: '#131517',
       danger: '#cf4342',
       success: '#57a77d',
+      background: '#1d1e23',
     },
     // fontSizes: {
     //   1: '13px',
