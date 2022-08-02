@@ -3,6 +3,11 @@ import type Peer from './models/Peer';
 
 export type Metadata = Record<string, unknown>;
 
+export type DispatchEvent = <Type extends keyof EventsDetail>(
+  type: Type,
+  detail: EventsDetail[Type]
+) => boolean;
+
 export type AddEventListener = <Type extends keyof EventsDetail>(
   type: Type,
   handler: EventHandler<Type>,
