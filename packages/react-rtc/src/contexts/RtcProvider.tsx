@@ -49,9 +49,9 @@ export const RtcProvider = ({
 
   const enter = () => connect();
 
-  const leave = (callback?: () => void) => {
+  const leave = () => {
     disconnect();
-    if (callback) callback();
+    dispatchEvent('leave');
   };
 
   return (
