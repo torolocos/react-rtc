@@ -14,10 +14,17 @@ export const usePubSub = () => {
   ) => eventTarget.current.dispatchEvent(new CustomEvent(type, { detail }));
 
   const on: AddEventListener = (type, handler, options) =>
-    eventTarget.current.addEventListener(type, handler, options);
+    eventTarget.current.addEventListener(
+      type,
+      handler as EventListenerOrEventListenerObject,
+      options
+    );
 
   const off: RemoveEventListener = (type, handler) =>
-    eventTarget.current.removeEventListener(type, handler);
+    eventTarget.current.removeEventListener(
+      type,
+      handler as EventListenerOrEventListenerObject
+    );
 
   return {
     dispatchEvent,
