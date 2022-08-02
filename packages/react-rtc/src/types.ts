@@ -15,9 +15,9 @@ export type RemoveEventListener = <Type extends keyof EventsDetail>(
   options?: EventListenerOptions
 ) => void;
 
-export type EventHandler<Type extends keyof EventsDetail> =
-  EventListenerOrEventListenerObject &
-    ((event: CustomEvent<EventsDetail[Type]>) => void);
+export type EventHandler<Type extends keyof EventsDetail> = (
+  event: CustomEvent<EventsDetail[Type]>
+) => void;
 
 export interface EventsDetail {
   message: Message;
