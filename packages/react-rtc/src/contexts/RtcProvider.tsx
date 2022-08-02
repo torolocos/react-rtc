@@ -15,17 +15,12 @@ export const RtcProvider = ({
   signalingServer,
   iceServers,
 }: Props) => {
-  const handleError = (error: unknown) => dispatchEvent('error', error);
-
   const { dispatchEvent, on, off } = usePubSub();
-
   const { peerConnections, disconnect, id, connect } = usePeerConnection(
     dispatchEvent,
     signalingServer,
-    iceServers,
-    handleError
+    iceServers
   );
-
   const send = (message: string, metadata?: Metadata) => {
     try {
       const messageData = new Message({
@@ -43,7 +38,8 @@ export const RtcProvider = ({
 
       dispatchEvent('send', messageData);
     } catch (error) {
-      handleError(error);
+      // TODO: Will be replaced shortly
+      // handleError(error);
     }
   };
 
