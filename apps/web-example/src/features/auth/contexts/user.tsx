@@ -1,5 +1,5 @@
 import type { FC, ReactNode } from 'react';
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 import type { User } from '../types';
 
@@ -18,13 +18,10 @@ export const UserContextProvider: FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  const value = useMemo(
-    () => ({
-      user,
-      setUser,
-    }),
-    [user]
-  );
+  const value = {
+    user,
+    setUser,
+  };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
