@@ -17,16 +17,12 @@ export const RtcProvider = ({
   iceServers,
 }: Props) => {
   const localUuid = useRef(crypto.randomUUID());
-  const handleError = (error: unknown) => dispatchEvent('error', error);
-
   const { dispatchEvent, on, off } = usePubSub();
-
   const { peerConnections, disconnect, connect } = usePeerConnection(
     localUuid.current,
     dispatchEvent,
     signalingServer,
-    iceServers,
-    handleError
+    iceServers
   );
 
   const send = (message: string, metadata?: Metadata) => {
@@ -46,7 +42,8 @@ export const RtcProvider = ({
 
       dispatchEvent('send', messageData);
     } catch (error) {
-      handleError(error);
+      // TODO: Will be replaced shortly
+      // handleError(error);
     }
   };
 
