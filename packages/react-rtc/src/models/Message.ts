@@ -1,4 +1,4 @@
-class Message<Metadata> {
+class Message<Metadata = unknown> {
   id: string;
   senderId?: string;
   message: string;
