@@ -54,6 +54,7 @@ const Chat = () => {
   const handleMessageSend = (event: RtcEvent<'send'>) => {
     if (isMessageMetadata(event.detail)) {
       const message = event.detail;
+
       setMessageData((messages) => [...messages, message]);
     }
   };
