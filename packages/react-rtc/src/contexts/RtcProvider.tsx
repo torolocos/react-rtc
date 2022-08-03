@@ -29,7 +29,7 @@ export const RtcProvider = ({
   );
   const { send } = useMessaging(
     localUuid.current,
-    peerConnections.current,
+    peerConnections,
     dispatchEvent
   );
 

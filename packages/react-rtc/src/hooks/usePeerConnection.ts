@@ -198,7 +198,7 @@ export const usePeerConnection = (
   }, [signaling]);
 
   return {
-    peerConnections,
+    peerConnections: peerConnections.current,
     connect,
     disconnect,
   };
