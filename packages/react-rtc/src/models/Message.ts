@@ -1,6 +1,4 @@
-import { Metadata } from '../types';
-
-class Message {
+class Message<Metadata> {
   id: string;
   senderId?: string;
   message: string;
