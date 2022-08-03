@@ -4,9 +4,7 @@ import './styles.css';
 
 type MessageMetadata = { username?: string };
 
-const isMessageMetadata = (
-  message: unknown
-): message is Message<MessageMetadata> => {
+const isMessage = (message: unknown): message is Message<MessageMetadata> => {
   return (
     message instanceof Message &&
     'username' in message.metadata &&
@@ -44,7 +42,7 @@ const Chat = () => {
   };
 
   const handleMessageReceived = (event: RtcEvent<'receive'>) => {
-    if (isMessageMetadata(event.detail)) {
+    if (isMessage(event.detail)) {
       const message = event.detail;
 
       setMessageData((messages) => [...messages, message]);
@@ -52,7 +50,7 @@ const Chat = () => {
   };
 
   const handleMessageSend = (event: RtcEvent<'send'>) => {
-    if (isMessageMetadata(event.detail)) {
+    if (isMessage(event.detail)) {
       const message = event.detail;
 
       setMessageData((messages) => [...messages, message]);
