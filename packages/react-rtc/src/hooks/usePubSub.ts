@@ -10,7 +10,7 @@ export const usePubSub = () => {
 
   const dispatchEvent = <Type extends keyof EventsDetail>(
     type: Type,
-    detail: EventsDetail[Type]
+    detail?: EventsDetail[Type]
   ) => eventTarget.current.dispatchEvent(new CustomEvent(type, { detail }));
 
   const on: AddEventListener = (type, handler, options) =>

@@ -25,6 +25,7 @@ export interface EventsDetail {
   error: unknown;
   peerConnected: Peer;
   peerDisconnected: Peer;
+  leave: unknown;
 }
 
 export interface ContextType {

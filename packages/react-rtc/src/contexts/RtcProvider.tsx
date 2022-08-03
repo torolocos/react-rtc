@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import Message from '../models/Message';
 import { RtcContext } from './RtcContext';
 import { type Metadata } from '../types';
@@ -15,11 +16,13 @@ export const RtcProvider = ({
   signalingServer,
   iceServers,
 }: Props) => {
+  const localUuid = useRef(crypto.randomUUID());
   const handleError = (error: unknown) => dispatchEvent('error', error);
 
   const { dispatchEvent, on, off } = usePubSub();
 
-  const { peerConnections, disconnect, id, connect } = usePeerConnection(
+  const { peerConnections, disconnect, connect } = usePeerConnection(
+    localUuid.current,
     dispatchEvent,
     signalingServer,
     iceServers,
@@ -30,7 +33,7 @@ export const RtcProvider = ({
     try {
       const messageData = new Message({
         message,
-        senderId: id,
+        senderId: localUuid.current,
         timestamp: Date.now(),
         metadata: metadata,
       });
@@ -49,9 +52,9 @@ export const RtcProvider = ({
 
   const enter = () => connect();
 
-  const leave = (callback?: () => void) => {
+  const leave = () => {
     disconnect();
-    if (callback) callback();
+    dispatchEvent('leave');
   };
 
   return (
