@@ -1,6 +1,6 @@
 import Message from '../models/Message';
 import Peer from '../models/Peer';
-import type { DispatchEvent, Metadata } from '../types';
+import type { DispatchEvent, Send } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 
 export const useMessaging = (
@@ -10,7 +10,7 @@ export const useMessaging = (
 ) => {
   const errorHandler = useErrorHandler(dispatchEvent);
 
-  const send = (data: string, metadata?: Metadata) => {
+  const send: Send = (data, metadata) => {
     try {
       const message = new Message({
         message: data,
