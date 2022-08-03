@@ -13,6 +13,7 @@
     "next": "12.2.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.34.0",
     "stitches-reset": "^1.0.0"
   },
   "devDependencies": {

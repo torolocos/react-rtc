@@ -25,7 +25,7 @@ const globalStyles = stitches.globalCss({
   body: {
     position: 'relative',
 
-    color: '$body',
+    color: '$text',
     background: '$background',
 
     fontFamily: '$MaisonNeue',
