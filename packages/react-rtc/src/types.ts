@@ -1,26 +1,26 @@
 import type Message from './models/Message';
 import type Peer from './models/Peer';
 
-export type DispatchEvent = <Type extends EventsKeys>(
+export type DispatchEvent = <Type extends keyof EventsDetail>(
   type: Type,
   detail?: EventsDetail[Type]
 ) => boolean;
 
-export type AddEventListener = <Type extends EventsKeys>(
+export type AddEventListener = <Type extends keyof EventsDetail>(
   type: Type,
   handler: (event: RtcEvent<Type>) => void,
   options?: AddEventListenerOptions
 ) => void;
 
-export type RemoveEventListener = <Type extends EventsKeys>(
+export type RemoveEventListener = <Type extends keyof EventsDetail>(
   type: Type,
   handler: (event: RtcEvent<Type>) => void,
   options?: EventListenerOptions
 ) => void;
 
-export type RtcEvent<Type extends EventsKeys> = CustomEvent<EventsDetail[Type]>;
-
-type EventsKeys = keyof EventsDetail;
+export type RtcEvent<Type extends keyof EventsDetail> = CustomEvent<
+  EventsDetail[Type]
+>;
 
 interface EventsDetail {
   receive: Message;
