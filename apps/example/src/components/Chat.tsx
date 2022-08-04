@@ -49,7 +49,7 @@ const Chat = () => {
     }
   };
 
-  const handleMessageSend = (event: RtcEvent<'send'>) => {
+  const handleMessageSent= (event: RtcEvent<'send'>) => {
     if (isMessage(event.detail)) {
       const message = event.detail;
 
