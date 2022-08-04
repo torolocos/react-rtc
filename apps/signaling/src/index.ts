@@ -7,9 +7,7 @@ const webSocket = new WebSocket.Server({ server: httpServer });
 
 const sendToAllClients = (message: string) => {
   webSocket.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(message);
-    }
+    if (client.readyState === WebSocket.OPEN) client.send(message);
   });
 };
 
