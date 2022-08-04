@@ -8,7 +8,7 @@ const isMessage = (message: unknown): message is Message<MessageMetadata> => {
   return (
     message instanceof Message &&
     'username' in message.metadata &&
-    typeof message.metadata === 'string'
+    typeof message.metadata.username === 'string'
   );
 };
 
