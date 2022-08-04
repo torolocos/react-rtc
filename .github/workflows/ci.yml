@@ -30,6 +30,7 @@ jobs:
         run: yarn lint
 
   notify:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Slack Notify Build
