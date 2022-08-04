@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import Message from '../models/Message';
 import Peer from '../models/Peer';
 import { ConnectionState, type Signal, type DispatchEvent } from '../types';
 import { useErrorHandler } from './useErrorHandler';
@@ -59,10 +60,15 @@ export const usePeerConnection = (
         dispatchEvent('peerConnected', peer);
     });
 
-    // TODO: Parse message outside, add try catch, use addMessageData
-    dataChannel.addEventListener('message', (event) =>
-      dispatchEvent('message', JSON.parse(event.data))
-    );
+    dataChannel.addEventListener('message', (event) => {
+      try {
+        const message = new Message(JSON.parse(event.data));
+
+        dispatchEvent('receive', message);
+      } catch (error) {
+        dispatchEvent('error', error);
+      }
+    });
 
     if (initCall) {
       peerConnection
@@ -192,7 +198,7 @@ export const usePeerConnection = (
   }, [signaling]);
 
   return {
-    peerConnections,
+    peerConnections: peerConnections.current,
     connect,
     disconnect,
   };

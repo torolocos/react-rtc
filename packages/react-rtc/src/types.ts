@@ -1,8 +1,6 @@
 import type Message from './models/Message';
 import type Peer from './models/Peer';
 
-export type Metadata = Record<string, unknown>;
-
 export type DispatchEvent = <Type extends keyof EventsDetail>(
   type: Type,
   detail?: EventsDetail[Type]
@@ -10,22 +8,22 @@ export type DispatchEvent = <Type extends keyof EventsDetail>(
 
 export type AddEventListener = <Type extends keyof EventsDetail>(
   type: Type,
-  handler: EventHandler<Type>,
+  handler: (event: RtcEvent<Type>) => void,
   options?: AddEventListenerOptions
 ) => void;
 
 export type RemoveEventListener = <Type extends keyof EventsDetail>(
   type: Type,
-  handler: EventHandler<Type>,
+  handler: (event: RtcEvent<Type>) => void,
   options?: EventListenerOptions
 ) => void;
 
-export type EventHandler<Type extends keyof EventsDetail> = (
-  event: CustomEvent<EventsDetail[Type]>
-) => void;
+export type RtcEvent<Type extends keyof EventsDetail> = CustomEvent<
+  EventsDetail[Type]
+>;
 
-export interface EventsDetail {
-  message: Message;
+interface EventsDetail {
+  receive: Message;
   send: Message;
   error: unknown;
   peerConnected: Peer;
@@ -33,8 +31,13 @@ export interface EventsDetail {
   leave: unknown;
 }
 
+export type Send = <Metadata = undefined>(
+  data: string,
+  metadata?: Metadata
+) => void;
+
 export interface ContextType {
-  send?: (inputValue: string) => void;
+  send?: Send;
   enter?: () => void;
   leave?: () => void;
   state?: { isEntered: boolean };

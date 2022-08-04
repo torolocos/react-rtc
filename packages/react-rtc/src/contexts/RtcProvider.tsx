@@ -1,9 +1,8 @@
 import { useRef } from 'react';
-import Message from '../models/Message';
 import { RtcContext } from './RtcContext';
-import { type Metadata } from '../types';
 import { usePubSub } from '../hooks/usePubSub';
 import { usePeerConnection } from '../hooks/usePeerConnection';
+import { useMessaging } from '../hooks/useMessaging';
 
 interface Props {
   children: JSX.Element;
@@ -18,36 +17,21 @@ export const RtcProvider = ({
 }: Props) => {
   const localUuid = useRef(crypto.randomUUID());
   const { dispatchEvent, on, off } = usePubSub();
-  const { peerConnections, disconnect, connect } = usePeerConnection(
+  const {
+    peerConnections,
+    disconnect,
+    connect: enter,
+  } = usePeerConnection(
     localUuid.current,
     dispatchEvent,
     signalingServer,
     iceServers
   );
-
-  const send = (message: string, metadata?: Metadata) => {
-    try {
-      const messageData = new Message({
-        message,
-        senderId: localUuid.current,
-        timestamp: Date.now(),
-        metadata: metadata,
-      });
-
-      peerConnections.current.forEach((connection) => {
-        const message = JSON.stringify(messageData);
-
-        connection?.dataChannel?.send(message);
-      });
-
-      dispatchEvent('send', messageData);
-    } catch (error) {
-      // TODO: Will be replaced shortly
-      // handleError(error);
-    }
-  };
-
-  const enter = () => connect();
+  const { send } = useMessaging(
+    localUuid.current,
+    peerConnections,
+    dispatchEvent
+  );
 
   const leave = () => {
     disconnect();
