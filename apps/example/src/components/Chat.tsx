@@ -49,7 +49,7 @@ const Chat = () => {
     }
   };
 
-  const handleMessageSent= (event: RtcEvent<'send'>) => {
+  const handleMessageSent = (event: RtcEvent<'send'>) => {
     if (isMessage(event.detail)) {
       const message = event.detail;
 
@@ -68,7 +68,7 @@ const Chat = () => {
   useEffect(() => {
     if (on) {
       on('receive', handleMessageReceived);
-      on('send', handleMessageSend);
+      on('send', handleMessageSent);
       on('send', () => console.log('first message sended'), { once: true });
       on('peerConnected', handlePeerConnected);
       on('peerDisconnected', handlePeerDisconnected);
@@ -78,7 +78,7 @@ const Chat = () => {
     return () => {
       if (off) {
         off('receive', handleMessageReceived);
-        off('send', handleMessageSend);
+        off('send', handleMessageSent);
         off('peerConnected', handlePeerConnected);
         off('peerDisconnected', handlePeerDisconnected);
         off('error', handleError);
