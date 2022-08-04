@@ -2,9 +2,9 @@
 
 ### Apps and Packages
 
-- `react-rtc`: React-RTC package
-- `server`: signaling server
-- `example`: example app
+-   `react-rtc`: React-RTC package
+-   `server`: signaling server
+-   `example`: example app
 
 ### Build
 
