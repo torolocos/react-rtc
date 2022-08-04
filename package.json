@@ -10,6 +10,9 @@
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint --parallel",
     "tsc:check": "turbo run lint --parallel",
+    "publish:patch": "yarn workspace @torolocos/react-rtc version --patch",
+    "publish:minor": "yarn workspace @torolocos/react-rtc version --minor",
+    "publish:major": "yarn workspace @torolocos/react-rtc version --major",
     "postinstall": "husky install"
   },
   "devDependencies": {
