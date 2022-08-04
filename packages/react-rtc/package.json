@@ -1,6 +1,6 @@
 {
   "name": "@torolocos/react-rtc",
-  "version": "0.1.5",
+  "version": "1.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/torolocos/react-rtc.git"
@@ -17,7 +17,9 @@
     "build": "tsc",
     "dev": "tsc --watch --preserveWatchOutput",
     "tsc:check": "tsc --pretty --noEmit",
-    "lint": "eslint . --ext ts --ext tsx"
+    "lint": "eslint . --ext ts --ext tsx",
+    "preversion": "yarn lint && yarn build",
+    "postversion": "yarn publish --access public --tag $npm_package_version && git push --tags"
   },
   "peerDependencies": {
     "react": "^18.2.0"
