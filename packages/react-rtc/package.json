@@ -4,7 +4,16 @@
   "description": "React real-time communication library.",
   "keywords": [
     "webrtc",
-    "react"
+    "rtc",
+    "peer",
+    "P2P",
+    "react",
+    "web",
+    "real-time",
+    "websockets",
+    "messaging",
+    "signaling",
+    "communication"
   ],
   "homepage": "https://github.com/torolocos/react-rtc#readme",
   "license": "MIT",
