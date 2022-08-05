@@ -9,6 +9,9 @@
       "cache": false
     },
     "lint": {},
-    "tsc:check": {}
+    "tsc:check": {},
+    "test": {
+      "dependsOn": ["build"]
+    }
   }
 }
