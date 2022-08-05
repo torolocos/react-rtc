@@ -8,7 +8,12 @@
     "peer",
     "P2P",
     "react",
-    "web"
+    "web",
+    "real-time",
+    "websockets",
+    "messaging",
+    "signaling",
+    "communication"
   ],
   "homepage": "https://github.com/torolocos/react-rtc#readme",
   "license": "MIT",
