@@ -13,6 +13,9 @@
     "publish:patch": "yarn workspace @torolocos/react-rtc version --patch",
     "publish:minor": "yarn workspace @torolocos/react-rtc version --minor",
     "publish:major": "yarn workspace @torolocos/react-rtc version --major",
+    "publish:prepatch": "yarn workspace @torolocos/react-rtc version --prepatch",
+    "publish:preminor": "yarn workspace @torolocos/react-rtc version --preminor",
+    "publish:premajor": "yarn workspace @torolocos/react-rtc version --premajor",
     "postinstall": "husky install"
   },
   "devDependencies": {
