@@ -1,23 +1,33 @@
 {
   "name": "@torolocos/react-rtc",
-  "version": "0.1.5",
+  "version": "1.0.0",
+  "description": "React real-time communication library.",
+  "keywords": [
+    "webrtc",
+    "react"
+  ],
+  "homepage": "https://github.com/torolocos/react-rtc#readme",
+  "license": "MIT",
+  "author": "torolocos",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/torolocos/react-rtc.git"
   },
-  "homepage": "https://github.com/torolocos/react-rtc#readme",
-  "author": "torolocos",
-  "main": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/torolocos/react-rtc/issues"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch --preserveWatchOutput",
     "tsc:check": "tsc --pretty --noEmit",
-    "lint": "eslint . --ext ts --ext tsx"
+    "lint": "eslint . --ext ts --ext tsx",
+    "preversion": "git pull && yarn lint && yarn build",
+    "postversion": "yarn publish --version $npm_package_version --access public && git push --tags"
   },
   "peerDependencies": {
     "react": "^18.2.0"
