@@ -27,7 +27,7 @@
     "tsc:check": "tsc --pretty --noEmit",
     "lint": "eslint . --ext ts --ext tsx",
     "preversion": "yarn lint && yarn build",
-    "postversion": "yarn publish --access public --tag $npm_package_version && git push --tags"
+    "postversion": "yarn publish --version $npm_package_version --access public && git push --tags"
   },
   "peerDependencies": {
     "react": "^18.2.0"
