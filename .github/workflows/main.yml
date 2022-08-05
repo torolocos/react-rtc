@@ -40,4 +40,4 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   vercel-org-id: ${{ secrets.VERCEL_ORG_ID}}
                   vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}}
-                  working-directory: apps/web-example
+                  working-directory: ./apps/web-example
