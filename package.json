@@ -20,11 +20,29 @@
     "postinstall": "husky install"
   },
   "devDependencies": {
+    "auto": "^10.37.4",
     "eslint": "^8.17.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.0",
     "prettier": "^2.6.2",
     "turbo": "^1.2.16"
   },
-  "packageManager": "yarn@1.22.17"
+  "packageManager": "yarn@1.22.17",
+  "auto": {
+    "plugins": [
+      "npm",
+      "all-contributors",
+      "conventional-commits",
+      "first-time-contributor"
+    ],
+    "onlyPublishWithReleaseLabel": true,
+    "labels": [
+      {
+        "name": "chore"
+      },
+      {
+        "name": "fix"
+      }
+    ]
+  }
 }
