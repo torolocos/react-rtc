@@ -8,8 +8,10 @@ if [ ! -z "$VERSION" ]; then
   npm version $VERSION --workspace=@torolocos/react-rtc
   npm publish --access public --workspace=@torolocos/react-rtc
 
-  # Update dependencies
+  ## Update dependencies
   yarn workspace example upgrade @torolocos/react-rtc
+
+  git add **/package.json
 
   ## Create GitHub Release
   git push --follow-tags --set-upstream origin $branch
