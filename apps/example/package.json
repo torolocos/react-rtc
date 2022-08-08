@@ -9,16 +9,16 @@
     "tsc:check": "tsc --pretty --noEmit"
   },
   "dependencies": {
+    "@torolocos/react-rtc": "0.4.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@torolocos/react-rtc": "*"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@torolocos/eslint-config": "*",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^2.0.0",
-    "vite": "^3.0.0",
-    "typescript": "^4.6.4"
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0"
   }
 }

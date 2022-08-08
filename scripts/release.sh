@@ -8,13 +8,13 @@ if [ ! -z "$VERSION" ]; then
   ## auto changelog
 
   ## Publish Package
-  yarn workspace @torolocos/react-rtc version --$VERSION
-  yarn workspace @torolocos/react-rtc publish --version $npm_package_version --access public
+  npm version $VERSION --workspace=@torolocos/react-rtc
+  npm publish --access public --workspace=@torolocos/react-rtc
 
   # Update dependencies
   yarn workspace example upgrade @torolocos/react-rtc
 
   ## Create GitHub Release
-  git push --follow-tags --set-upstream origin $branch
-  auto release
+  ## git push --follow-tags --set-upstream origin $branch
+  # auto release
 fi

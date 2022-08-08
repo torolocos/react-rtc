@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@auto-it/all-contributors": "^10.37.4",
-    "@auto-it/conventional-commits": "^10.37.4",
+    "@auto-it/conventional-commits": "8.5.0",
     "auto": "^10.37.4",
     "eslint": "^8.17.0",
     "husky": "^8.0.1",
@@ -33,16 +33,7 @@
   "auto": {
     "plugins": [
       "npm",
-      "all-contributors",
       "conventional-commits"
-    ],
-    "labels": [
-      {
-        "name": "chore"
-      },
-      {
-        "name": "fix"
-      }
     ]
   },
   "repository": "pchalupa/react-rtc",
