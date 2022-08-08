@@ -42,8 +42,10 @@
     "react": "^18.2.0"
   },
   "devDependencies": {
+    "@release-it/conventional-changelog": "^5.0.0",
     "@torolocos/eslint-config": "*",
     "@types/react": "^18.0.12",
+    "release-it": "^15.2.0",
     "typescript": "^4.7.3"
   }
 }
