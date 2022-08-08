@@ -35,9 +35,7 @@
     "dev": "tsc --watch --preserveWatchOutput",
     "tsc:check": "tsc --pretty --noEmit",
     "lint": "eslint . --ext ts --ext tsx",
-    "prepublish": "yarn build",
-    "publish": "auto release --no-version-prefix",
-    "postpublish": "git push --follow-tags --set-upstream origin $branch"
+    "prepublish": "yarn build"
   },
   "peerDependencies": {
     "react": "^18.2.0"

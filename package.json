@@ -25,7 +25,16 @@
   "packageManager": "yarn@1.22.17",
   "auto": {
     "plugins": [
-      "npm",
+      [
+        "npm",
+        {
+          "forcePublish": false,
+          "subPackageChangelogs": true,
+          "monorepoChangelog": true,
+          "commitNextVersion": true,
+          "legacyAuth": true
+        }
+      ],
       "conventional-commits"
     ]
   },
