@@ -1,6 +1,6 @@
 {
   "name": "@torolocos/react-rtc",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "React real-time communication library.",
   "keywords": [
     "webrtc",
@@ -36,7 +36,7 @@
     "tsc:check": "tsc --pretty --noEmit",
     "lint": "eslint . --ext ts --ext tsx",
     "prepublish": "yarn build",
-    "postpublish": "auto release"
+    "postpublish": "auto release --no-version-prefix"
   },
   "peerDependencies": {
     "react": "^18.2.0"

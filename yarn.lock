@@ -1254,11 +1254,6 @@
   resolved "https://registry.npmjs.org/@tootallnate/once/-/once-1.1.2.tgz"
   integrity sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==
 
-"@torolocos/react-rtc@0.4.0":
-  version "0.4.0"
-  resolved "https://registry.npmjs.org/@torolocos/react-rtc/-/react-rtc-0.4.0.tgz"
-  integrity sha512-YSZ7Xxyd3zQO5E72IruWGmDadqkmYDR8sZpabEJ0Jf3IKn5Oqw3stLrVmemE+fV7UBIhI/NINEnEnKMK270dxQ==
-
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
   resolved "https://registry.npmjs.org/@tsconfig/node10/-/node10-1.0.9.tgz"

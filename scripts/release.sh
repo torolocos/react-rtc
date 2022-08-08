@@ -12,5 +12,5 @@ if [ ! -z "$VERSION" ]; then
   yarn workspace example upgrade @torolocos/react-rtc
 
   ## Create GitHub Release
-  ## git push --follow-tags --set-upstream origin $branch
+  git push --follow-tags --set-upstream origin $branch
 fi
