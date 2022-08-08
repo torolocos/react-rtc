@@ -44,5 +44,7 @@
         "name": "fix"
       }
     ]
-  }
+  },
+  "repository": "pchalupa/react-rtc",
+  "author": "pchalupa <chalupa.petr93@gmail.com>"
 }
