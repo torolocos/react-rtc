@@ -12,7 +12,7 @@ if [ ! -z "$VERSION" ]; then
   yarn workspace example upgrade @torolocos/react-rtc
 
   git add **/package.json
-  git commit -m "chore: release"
+  git commit -m "chore: bump version"
 
   ## Create GitHub Release
   git push --follow-tags --set-upstream origin $branch
