@@ -59,3 +59,16 @@ jobs:
                   vercel-org-id: ${{ secrets.VERCEL_ORG_ID}}
                   vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}}
                   vercel-args: '--prod'
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          yarn install --frozen-lockfile
+          yarn build
+          npx auto shipit
