@@ -16,5 +16,5 @@ if [ ! -z "$VERSION" ]; then
 
   ## Create GitHub Release
   git push --follow-tags --set-upstream origin $branch
-  auto release --no-version-prefix
+  yarn workspace @torolocos/react-rtc run auto release --no-version-prefix
 fi
