@@ -10,13 +10,6 @@
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint --parallel",
     "tsc:check": "turbo run lint --parallel",
-    "publish:patch": "yarn workspace @torolocos/react-rtc version --patch",
-    "publish:minor": "yarn workspace @torolocos/react-rtc version --minor",
-    "publish:major": "yarn workspace @torolocos/react-rtc version --major",
-    "publish:prepatch": "yarn workspace @torolocos/react-rtc version --prepatch",
-    "publish:preminor": "yarn workspace @torolocos/react-rtc version --preminor",
-    "publish:premajor": "yarn workspace @torolocos/react-rtc version --premajor",
-    "publish:prerelease": "yarn workspace @torolocos/react-rtc version --prerelease",
     "postinstall": "husky install",
     "changelog": "auto changelog"
   },
@@ -33,14 +26,9 @@
   "packageManager": "yarn@1.22.17",
   "auto": {
     "plugins": [
-      [
-        "npm",
-        {
-          "subPackageChangelogs": false,
-          "monorepoChangelog": true
-        }
-      ],
-      "conventional-commits"
+      "npm",
+      "conventional-commits",
+      "all-contributors"
     ]
   },
   "repository": "pchalupa/react-rtc",
