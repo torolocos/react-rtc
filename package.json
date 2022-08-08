@@ -14,7 +14,6 @@
     "changelog": "auto changelog"
   },
   "devDependencies": {
-    "@auto-it/all-contributors": "^10.37.4",
     "@auto-it/conventional-commits": "8.5.0",
     "auto": "^10.37.4",
     "eslint": "^8.17.0",
@@ -27,8 +26,7 @@
   "auto": {
     "plugins": [
       "npm",
-      "conventional-commits",
-      "all-contributors"
+      "conventional-commits"
     ]
   },
   "repository": "pchalupa/react-rtc",
