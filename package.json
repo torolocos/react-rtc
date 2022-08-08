@@ -20,6 +20,8 @@
     "postinstall": "husky install"
   },
   "devDependencies": {
+    "@auto-it/all-contributors": "^10.37.4",
+    "@auto-it/conventional-commits": "^10.37.4",
     "auto": "^10.37.4",
     "eslint": "^8.17.0",
     "husky": "^8.0.1",
@@ -32,8 +34,7 @@
     "plugins": [
       "npm",
       "all-contributors",
-      "conventional-commits",
-      "first-time-contributor"
+      "conventional-commits"
     ],
     "onlyPublishWithReleaseLabel": true,
     "labels": [
