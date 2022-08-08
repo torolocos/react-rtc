@@ -34,9 +34,7 @@
     "build": "tsc",
     "dev": "tsc --watch --preserveWatchOutput",
     "tsc:check": "tsc --pretty --noEmit",
-    "lint": "eslint . --ext ts --ext tsx",
-    "preversion": "git pull && yarn lint && yarn build",
-    "postversion": "yarn publish --version $npm_package_version --access public && git push --tags"
+    "lint": "eslint . --ext ts --ext tsx"
   },
   "peerDependencies": {
     "react": "^18.2.0"
