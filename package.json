@@ -36,7 +36,6 @@
       "all-contributors",
       "conventional-commits"
     ],
-    "onlyPublishWithReleaseLabel": true,
     "labels": [
       {
         "name": "chore"
