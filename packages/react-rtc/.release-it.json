@@ -1,7 +1,6 @@
 {
   "git": {
-    "commitMessage": "chore: release ${version}",
-    "tagName": "${version}"
+    "commitMessage": "chore: release ${version}"
   },
   "github": {
     "release": true
@@ -13,7 +12,11 @@
     }
   },
   "hooks": {
-    "before:release": "yarn build",
-    "after:release": "yarn workspace example upgrade @torolocos/react-rtc"
+    "before:bump": "yarn build",
+    "after:bump": "rm ../../package-lock.json",
+    "after:npm:release": [
+      "yarn workspace example upgrade @torolocos/react-rtc",
+      "git add ../../apps/example/package.json"
+    ]
   }
 }
