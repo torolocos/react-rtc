@@ -2,15 +2,15 @@
 
 ### Apps and Packages
 
--   `react-rtc`: React-RTC package
--   `signaling`: signaling server
--   `example`: example app
+- `react-rtc`: React-RTC package
+- `signaling`: signaling server
+- `example`: example app
 
 ### Build
 
 To build all apps and packages, run the following command:
 
-```
+```shell
 yarn run build
 ```
 
@@ -18,7 +18,7 @@ yarn run build
 
 To develop all apps and packages, run the following command:
 
-```
+```shell
 yarn run dev
 ```
 
@@ -26,8 +26,6 @@ yarn run dev
 
 To publish react-rtc package, run one of the following commands:
 
-```
-yarn publish:patch
-yarn publish:minor
-yarn publish:major
+```shell
+npm run release
 ```
