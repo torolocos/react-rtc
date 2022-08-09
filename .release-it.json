@@ -1,7 +1,6 @@
 {
   "git": {
-    "commitMessage": "chore: release ${version}",
-    "requireCleanWorkingDir": false
+    "commitMessage": "chore: release ${version}"
   },
   "github": {
     "release": true
@@ -13,14 +12,13 @@
       "infile": "CHANGELOG.md"
     },
     "@release-it-plugins/workspaces": {
-      "workspaces": ["packages/*"]
+      "workspaces": ["packages/*"],
+      "additionalManifests": {
+        "dependencyUpdates": ["apps/*/package.json"]
+      }
     }
   },
   "hooks": {
-    "before:bump": "yarn build",
-    "after:npm:release": [
-      "yarn workspace example upgrade @torolocos/react-rtc",
-      "git add apps/example/package.json"
-    ]
+    "before:bump": "yarn build"
   }
 }
