@@ -1,22 +1,26 @@
 {
   "git": {
-    "commitMessage": "chore: release ${version}"
+    "commitMessage": "chore: release ${version}",
+    "requireCleanWorkingDir": false
   },
   "github": {
     "release": true
   },
+  "npm": false,
   "plugins": {
     "@release-it/conventional-changelog": {
       "preset": "conventionalcommits",
       "infile": "CHANGELOG.md"
+    },
+    "@release-it-plugins/workspaces": {
+      "workspaces": ["packages/*"]
     }
   },
   "hooks": {
     "before:bump": "yarn build",
-    "after:bump": "rm ../../package-lock.json",
     "after:npm:release": [
       "yarn workspace example upgrade @torolocos/react-rtc",
-      "git add ../../apps/example/package.json"
+      "git add **/package.json"
     ]
   }
 }
