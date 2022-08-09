@@ -1,5 +1,5 @@
 {
-  "version": "0.0.0",
+  "version": "0.1.0-rc.0",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -11,19 +11,18 @@
     "lint": "turbo run lint --parallel",
     "tsc:check": "turbo run lint --parallel",
     "test": "turbo run test --parallel",
-    "publish:patch": "yarn workspace @torolocos/react-rtc version --patch",
-    "publish:minor": "yarn workspace @torolocos/react-rtc version --minor",
-    "publish:major": "yarn workspace @torolocos/react-rtc version --major",
-    "publish:prepatch": "yarn workspace @torolocos/react-rtc version --prepatch",
-    "publish:preminor": "yarn workspace @torolocos/react-rtc version --preminor",
-    "publish:premajor": "yarn workspace @torolocos/react-rtc version --premajor",
+    "release": "release-it",
     "postinstall": "husky install"
   },
   "devDependencies": {
+    "@release-it-plugins/workspaces": "^3.2.0",
+    "@release-it/conventional-changelog": "^5.0.0",
+    "@torolocos/eslint-config": "^0.0.6",
     "eslint": "^8.17.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.0",
     "prettier": "^2.6.2",
+    "release-it": "^15.2.0",
     "turbo": "^1.2.16"
   },
   "packageManager": "yarn@1.22.17"

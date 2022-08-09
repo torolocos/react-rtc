@@ -1,6 +1,6 @@
 {
   "name": "@torolocos/react-rtc",
-  "version": "1.0.0",
+  "version": "0.1.0-rc.0",
   "description": "React real-time communication library.",
   "keywords": [
     "webrtc",
@@ -21,6 +21,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "repository": {
@@ -35,18 +38,15 @@
     "dev": "tsc --watch --preserveWatchOutput",
     "tsc:check": "tsc --pretty --noEmit",
     "lint": "eslint . --ext ts --ext tsx",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "preversion": "git pull && yarn lint && yarn build",
-    "postversion": "yarn publish --version $npm_package_version --access public && git push --tags"
+    "test": "jest"
   },
   "peerDependencies": {
     "react": "^18.2.0"
   },
   "devDependencies": {
     "@testing-library/react-hooks": "^8.0.1",
-    "@torolocos/eslint-config": "*",
     "@types/jest": "^28.1.3",
+    "@torolocos/eslint-config": "^0.0.6",
     "@types/react": "^18.0.12",
     "jest": "^28.1.3",
     "react-test-renderer": "^18.2.0",

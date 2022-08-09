@@ -2,15 +2,15 @@
 
 ### Apps and Packages
 
--   `react-rtc`: React-RTC package
--   `signaling`: signaling server
--   `example`: example app
+- `react-rtc`: React-RTC package
+- `signaling`: signaling server
+- `example`: example app
 
 ### Build
 
 To build all apps and packages, run the following command:
 
-```
+```shell
 yarn run build
 ```
 
@@ -18,16 +18,16 @@ yarn run build
 
 To develop all apps and packages, run the following command:
 
-```
+```shell
 yarn run dev
 ```
 
 ### Publish
 
-To publish react-rtc package, run one of the following commands:
+To publish all packges, run the following command:
 
+```shell
+npm run release
 ```
-yarn publish:patch
-yarn publish:minor
-yarn publish:major
-```
+
+> Optional you can provide desired version `major`, `minor` or `patch` or `preRelease` flag with `alpha`, `beta` or `rc`. See: https://github.com/release-it/release-it/blob/master/docs/pre-releases.md
