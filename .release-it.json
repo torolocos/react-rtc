@@ -20,7 +20,7 @@
     "before:bump": "yarn build",
     "after:npm:release": [
       "yarn workspace example upgrade @torolocos/react-rtc",
-      "git add **/package.json"
+      "git add apps/example/package.json"
     ]
   }
 }
