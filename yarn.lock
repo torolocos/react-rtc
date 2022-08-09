@@ -1067,6 +1067,20 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
   integrity sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==
 
+"@torolocos/eslint-config@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@torolocos/eslint-config/-/eslint-config-0.0.6.tgz#406bad0e8e7e09063d7b6b949cdc3b0542e71a41"
+  integrity sha512-6EP+LglvjDO5YT46ie5J3L8ZuF498iy9tlGVxzBRlh8AaevMxcLLmCtHb1bsbbXSv6KQTJ6NjXS/i+MasBBc/w==
+  dependencies:
+    "@typescript-eslint/eslint-plugin" "^5.27.1"
+    "@typescript-eslint/parser" "^5.27.1"
+    eslint-config-google "^0.14.0"
+    eslint-config-prettier "^8.5.0"
+    eslint-plugin-import "^2.25.4"
+    eslint-plugin-jsx-a11y "^6.5.1"
+    eslint-plugin-react "^7.29.4"
+    eslint-plugin-react-hooks "^4.3.0"
+
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/@tsconfig/node10/-/node10-1.0.9.tgz#df4907fc07a886922637b15e02d4cebc4c0021b2"

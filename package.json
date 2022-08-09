@@ -15,6 +15,7 @@
   "devDependencies": {
     "@release-it-plugins/workspaces": "^3.2.0",
     "@release-it/conventional-changelog": "^5.0.0",
+    "@torolocos/eslint-config": "^0.0.6",
     "eslint": "^8.17.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.0",
