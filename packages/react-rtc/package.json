@@ -1,6 +1,6 @@
 {
   "name": "@torolocos/react-rtc",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "React real-time communication library.",
   "keywords": [
     "webrtc",
@@ -37,17 +37,14 @@
     "build": "tsc",
     "dev": "tsc --watch --preserveWatchOutput",
     "tsc:check": "tsc --pretty --noEmit",
-    "lint": "eslint . --ext ts --ext tsx",
-    "release": "release-it"
+    "lint": "eslint . --ext ts --ext tsx"
   },
   "peerDependencies": {
     "react": "^18.2.0"
   },
   "devDependencies": {
-    "@release-it/conventional-changelog": "^5.0.0",
-    "@torolocos/eslint-config": "*",
+    "@torolocos/eslint-config": "0.1.0",
     "@types/react": "^18.0.12",
-    "release-it": "^15.2.0",
     "typescript": "^4.7.3"
   }
 }

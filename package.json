@@ -1,5 +1,4 @@
 {
-  "version": "0.0.0",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -10,13 +9,17 @@
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint --parallel",
     "tsc:check": "turbo run lint --parallel",
+    "release": "release-it",
     "postinstall": "husky install"
   },
   "devDependencies": {
+    "@release-it-plugins/workspaces": "^3.2.0",
+    "@release-it/conventional-changelog": "^5.0.0",
     "eslint": "^8.17.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.0",
     "prettier": "^2.6.2",
+    "release-it": "^15.2.0",
     "turbo": "^1.2.16"
   },
   "packageManager": "yarn@1.22.17"
