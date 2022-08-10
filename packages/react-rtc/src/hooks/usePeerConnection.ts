@@ -25,6 +25,7 @@ export const usePeerConnection = (
   const disconnect = () => {
     disconnectFromSignaling();
     peerConnections.current.forEach((connection) => connection.pc.close());
+    dispatchEvent('leave');
   };
 
   const onIceCandidate = (
