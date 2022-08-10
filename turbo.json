@@ -10,8 +10,6 @@
     },
     "lint": {},
     "tsc:check": {},
-    "test": {
-      "dependsOn": ["build"]
-    }
+    "test": {}
   }
 }
