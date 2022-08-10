@@ -1,5 +1,5 @@
 import Message from '../models/Message';
-import type PeerConnections from '../models/PeerConnections';
+import type PeerConnections from '../structures/PeerConnections';
 import type { DispatchEvent, Send } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 

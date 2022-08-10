@@ -1,4 +1,4 @@
-import Peer from './Peer';
+import Peer from '../models/Peer';
 
 export default class PeerConnections {
   private peers = new Map<string, Peer>();
