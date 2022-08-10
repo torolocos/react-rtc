@@ -58,10 +58,10 @@ const Chat = () => {
   };
 
   const handlePeerConnected = (event: RtcEvent<'peerConnected'>) =>
-    console.log('Peer connected', event.detail.uuid);
+    console.log('Peer connected', event.detail.id);
 
   const handlePeerDisconnected = (event: RtcEvent<'peerDisconnected'>) =>
-    console.log('Peer disconnected', event.detail.uuid);
+    console.log('Peer disconnected', event.detail.id);
 
   const handleError = () => setError('Err');
 
