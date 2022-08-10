@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import Message from '../models/Message';
-import Peer from '../models/Peer';
+import PeerConnections from '../models/PeerConnections';
 import { ConnectionState, type Signal, type DispatchEvent } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 import { useSignaling } from './useSignaling';
@@ -11,7 +11,7 @@ export const usePeerConnection = (
   signalingServer: string,
   iceServers: { urls: string }[]
 ) => {
-  const peerConnections = useRef<Map<string, Peer>>(new Map());
+  const peerConnections = useRef(new PeerConnections());
   const {
     sendSignalingMessage,
     signaling,
@@ -77,10 +77,11 @@ export const usePeerConnection = (
         .catch((e) => handleError(e));
     }
 
-    peerConnections.current.set(
-      peerUuid,
-      new Peer({ uuid: peerUuid, peerConnection, dataChannel })
-    );
+    peerConnections.current.add({
+      id: peerUuid,
+      peerConnection,
+      dataChannel,
+    });
   };
 
   const sendSignalingMessageToNewcomers = (uuid: string) => {

@@ -1,11 +1,11 @@
 import Message from '../models/Message';
-import Peer from '../models/Peer';
+import type PeerConnections from '../models/PeerConnections';
 import type { DispatchEvent, Send } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 
 export const useMessaging = (
   id: string,
-  peerConnections: Map<string, Peer>,
+  peerConnections: PeerConnections,
   dispatchEvent: DispatchEvent
 ) => {
   const errorHandler = useErrorHandler(dispatchEvent);
