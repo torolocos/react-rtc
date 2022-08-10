@@ -1,0 +1,5 @@
+{
+  "preset": "ts-jest",
+  "testPathIgnorePatterns": ["dist"],
+  "coverageReporters": ["html", "lcov"]
+}

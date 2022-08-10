@@ -24,6 +24,8 @@ jobs:
         run: yarn tsc:check
       - name: Run eslint
         run: yarn lint
+      - name: Run tests
+        run: yarn test
 
   deploy_preview:
         runs-on: ubuntu-latest
