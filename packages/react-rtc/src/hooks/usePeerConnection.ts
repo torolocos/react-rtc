@@ -17,7 +17,7 @@ export const usePeerConnection = (
     signaling,
     connect: connectToSginaling,
     disconnect: disconnectFromSignaling,
-  } = useSignaling(localUuid, signalingServer);
+  } = useSignaling(localUuid, signalingServer, dispatchEvent);
   const handleError = useErrorHandler(dispatchEvent);
 
   const connect = connectToSginaling;
