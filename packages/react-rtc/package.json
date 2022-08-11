@@ -37,7 +37,8 @@
     "build": "tsc",
     "dev": "tsc --watch --preserveWatchOutput",
     "tsc:check": "tsc --pretty --noEmit",
-    "lint": "eslint . --ext ts --ext tsx"
+    "lint": "eslint . --ext ts --ext tsx",
+    "test": "jest"
   },
   "peerDependencies": {
     "react": "^18.2.0"
