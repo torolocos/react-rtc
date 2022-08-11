@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import Message from '../models/Message';
-import PeerConnections from '../models/PeerConnections';
 import { ConnectionState, type Signal, type DispatchEvent } from '../types';
 import { useErrorHandler } from './useErrorHandler';
+import { usePeers } from './usePeers';
 import { useSignaling } from './useSignaling';
 
 export const usePeerConnection = (
@@ -11,7 +11,7 @@ export const usePeerConnection = (
   signalingServer: string,
   iceServers: { urls: string }[]
 ) => {
-  const peerConnections = useRef(new PeerConnections());
+  const peerConnections = usePeers();
   const {
     sendSignalingMessage,
     signaling,
@@ -24,7 +24,7 @@ export const usePeerConnection = (
 
   const disconnect = () => {
     disconnectFromSignaling();
-    peerConnections.current.forEach((connection) => connection.pc.close());
+    peerConnections.disconnect();
   };
 
   const onIceCandidate = (
@@ -46,16 +46,12 @@ export const usePeerConnection = (
       checkPeerDisconnect(peerUuid)
     );
     peerConnection.addEventListener('datachannel', (event) =>
-      Object.defineProperty(
-        peerConnections.current.get(peerUuid),
-        'dataChannel',
-        {
-          value: event.channel,
-        }
-      )
+      Object.defineProperty(peerConnections.get(peerUuid), 'dataChannel', {
+        value: event.channel,
+      })
     );
     peerConnection.addEventListener('connectionstatechange', () => {
-      const peer = peerConnections.current.get(peerUuid);
+      const peer = peerConnections.get(peerUuid);
       if (peer && peer.pc.connectionState === 'connected' && !initCall)
         dispatchEvent('peerConnected', peer);
     });
@@ -77,11 +73,7 @@ export const usePeerConnection = (
         .catch((e) => handleError(e));
     }
 
-    peerConnections.current.add({
-      id: peerUuid,
-      peerConnection,
-      dataChannel,
-    });
+    peerConnections.add(peerUuid, peerConnection, dataChannel);
   };
 
   const sendSignalingMessageToNewcomers = (uuid: string) => {
@@ -96,12 +88,10 @@ export const usePeerConnection = (
     peerUuid: string
   ) => {
     try {
-      await peerConnections.current
-        .get(peerUuid)
-        ?.pc.setLocalDescription(description);
+      await peerConnections.get(peerUuid)?.pc.setLocalDescription(description);
 
       sendSignalingMessage(peerUuid, {
-        sdp: peerConnections.current.get(peerUuid)?.pc.localDescription,
+        sdp: peerConnections.get(peerUuid)?.pc.localDescription,
       });
     } catch (error) {
       handleError(error);
@@ -119,7 +109,7 @@ export const usePeerConnection = (
         );
         // Only create answers in response to offers
         if (signal.sdp?.type == 'offer') {
-          const description = await peerConnections.current
+          const description = await peerConnections
             .get(signal.uuid)
             ?.pc.createAnswer();
 
@@ -155,7 +145,7 @@ export const usePeerConnection = (
     )
       return;
 
-    const currentPeerConnection = peerConnections.current.get(peerUuid)?.pc;
+    const currentPeerConnection = peerConnections.get(peerUuid)?.pc;
 
     if (currentPeerConnection) {
       if (isSessionDescription) {
@@ -176,8 +166,8 @@ export const usePeerConnection = (
   };
 
   const checkPeerDisconnect = (peerUuid: string) => {
-    const state = peerConnections.current.get(peerUuid)?.pc.iceConnectionState;
-    const peer = peerConnections.current.get(peerUuid);
+    const state = peerConnections.get(peerUuid)?.pc.iceConnectionState;
+    const peer = peerConnections.get(peerUuid);
 
     if (
       peer &&
@@ -186,7 +176,7 @@ export const usePeerConnection = (
         state === ConnectionState.DISCONNECT)
     ) {
       dispatchEvent('peerDisconnected', peer);
-      peerConnections.current.delete(peerUuid);
+      peerConnections.remove(peerUuid);
     }
   };
 
@@ -199,7 +189,7 @@ export const usePeerConnection = (
   }, [signaling]);
 
   return {
-    peerConnections: peerConnections.current,
+    peerConnections,
     connect,
     disconnect,
   };

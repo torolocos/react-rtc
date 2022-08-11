@@ -15,7 +15,7 @@ export const usePeers = () => {
     peerConnection: RTCPeerConnection,
     dataChannel: RTCDataChannel
   ) => {
-    const peer = new Peer({ id, peerConnection, dataChannel });
+    const peer = new Peer({ uuid: id, peerConnection, dataChannel });
 
     peers.current.set(id, peer);
   };
