@@ -44,6 +44,7 @@ export const RtcProvider = ({
         enter,
         leave,
         send,
+        getAllPeers: peerConnections.getAll,
         on,
         off,
       }}
