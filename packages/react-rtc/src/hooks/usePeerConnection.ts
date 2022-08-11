@@ -175,8 +175,8 @@ export const usePeerConnection = (
         state === ConnectionState.CLOSED ||
         state === ConnectionState.DISCONNECT)
     ) {
-      dispatchEvent('peerDisconnected', peer);
       peerConnections.remove(peerUuid);
+      dispatchEvent('peerDisconnected', peer);
     }
   };
 
