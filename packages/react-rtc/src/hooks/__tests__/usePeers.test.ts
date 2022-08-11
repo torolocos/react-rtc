@@ -23,7 +23,7 @@ describe('usePeers', () => {
     const { result } = renderHook(() => usePeers());
 
     result.current.add(id[0], peerConnection, dataChannel);
-    expect(result.current.get(id[0])).toMatchObject({ id: id[0] });
+    expect(result.current.get(id[0])).toMatchObject({ uuid: id[0] });
   });
 
   it('should get all peers', () => {
