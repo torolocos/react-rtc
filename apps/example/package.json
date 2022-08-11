@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts --ext tsx",
-    "tsc:check": "tsc --pretty --noEmit"
+    "tsc:check": "tsc --pretty --noEmit",
+    "dev": "vite"
   },
   "dependencies": {
     "@torolocos/react-rtc": "0.1.0-rc.0",
