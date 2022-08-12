@@ -17,7 +17,7 @@ export const usePeerConnection = (
     signaling,
     connect: connectToSginaling,
     disconnect: disconnectFromSignaling,
-  } = useSignaling(localUuid, signalingServer);
+  } = useSignaling(localUuid, signalingServer, dispatchEvent);
   const handleError = useErrorHandler(dispatchEvent);
 
   const connect = connectToSginaling;
@@ -25,6 +25,7 @@ export const usePeerConnection = (
   const disconnect = () => {
     disconnectFromSignaling();
     peerConnections.disconnect();
+    dispatchEvent('leave');
   };
 
   const onIceCandidate = (

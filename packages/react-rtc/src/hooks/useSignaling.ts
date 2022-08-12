@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
+import type { DispatchEvent } from '../types';
 
-export const useSignaling = (uuid: string, signalingServer: string) => {
+export const useSignaling = (
+  uuid: string,
+  signalingServer: string,
+  dispatchEvent: DispatchEvent
+) => {
   const [signaling, setSignaling] = useState<WebSocket | undefined>();
 
   const connect = () => setSignaling(new WebSocket(signalingServer));
@@ -20,8 +25,10 @@ export const useSignaling = (uuid: string, signalingServer: string) => {
     signaling?.send(message);
   };
 
-  const handleSignalingOpen = () =>
+  const handleSignalingOpen = () => {
     sendSignalingMessage('all', { newPeer: true });
+    dispatchEvent('enter');
+  };
 
   useEffect(() => {
     signaling?.addEventListener('open', handleSignalingOpen);

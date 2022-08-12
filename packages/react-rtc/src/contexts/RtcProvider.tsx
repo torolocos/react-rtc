@@ -19,7 +19,7 @@ export const RtcProvider = ({
   const { dispatchEvent, on, off } = usePubSub();
   const {
     peerConnections,
-    disconnect,
+    disconnect: leave,
     connect: enter,
   } = usePeerConnection(
     localUuid.current,
@@ -32,11 +32,6 @@ export const RtcProvider = ({
     peerConnections.sendToAll,
     dispatchEvent
   );
-
-  const leave = () => {
-    disconnect();
-    dispatchEvent('leave');
-  };
 
   return (
     <RtcContext.Provider
