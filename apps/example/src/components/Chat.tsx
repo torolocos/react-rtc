@@ -24,15 +24,10 @@ const Chat = () => {
 
   const onStartChat = () => {
     if (enter) enter();
-
-    // TODO: zkontrolovat jestli pripojeni probehlo uspesne
-    setChatOpen(true);
   };
 
   const onEndChat = () => {
     if (leave) leave();
-    // TODO: zkontrolovat jestli pripojeni probehlo uspesne
-    setChatOpen(false);
   };
 
   const onMessageSend = () => {
@@ -63,6 +58,10 @@ const Chat = () => {
   const handlePeerDisconnected = (event: RtcEvent<'peerDisconnected'>) =>
     console.log('Peer disconnected', event.detail.uuid);
 
+  const handleEnter = () => setChatOpen(true);
+
+  const handleLeave = () => setChatOpen(false);
+
   const handleError = () => setError('Err');
 
   useEffect(() => {
@@ -72,6 +71,8 @@ const Chat = () => {
       on('send', () => console.log('first message sended'), { once: true });
       on('peerConnected', handlePeerConnected);
       on('peerDisconnected', handlePeerDisconnected);
+      on('enter', handleEnter);
+      on('leave', handleLeave);
       on('error', handleError);
     }
 
@@ -81,6 +82,8 @@ const Chat = () => {
         off('send', handleMessageSent);
         off('peerConnected', handlePeerConnected);
         off('peerDisconnected', handlePeerDisconnected);
+        off('enter', handleEnter);
+        off('enter', handleLeave);
         off('error', handleError);
       }
       if (leave) leave();

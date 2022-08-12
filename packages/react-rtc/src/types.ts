@@ -29,6 +29,7 @@ interface EventsDetail {
   peerConnected: Peer;
   peerDisconnected: Peer;
   leave: unknown;
+  enter: unknown;
 }
 
 export type Send = <Metadata = undefined>(
