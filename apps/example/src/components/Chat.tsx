@@ -52,8 +52,6 @@ const Chat = () => {
   const handleMessageSent = (event: RtcEvent<'send'>) => {
     const message: Message = JSON.parse(event.detail);
 
-    console.log(message, event.detail);
-
     setMessageData((messages) => [...messages, message]);
   };
 
