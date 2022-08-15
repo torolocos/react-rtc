@@ -13,13 +13,14 @@ const isMessage = (message: unknown): message is Message<MessageMetadata> => {
 };
 
 const Chat = () => {
-  const { send, enter, leave, on, off } = useRtc();
+  const { send, enter, leave, on, off, getAllPeers } = useRtc();
   const [inputValue, setInputValue] = useState('');
   const [messageData, setMessageData] = useState<Message<MessageMetadata>[]>(
     []
   );
   const [error, setError] = useState('');
   const [isChatOpen, setChatOpen] = useState(false);
+  const [userCount, setUserCount] = useState(0);
   const username = useRef(Math.random().toPrecision(4).toString());
 
   const onStartChat = () => {
@@ -52,11 +53,15 @@ const Chat = () => {
     }
   };
 
-  const handlePeerConnected = (event: RtcEvent<'peerConnected'>) =>
+  const handlePeerConnected = (event: RtcEvent<'peerConnected'>) => {
+    if (getAllPeers) setUserCount(getAllPeers().length);
     console.log('Peer connected', event.detail.uuid);
+  };
 
-  const handlePeerDisconnected = (event: RtcEvent<'peerDisconnected'>) =>
+  const handlePeerDisconnected = (event: RtcEvent<'peerDisconnected'>) => {
+    if (getAllPeers) setUserCount(getAllPeers().length);
     console.log('Peer disconnected', event.detail.uuid);
+  };
 
   const handleEnter = () => setChatOpen(true);
 
@@ -94,6 +99,7 @@ const Chat = () => {
     <>
       <h2>Chat</h2>
       {error && <div className="errorText">Something went wrong</div>}
+      <p>User coount: {userCount}</p>
       <div>
         {messageData.map(({ id, message, metadata }) => (
           <div key={id}>

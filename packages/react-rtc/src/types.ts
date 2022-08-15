@@ -38,10 +38,10 @@ export type Send = <Metadata = undefined>(
 ) => void;
 
 export interface ContextType {
-  send?: Send;
   enter?: () => void;
   leave?: () => void;
-  state?: { isEntered: boolean };
+  send?: Send;
+  getAllPeers?: () => string[];
   on?: AddEventListener;
   off?: RemoveEventListener;
 }

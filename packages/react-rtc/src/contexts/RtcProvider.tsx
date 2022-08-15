@@ -29,7 +29,7 @@ export const RtcProvider = ({
   );
   const { send } = useMessaging(
     localUuid.current,
-    peerConnections,
+    peerConnections.sendToAll,
     dispatchEvent
   );
 
@@ -39,6 +39,7 @@ export const RtcProvider = ({
         enter,
         leave,
         send,
+        getAllPeers: peerConnections.getAll,
         on,
         off,
       }}

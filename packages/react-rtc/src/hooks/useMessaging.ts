@@ -1,11 +1,10 @@
 import Message from '../models/Message';
-import Peer from '../models/Peer';
 import type { DispatchEvent, Send } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 
 export const useMessaging = (
   id: string,
-  peerConnections: Map<string, Peer>,
+  sendToAllPeers: (data: string) => void,
   dispatchEvent: DispatchEvent
 ) => {
   const errorHandler = useErrorHandler(dispatchEvent);
@@ -18,9 +17,8 @@ export const useMessaging = (
         timestamp: Date.now(),
         metadata,
       });
-      const payload = JSON.stringify(message);
 
-      peerConnections.forEach((peer) => peer.dataChannel.send(payload));
+      sendToAllPeers(JSON.stringify(message));
       dispatchEvent('send', message);
     } catch (error) {
       errorHandler(error);
