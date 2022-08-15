@@ -22,9 +22,9 @@ export const usePeers = () => {
 
   const remove = (id: string) => peers.current.delete(id);
 
-  // TODO: Remove peers from map?
   const disconnect = () => {
     peers.current.forEach((peer) => peer.pc.close());
+    peers.current.clear();
   };
 
   const sendToAll = (data: string) =>
