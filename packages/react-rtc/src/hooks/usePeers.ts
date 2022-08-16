@@ -8,7 +8,7 @@ export const usePeers = () => {
     return peers.current.get(id);
   };
 
-  const getAll = () => Array.from(peers.current).map(([id]) => id);
+  const getAll = () => Array.from(peers.current).map(([, { id }]) => id);
 
   const add = (
     id: string,
