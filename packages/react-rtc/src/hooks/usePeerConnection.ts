@@ -36,25 +36,29 @@ export const usePeerConnection = (
       sendSignalingMessage(peerUuid, { ice: event.candidate });
   };
 
-  const addNewPeer = (peerUuid: string, initCall = false) => {
+  const addNewPeer = (peerId: string, initCall = false) => {
     const peerConnection = new RTCPeerConnection({ iceServers });
     const dataChannel = peerConnection.createDataChannel(crypto.randomUUID());
 
     peerConnection.addEventListener('icecandidate', (event) =>
-      onIceCandidate(event, peerUuid)
+      onIceCandidate(event, peerId)
     );
     peerConnection.addEventListener('iceconnectionstatechange', () =>
-      checkPeerDisconnect(peerUuid)
+      checkPeerDisconnect(peerId)
     );
     peerConnection.addEventListener('datachannel', (event) =>
-      Object.defineProperty(peerConnections.get(peerUuid), 'dataChannel', {
+      Object.defineProperty(peerConnections.get(peerId), 'dataChannel', {
         value: event.channel,
       })
     );
     peerConnection.addEventListener('connectionstatechange', () => {
-      const peer = peerConnections.get(peerUuid);
-      if (peer && peer.pc.connectionState === 'connected' && !initCall)
-        dispatchEvent('peerConnected', peer);
+      const peer = peerConnections.get(peerId);
+      if (
+        peer &&
+        peer.peerConnection.connectionState === 'connected' &&
+        !initCall
+      )
+        dispatchEvent('peerConnected', peer.id);
     });
 
     dataChannel.addEventListener('message', (event) => {
@@ -70,11 +74,11 @@ export const usePeerConnection = (
     if (initCall) {
       peerConnection
         .createOffer()
-        .then((description) => createdDescription(description, peerUuid))
+        .then((description) => createdDescription(description, peerId))
         .catch((e) => handleError(e));
     }
 
-    peerConnections.add(peerUuid, peerConnection, dataChannel);
+    peerConnections.add(peerId, peerConnection, dataChannel);
   };
 
   const sendSignalingMessageToNewcomers = (uuid: string) => {
@@ -89,10 +93,12 @@ export const usePeerConnection = (
     peerUuid: string
   ) => {
     try {
-      await peerConnections.get(peerUuid)?.pc.setLocalDescription(description);
+      await peerConnections
+        .get(peerUuid)
+        ?.peerConnection.setLocalDescription(description);
 
       sendSignalingMessage(peerUuid, {
-        sdp: peerConnections.get(peerUuid)?.pc.localDescription,
+        sdp: peerConnections.get(peerUuid)?.peerConnection.localDescription,
       });
     } catch (error) {
       handleError(error);
@@ -112,7 +118,7 @@ export const usePeerConnection = (
         if (signal.sdp?.type == 'offer') {
           const description = await peerConnections
             .get(signal.uuid)
-            ?.pc.createAnswer();
+            ?.peerConnection.createAnswer();
 
           if (description) createdDescription(description, signal.uuid);
         }
@@ -146,7 +152,7 @@ export const usePeerConnection = (
     )
       return;
 
-    const currentPeerConnection = peerConnections.get(peerUuid)?.pc;
+    const currentPeerConnection = peerConnections.get(peerUuid)?.peerConnection;
 
     if (currentPeerConnection) {
       if (isSessionDescription) {
@@ -167,7 +173,8 @@ export const usePeerConnection = (
   };
 
   const checkPeerDisconnect = (peerUuid: string) => {
-    const state = peerConnections.get(peerUuid)?.pc.iceConnectionState;
+    const state =
+      peerConnections.get(peerUuid)?.peerConnection.iceConnectionState;
     const peer = peerConnections.get(peerUuid);
 
     if (
@@ -177,7 +184,7 @@ export const usePeerConnection = (
         state === ConnectionState.DISCONNECT)
     ) {
       peerConnections.remove(peerUuid);
-      dispatchEvent('peerDisconnected', peer);
+      dispatchEvent('peerDisconnected', peer.id);
     }
   };
 

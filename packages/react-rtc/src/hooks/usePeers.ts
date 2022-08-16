@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import Peer from '../models/Peer';
+import type { Peer } from '../types';
 
 export const usePeers = () => {
   const peers = useRef(new Map<string, Peer>());
@@ -15,7 +15,7 @@ export const usePeers = () => {
     peerConnection: RTCPeerConnection,
     dataChannel: RTCDataChannel
   ) => {
-    const peer = new Peer({ uuid: id, peerConnection, dataChannel });
+    const peer = { id, peerConnection, dataChannel };
 
     peers.current.set(id, peer);
   };
@@ -23,7 +23,7 @@ export const usePeers = () => {
   const remove = (id: string) => peers.current.delete(id);
 
   const disconnect = () => {
-    peers.current.forEach((peer) => peer.pc.close());
+    peers.current.forEach((peer) => peer.peerConnection.close());
     peers.current.clear();
   };
 
