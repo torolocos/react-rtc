@@ -2,9 +2,9 @@
 
 ### Apps and Packages
 
-- `react-rtc`: React-RTC package
-- `signaling`: signaling server
-- `example`: example app
+- [react-rtc](https://github.com/torolocos/react-rtc/tree/main/packages/react-rtc)
+- [signaling](https://github.com/torolocos/react-rtc/tree/main/apps/signaling)
+- [example](https://github.com/torolocos/react-rtc/tree/main/apps/example)
 
 ### Build
 
