@@ -55,12 +55,12 @@ const Chat = () => {
 
   const handlePeerConnected = (event: RtcEvent<'peerConnected'>) => {
     if (getAllPeers) setUserCount(getAllPeers().length);
-    console.log('Peer connected', event.detail.uuid);
+    console.log('Peer connected', event.detail);
   };
 
   const handlePeerDisconnected = (event: RtcEvent<'peerDisconnected'>) => {
     if (getAllPeers) setUserCount(getAllPeers().length);
-    console.log('Peer disconnected', event.detail.uuid);
+    console.log('Peer disconnected', event.detail);
   };
 
   const handleEnter = () => setChatOpen(true);

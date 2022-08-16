@@ -52,7 +52,7 @@ export enum ConnectionState {
 }
 
 export interface Signal {
-  uuid: string;
+  id: string;
   dest: 'all' | string;
   sdp?: RTCSessionDescriptionInit;
   ice?: RTCIceCandidateInit | undefined;

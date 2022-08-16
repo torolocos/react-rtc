@@ -15,20 +15,20 @@ export const RtcProvider = ({
   signalingServer,
   iceServers,
 }: Props) => {
-  const localUuid = useRef(crypto.randomUUID());
+  const localId = useRef(crypto.randomUUID());
   const { dispatchEvent, on, off } = usePubSub();
   const {
     peerConnections,
     disconnect: leave,
     connect: enter,
   } = usePeerConnection(
-    localUuid.current,
+    localId.current,
     dispatchEvent,
     signalingServer,
     iceServers
   );
   const { send } = useMessaging(
-    localUuid.current,
+    localId.current,
     peerConnections.sendToAll,
     dispatchEvent
   );
