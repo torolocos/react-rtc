@@ -46,72 +46,57 @@ export default App;
 
 ```tsx
 import { useEffect, useState, useRef } from 'react';
-import { type RtcEvent, useRtc } from '@torolocos/react-rtc';
+import { type RtcEvent, Message, useRtc } from '@torolocos/react-rtc';
+import './styles.css';
 
-interface Message {
-  id: string;
-  message: string;
-  metadata: {
-    username: string;
-    time: number;
-  };
-}
+type MessageMetadata = { username?: string };
+
+const isMessage = (message: unknown): message is Message<MessageMetadata> => {
+  return (
+    message instanceof Message &&
+    'username' in message.metadata &&
+    typeof message.metadata.username === 'string'
+  );
+};
 
 const Chat = () => {
-  const { sendToAllPeers, enter, leave, on, off, getAllPeers } = useRtc();
+  const { send, enter, leave, on, off } = useRtc();
   const [inputValue, setInputValue] = useState('');
-  const [messageData, setMessageData] = useState<Message[]>([]);
+  const [messageData, setMessageData] = useState<Message<MessageMetadata>[]>(
+    []
+  );
   const [error, setError] = useState('');
-  const [isChatOpen, setChatOpen] = useState(false);
   const username = useRef(Math.random().toPrecision(4).toString());
 
-  const onStartChat = () => {
-    if (enter) enter();
-  };
-
-  const onEndChat = () => {
-    if (leave) leave();
-  };
-
   const onMessageSend = () => {
-    const message: Message = {
-      id: crypto.randomUUID(),
-      message: inputValue,
-      metadata: {
-        username: username.current,
-        time: Date.now(),
-      },
-    };
-
-    if (sendToAllPeers) sendToAllPeers(JSON.stringify(message));
+    if (send) send<MessageMetadata>(inputValue, { username: username.current });
 
     setInputValue('');
   };
 
   const handleMessageReceived = (event: RtcEvent<'receive'>) => {
-    const message: Message = JSON.parse(event.detail);
+    if (isMessage(event.detail)) {
+      const message = event.detail;
 
-    setMessageData((messages) => [...messages, message]);
+      setMessageData((messages) => [...messages, message]);
+    }
   };
 
   const handleMessageSent = (event: RtcEvent<'send'>) => {
-    const message: Message = JSON.parse(event.detail);
+    if (isMessage(event.detail)) {
+      const message = event.detail;
 
-    setMessageData((messages) => [...messages, message]);
+      setMessageData((messages) => [...messages, message]);
+    }
   };
-
-  const handleEnter = () => setChatOpen(true);
-
-  const handleLeave = () => setChatOpen(false);
 
   const handleError = () => setError('Err');
 
   useEffect(() => {
+    if (enter) enter();
     if (on) {
       on('receive', handleMessageReceived);
       on('send', handleMessageSent);
-      on('enter', handleEnter);
-      on('leave', handleLeave);
       on('error', handleError);
     }
 
@@ -119,8 +104,6 @@ const Chat = () => {
       if (off) {
         off('receive', handleMessageReceived);
         off('send', handleMessageSent);
-        off('enter', handleEnter);
-        off('enter', handleLeave);
         off('error', handleError);
       }
       if (leave) leave();
@@ -129,7 +112,7 @@ const Chat = () => {
 
   return (
     <>
-      <h2>Chat</h2>
+      {error && <div className="errorText">Something went wrong</div>}
       <div>
         {messageData.map(({ id, message, metadata }) => (
           <div key={id}>
@@ -137,18 +120,11 @@ const Chat = () => {
           </div>
         ))}
       </div>
-      {isChatOpen && (
-        <>
-          <input
-            value={inputValue}
-            onChange={({ target: { value } }) => setInputValue(value)}
-          />
-          <button onClick={onMessageSend}>send</button>
-        </>
-      )}
-      <button onClick={!isChatOpen ? onStartChat : onEndChat}>
-        {!isChatOpen ? 'join' : 'leave chat'}
-      </button>
+      <input
+        value={inputValue}
+        onChange={({ target: { value } }) => setInputValue(value)}
+      />
+      <button onClick={onMessageSend}>send</button>
     </>
   );
 };
