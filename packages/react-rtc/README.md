@@ -18,15 +18,17 @@ npm install @torolocos/react-rtc
 
 ## Usage
 
-1. To use [WebRTC](https://webrtc.org/) you have to run [signaling server](https://www.wowza.com/blog/webrtc-signaling-servers). Check out our [implementation](https://github.com/torolocos/react-rtc/tree/main/apps/signaling).
+1. Run [signaling](https://www.wowza.com/blog/webrtc-signaling-servers) server.
 
-2. Wrap your app with `RtcProvider`
+   - To use [WebRTC](https://webrtc.org/) you have to run [signaling](https://www.wowza.com/blog/webrtc-signaling-servers) server. Check out our [implementation](https://github.com/torolocos/react-rtc/tree/main/apps/signaling).
 
-```jsx
+2. Wrap your top level component with `RtcProvider`.
+
+```tsx
 import { RtcProvider } from '@torolocos/react-rtc';
 import Chat from './components/Chat';
 
-function App() {
+const App = () => {
   return (
     <RtcProvider
       signalingServer="ws://localhost:8001/"
@@ -35,14 +37,14 @@ function App() {
       <Chat />
     </RtcProvider>
   );
-}
+};
 
 export default App;
 ```
 
 3. Use `useRtc` hook in your components.
 
-```jsx
+```tsx
 import { useEffect, useState, useRef } from 'react';
 import { type RtcEvent, useRtc } from '@torolocos/react-rtc';
 
