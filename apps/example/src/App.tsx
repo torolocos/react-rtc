@@ -1,7 +1,7 @@
 import { RtcProvider } from '@torolocos/react-rtc';
 import Chat from './components/Chat';
 
-function App() {
+const App = () => {
   return (
     <RtcProvider
       signalingServer="ws://localhost:8001/"
@@ -10,6 +10,6 @@ function App() {
       <Chat />
     </RtcProvider>
   );
-}
+};
 
 export default App;
