@@ -6,6 +6,16 @@ React real-time communication library.
 
 This project aims to create a simple and versatile [WebRTC](https://webrtc.org/) wrapper in [React](https://reactjs.org/) ecosystem.
 
+```mermaid
+sequenceDiagram
+    App A->>+App B: John, can you hear me?
+    App B-->>-App A: Hi Alice, I can hear you!
+    App B->>+Signaling: local session description
+    Signaling-->>-App B: remote session description
+    App A->>+Signaling: local session description
+    Signaling-->>-App A: remote session description
+```
+
 ### Apps and Packages
 
 - [react-rtc](https://github.com/torolocos/react-rtc/tree/main/packages/react-rtc)
