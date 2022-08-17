@@ -22,13 +22,13 @@ Below are instructions on how to set up this project.
 
 1. Clone this repository
 
-```bash
+```shell
 git clone git@github.com:torolocos/react-rtc.git
 ```
 
 2. Install all dependencies
 
-```bash
+```shell
 yarn
 ```
 
