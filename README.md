@@ -4,7 +4,7 @@ React real-time communication library.
 
 ## About The Project
 
-This project aims to create a simple and versatile [WebRTC](https://webrtc.org/) wrapper in [React](https://reactjs.org/) ecosystem.
+This project aims to create a simple and versatile wrapper around [WebRTC](https://webrtc.org/) in [React](https://reactjs.org/) ecosystem.
 
 ```mermaid
 sequenceDiagram
