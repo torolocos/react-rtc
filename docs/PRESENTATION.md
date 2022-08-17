@@ -1,6 +1,6 @@
 # React-RTC
 
-`React-RTC` aims to be a simple and versatile [React](https://reactjs.org/) wrapper around [WebRTC](https://webrtc.org/) technology. This project is open-source, so any contribution would have a warm welcome.
+[React-RTC](https://github.com/torolocos/react-rtc) aims to be a simple and versatile [React](https://reactjs.org/) wrapper around [WebRTC](https://webrtc.org/) technology. This project is open-source, so any contribution would have a warm welcome.
 
 ## WebRTC
 
