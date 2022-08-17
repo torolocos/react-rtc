@@ -18,9 +18,7 @@ npm install @torolocos/react-rtc
 
 ## Usage
 
-1. Start signaling
-
-⋅⋅⋅To use [WebRTC](https://webrtc.org/) you have to run [signaling server](https://www.wowza.com/blog/webrtc-signaling-servers). Check our [implementation](https://github.com/torolocos/react-rtc/tree/main/apps/signaling).⋅⋅
+1. To use [WebRTC](https://webrtc.org/) you have to run [signaling server](https://www.wowza.com/blog/webrtc-signaling-servers). Check out our [implementation](https://github.com/torolocos/react-rtc/tree/main/apps/signaling).
 
 2. Wrap your app with `RtcProvider`
 
