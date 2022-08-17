@@ -2,6 +2,12 @@
 
 React real-time communication library.
 
+### Apps and Packages
+
+- [react-rtc](https://github.com/torolocos/react-rtc/tree/main/packages/react-rtc)
+- [signaling](https://github.com/torolocos/react-rtc/tree/main/apps/signaling)
+- [example](https://github.com/torolocos/react-rtc/tree/main/apps/example)
+
 ## About The Project
 
 This project aims to create a simple and versatile [WebRTC](https://webrtc.org/) wrapper in [React](https://reactjs.org/) ecosystem.
@@ -15,12 +21,6 @@ sequenceDiagram
     App A->>+Signaling: local session description
     Signaling-->>-App A: remote session description
 ```
-
-### Apps and Packages
-
-- [react-rtc](https://github.com/torolocos/react-rtc/tree/main/packages/react-rtc)
-- [signaling](https://github.com/torolocos/react-rtc/tree/main/apps/signaling)
-- [example](https://github.com/torolocos/react-rtc/tree/main/apps/example)
 
 ## Getting Started
 
