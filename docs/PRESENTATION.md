@@ -1,6 +1,6 @@
 # React-RTC
 
-`React-RTC` aims to be a simple and versatile [React](https://reactjs.org/) wrapper around [WebRTC](https://webrtc.org/) technology.
+`React-RTC` aims to be a simple and versatile [React](https://reactjs.org/) wrapper around [WebRTC](https://webrtc.org/) technology. This project is open-source, so any contribution would have a warm welcome.
 
 ## WebRTC
 
@@ -89,3 +89,8 @@ There is an event-based API. By `on` you subscribe to a certain event and by `of
 | enter            | when the client enters the network      |
 | peerConnected    | when peer connected to the network      |
 | peerDisconnected | when peer disconnected from the network |
+
+## Contributors
+
+- [Petr Brantalík](https://github.com/BrantalikP)
+- [Petr Chalupa](https://github.com/pchalupa)
