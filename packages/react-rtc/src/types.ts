@@ -1,5 +1,3 @@
-import type Message from './models/Message';
-
 export type DispatchEvent = <Type extends keyof EventsDetail>(
   type: Type,
   detail?: EventsDetail[Type]
@@ -22,8 +20,8 @@ export type RtcEvent<Type extends keyof EventsDetail> = CustomEvent<
 >;
 
 interface EventsDetail {
-  receive: Message;
-  send: Message;
+  receive: string;
+  send: string;
   error: unknown;
   peerConnected: string;
   peerDisconnected: string;
@@ -31,15 +29,10 @@ interface EventsDetail {
   enter: unknown;
 }
 
-export type Send = <Metadata = undefined>(
-  data: string,
-  metadata?: Metadata
-) => void;
-
 export interface ContextType {
   enter?: () => void;
   leave?: () => void;
-  send?: Send;
+  sendToAllPeers?: (data: string) => void;
   getAllPeers?: () => string[];
   on?: AddEventListener;
   off?: RemoveEventListener;

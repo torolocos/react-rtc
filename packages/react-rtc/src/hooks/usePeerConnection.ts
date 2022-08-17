@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import Message from '../models/Message';
 import { ConnectionState, type Signal, type DispatchEvent } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 import { usePeers } from './usePeers';
@@ -11,7 +10,7 @@ export const usePeerConnection = (
   signalingServer: string,
   iceServers: { urls: string }[]
 ) => {
-  const peerConnections = usePeers();
+  const peerConnections = usePeers(dispatchEvent);
   const {
     sendSignalingMessage,
     signaling,
@@ -57,15 +56,9 @@ export const usePeerConnection = (
         dispatchEvent('peerConnected', peer.id);
     });
 
-    dataChannel.addEventListener('message', (event) => {
-      try {
-        const message = new Message(JSON.parse(event.data));
-
-        dispatchEvent('receive', message);
-      } catch (error) {
-        dispatchEvent('error', error);
-      }
-    });
+    dataChannel.addEventListener('message', (event) =>
+      dispatchEvent('receive', event.data)
+    );
 
     if (initCall) {
       peerConnection
@@ -190,8 +183,9 @@ export const usePeerConnection = (
   }, [signaling]);
 
   return {
-    peerConnections,
     connect,
     disconnect,
+    sendToAllPeers: peerConnections.sendToAll,
+    getAllPeers: peerConnections.getAll,
   };
 };

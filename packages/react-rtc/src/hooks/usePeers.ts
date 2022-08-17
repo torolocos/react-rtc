@@ -1,7 +1,7 @@
 import { useRef } from 'react';
-import type { Peer } from '../types';
+import type { Peer, DispatchEvent } from '../types';
 
-export const usePeers = () => {
+export const usePeers = (dispatchEvent: DispatchEvent) => {
   const peers = useRef(new Map<string, Peer>());
 
   const get = (id: string) => {
@@ -27,8 +27,10 @@ export const usePeers = () => {
     peers.current.clear();
   };
 
-  const sendToAll = (data: string) =>
+  const sendToAll = (data: string) => {
     peers.current.forEach((peer) => peer.dataChannel.send(data));
+    dispatchEvent('send', data);
+  };
 
   return {
     add,
