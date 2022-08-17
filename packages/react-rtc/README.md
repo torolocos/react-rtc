@@ -156,4 +156,4 @@ const Chat = () => {
 export default Chat;
 ```
 
-> See [example](https://github.com/torolocos/react-rtc/tree/main/apps/example) app.
+> See the [example](https://github.com/torolocos/react-rtc/tree/main/apps/example) app.
