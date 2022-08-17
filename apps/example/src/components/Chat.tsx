@@ -1,23 +1,20 @@
 import { useEffect, useState, useRef } from 'react';
-import { type RtcEvent, Message, useRtc } from '@torolocos/react-rtc';
+import { type RtcEvent, useRtc } from '@torolocos/react-rtc';
 import './styles.css';
 
-type MessageMetadata = { username?: string };
-
-const isMessage = (message: unknown): message is Message<MessageMetadata> => {
-  return (
-    message instanceof Message &&
-    'username' in message.metadata &&
-    typeof message.metadata.username === 'string'
-  );
-};
+interface Message {
+  id: string;
+  message: string;
+  metadata: {
+    username: string;
+    time: number;
+  };
+}
 
 const Chat = () => {
-  const { send, enter, leave, on, off, getAllPeers } = useRtc();
+  const { sendToAllPeers, enter, leave, on, off, getAllPeers } = useRtc();
   const [inputValue, setInputValue] = useState('');
-  const [messageData, setMessageData] = useState<Message<MessageMetadata>[]>(
-    []
-  );
+  const [messageData, setMessageData] = useState<Message[]>([]);
   const [error, setError] = useState('');
   const [isChatOpen, setChatOpen] = useState(false);
   const [userCount, setUserCount] = useState(0);
@@ -32,25 +29,30 @@ const Chat = () => {
   };
 
   const onMessageSend = () => {
-    if (send) send<MessageMetadata>(inputValue, { username: username.current });
+    const message: Message = {
+      id: crypto.randomUUID(),
+      message: inputValue,
+      metadata: {
+        username: username.current,
+        time: Date.now(),
+      },
+    };
+
+    if (sendToAllPeers) sendToAllPeers(JSON.stringify(message));
 
     setInputValue('');
   };
 
   const handleMessageReceived = (event: RtcEvent<'receive'>) => {
-    if (isMessage(event.detail)) {
-      const message = event.detail;
+    const message: Message = JSON.parse(event.detail);
 
-      setMessageData((messages) => [...messages, message]);
-    }
+    setMessageData((messages) => [...messages, message]);
   };
 
   const handleMessageSent = (event: RtcEvent<'send'>) => {
-    if (isMessage(event.detail)) {
-      const message = event.detail;
+    const message: Message = JSON.parse(event.detail);
 
-      setMessageData((messages) => [...messages, message]);
-    }
+    setMessageData((messages) => [...messages, message]);
   };
 
   const handlePeerConnected = (event: RtcEvent<'peerConnected'>) => {
