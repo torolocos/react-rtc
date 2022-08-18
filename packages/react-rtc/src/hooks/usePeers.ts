@@ -28,8 +28,21 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
     peers.current.clear();
   };
 
+  const send = (peer: Peer, data: string) => {
+    peer.dataChannel.send(data);
+  };
+
+  const sendTo = (id: string, data: string) => {
+    const peer = peers.current.get(id);
+
+    if (peer) {
+      send(peer, data);
+      dispatchEvent('send', data);
+    }
+  };
+
   const sendToAll = (data: string) => {
-    peers.current.forEach((peer) => peer.dataChannel.send(data));
+    peers.current.forEach((peer) => send(peer, data));
     dispatchEvent('send', data);
   };
 
@@ -38,6 +51,7 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
     get,
     getAll,
     remove,
+    sendTo,
     sendToAll,
     disconnect,
   };
