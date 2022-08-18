@@ -18,21 +18,15 @@ describe('usePeers', () => {
   const peerConnection = new RTCPeerConnection();
   const dataChannel = peerConnection.createDataChannel('test');
 
-  it.only('should add and get a peer', () => {
-    const peerConnection = new RTCPeerConnection();
-    const dataChannel = peerConnection.createDataChannel('test');
+  it('should add and get a peer', () => {
     const { result } = renderHook(() => usePeers(dispatchEvent));
 
     result.current.add(id[0], peerConnection, dataChannel);
-    expect(result.current.get(id[0])).toMatchObject({ uuid: id[0] });
-  });
-
-  it('should get all peers', () => {
-    const { result } = renderHook(() => usePeers(dispatchEvent));
-
-    result.current.add(id[0], peerConnection, dataChannel);
-    result.current.add(id[1], peerConnection, dataChannel);
-    expect(result.current.getAll()).toStrictEqual(id);
+    expect(result.current.get(id[0])).toEqual({
+      uuid: id[0],
+      pc: peerConnection,
+      dataChannel,
+    });
   });
 
   it('should remove a peer', () => {
@@ -51,6 +45,17 @@ describe('usePeers', () => {
     result.current.disconnect();
 
     expect(close).toBeCalledTimes(2);
+  });
+
+  it('should send data to peer', () => {
+    const data = 'data';
+    const { result } = renderHook(() => usePeers(dispatchEvent));
+
+    result.current.add(id[0], peerConnection, dataChannel);
+    result.current.sendTo(id[0], data);
+
+    expect(send).toBeCalledWith(data);
+    expect(dispatchEvent).toBeCalledWith('send', data);
   });
 
   it('should send data to all peers', () => {
