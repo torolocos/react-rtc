@@ -19,8 +19,11 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
 
   const remove = (id: string) => peers.current.delete(id);
 
+  const forEach = (callback: (peer: Peer) => void) =>
+    peers.current.forEach(callback);
+
   const disconnect = () => {
-    peers.current.forEach((peer) => peer.pc.close());
+    forEach((peer) => peer.pc.close());
     peers.current.clear();
   };
 
@@ -38,7 +41,7 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
   };
 
   const sendToAll = (data: string) => {
-    peers.current.forEach((peer) => send(peer, data));
+    forEach((peer) => send(peer, data));
     dispatchEvent('send', data);
   };
 
