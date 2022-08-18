@@ -5,12 +5,6 @@ import type { DispatchEvent } from '../types';
 export const usePeers = (dispatchEvent: DispatchEvent) => {
   const peers = useRef(new Map<string, Peer>());
 
-  const get = (id: string) => {
-    return peers.current.get(id);
-  };
-
-  const getAll = () => Array.from(peers.current).map(([id]) => id);
-
   const add = (
     id: string,
     peerConnection: RTCPeerConnection,
@@ -20,6 +14,8 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
 
     peers.current.set(id, peer);
   };
+
+  const get = (id: string) => peers.current.get(id);
 
   const remove = (id: string) => peers.current.delete(id);
 
@@ -49,7 +45,6 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
   return {
     add,
     get,
-    getAll,
     remove,
     sendTo,
     sendToAll,
