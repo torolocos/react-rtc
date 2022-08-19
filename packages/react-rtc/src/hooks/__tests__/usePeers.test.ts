@@ -55,7 +55,21 @@ describe('usePeers', () => {
     result.current.sendTo(id[0], data);
 
     expect(send).toBeCalledWith(data);
-    expect(dispatchEvent).toBeCalledWith('send', data);
+    expect(dispatchEvent).toBeCalledWith('send', [id[0], data]);
+  });
+
+  it('should handle send error', () => {
+    send.mockImplementationOnce(() => {
+      throw new Error();
+    });
+    const data = 'data';
+    const { result } = renderHook(() => usePeers(dispatchEvent));
+
+    result.current.add(id[0], peerConnection, dataChannel);
+    result.current.sendTo(id[0], data);
+
+    expect(send).toBeCalledWith(data);
+    expect(dispatchEvent).toBeCalledWith('error', expect.anything());
   });
 
   it('should send data to all peers', () => {
@@ -67,6 +81,7 @@ describe('usePeers', () => {
     result.current.sendToAll(data);
 
     expect(send).toHaveBeenNthCalledWith(2, data);
-    expect(dispatchEvent).toBeCalledWith('send', data);
+    expect(dispatchEvent).toHaveBeenCalledWith('send', [id[0], data]);
+    expect(dispatchEvent).toHaveBeenCalledWith('send', [id[1], data]);
   });
 });
