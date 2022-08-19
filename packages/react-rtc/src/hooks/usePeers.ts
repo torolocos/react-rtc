@@ -1,9 +1,11 @@
 import { useRef } from 'react';
 import Peer from '../models/Peer';
 import type { DispatchEvent } from '../types';
+import { useErrorHandler } from './useErrorHandler';
 
 export const usePeers = (dispatchEvent: DispatchEvent) => {
   const peers = useRef(new Map<string, Peer>());
+  const handleError = useErrorHandler(dispatchEvent);
 
   const add = (
     id: string,
@@ -19,7 +21,7 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
 
   const remove = (id: string) => peers.current.delete(id);
 
-  const forEach = (callback: (peer: Peer) => void) =>
+  const forEach = (callback: (peer: Peer, id?: string) => void) =>
     peers.current.forEach(callback);
 
   const disconnect = () => {
@@ -28,21 +30,22 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
   };
 
   const send = (peer: Peer, data: string) => {
-    peer.dataChannel.send(data);
+    try {
+      peer.dataChannel.send(data);
+      dispatchEvent('send', [peer.uuid, data]);
+    } catch (error) {
+      handleError(error);
+    }
   };
 
   const sendTo = (id: string, data: string) => {
     const peer = peers.current.get(id);
 
-    if (peer) {
-      send(peer, data);
-      dispatchEvent('send', data);
-    }
+    if (peer) send(peer, data);
   };
 
   const sendToAll = (data: string) => {
     forEach((peer) => send(peer, data));
-    dispatchEvent('send', data);
   };
 
   return {
