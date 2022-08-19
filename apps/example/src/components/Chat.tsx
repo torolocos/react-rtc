@@ -4,7 +4,7 @@ import './styles.css';
 
 interface Message {
   id: string;
-  from?: string;
+  from: string;
   message: string;
 }
 
@@ -13,11 +13,11 @@ interface Peer {
   username: string;
 }
 
+const isObject = (object: unknown): object is object =>
+  typeof object === 'object';
+
 const isMessage = (message: unknown): message is Message =>
-  typeof message === 'object' &&
-  !!message &&
-  'id' in message &&
-  'message' in message;
+  isObject(message) && !!message && 'id' in message && 'message' in message;
 
 const generateUserName = () => {
   const toUpperCaseFirstCharacter = (text: string) =>
@@ -54,6 +54,7 @@ const Chat = () => {
   const handleSendPress = () => {
     const message = {
       id: crypto.randomUUID(),
+      from: '',
       message: inputValue,
     };
 
@@ -68,11 +69,8 @@ const Chat = () => {
 
     if (isMessage(data)) {
       setMessageData((messages) => [...messages, { ...data, from }]);
-    } else {
-      if (!peers.includes(data))
-        setPeers((peersMap) => [...peersMap, { id: from, ...data }]);
-      else if (sendToPeer) sendToPeer(from, username.current);
-    }
+    } else if (!peers.includes(data))
+      setPeers((peersMap) => [...peersMap, { id: from, ...data }]);
   };
 
   const handleMessageSend = (event: RtcEvent<'send'>) => {
