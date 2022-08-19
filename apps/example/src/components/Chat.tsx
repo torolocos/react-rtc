@@ -4,21 +4,30 @@ import './styles.css';
 
 interface Message {
   id: string;
+  from: string;
   message: string;
-  metadata: {
-    username: string;
-    time: number;
-  };
 }
 
+interface Peer {
+  username: string;
+}
+
+const isMessage = (message: unknown): message is Message =>
+  typeof message === 'object' &&
+  !!message &&
+  'id' in message &&
+  'message' in message;
+
 const Chat = () => {
-  const { sendToAllPeers, enter, leave, on, off, getAllPeers } = useRtc();
+  const { sendToPeer, sendToAllPeers, enter, leave, on, off } = useRtc();
   const [inputValue, setInputValue] = useState('');
   const [messageData, setMessageData] = useState<Message[]>([]);
   const [error, setError] = useState('');
   const [isChatOpen, setChatOpen] = useState(false);
-  const [userCount, setUserCount] = useState(0);
-  const username = useRef(Math.random().toPrecision(4).toString());
+  const peer = useRef({ username: Math.random().toPrecision(4).toString() });
+  const [peers, setPeers] = useState(new Map<string, Peer>());
+
+  const getPeerUsername = (id: string) => peers.get(id)?.username;
 
   const onStartChat = () => {
     if (enter) enter();
@@ -29,40 +38,39 @@ const Chat = () => {
   };
 
   const onMessageSend = () => {
-    const message: Message = {
+    const message = {
       id: crypto.randomUUID(),
       message: inputValue,
-      metadata: {
-        username: username.current,
-        time: Date.now(),
-      },
     };
 
     if (sendToAllPeers) sendToAllPeers(JSON.stringify(message));
+    setMessageData((messages) => {
+      return [...messages, { ...message, from: peer.current.username }];
+    });
 
     setInputValue('');
   };
 
   const handleMessageReceived = (event: RtcEvent<'receive'>) => {
-    const message: Message = JSON.parse(event.detail);
+    const [from, data] = event.detail;
+    const message = JSON.parse(data);
 
-    setMessageData((messages) => [...messages, message]);
+    if (!isMessage(message)) {
+      if (!peers.has(from)) setPeers((peersMap) => peersMap.set(from, message));
+      else if (sendToPeer) sendToPeer(from, peer.current.username);
+    } else {
+      setMessageData((messages) => [...messages, { ...message, from }]);
+    }
   };
 
   const handleMessageSent = (event: RtcEvent<'send'>) => {
-    const message: Message = JSON.parse(event.detail);
+    const [to, data] = event.detail;
+    const message = JSON.parse(data);
 
-    setMessageData((messages) => [...messages, message]);
-  };
-
-  const handlePeerConnected = (event: RtcEvent<'peerConnected'>) => {
-    if (getAllPeers) setUserCount(getAllPeers().length);
-    console.log('Peer connected', event.detail.uuid);
-  };
-
-  const handlePeerDisconnected = (event: RtcEvent<'peerDisconnected'>) => {
-    if (getAllPeers) setUserCount(getAllPeers().length);
-    console.log('Peer disconnected', event.detail.uuid);
+    if (isMessage(message))
+      console.log(
+        `Message: "${message.message}" to ${getPeerUsername(to)} was delivered.`
+      );
   };
 
   const handleEnter = () => setChatOpen(true);
@@ -71,15 +79,20 @@ const Chat = () => {
 
   const handleError = () => setError('Err');
 
+  const handleDataChannelOpen = (event: RtcEvent<'dataChannel'>) => {
+    const id = event.detail;
+
+    if (sendToPeer)
+      sendToPeer(id, JSON.stringify({ username: peer.current.username }));
+  };
+
   useEffect(() => {
     if (on) {
       on('receive', handleMessageReceived);
       on('send', handleMessageSent);
-      on('send', () => console.log('first message sended'), { once: true });
-      on('peerConnected', handlePeerConnected);
-      on('peerDisconnected', handlePeerDisconnected);
       on('enter', handleEnter);
       on('leave', handleLeave);
+      on('dataChannel', handleDataChannelOpen);
       on('error', handleError);
     }
 
@@ -87,10 +100,9 @@ const Chat = () => {
       if (off) {
         off('receive', handleMessageReceived);
         off('send', handleMessageSent);
-        off('peerConnected', handlePeerConnected);
-        off('peerDisconnected', handlePeerDisconnected);
         off('enter', handleEnter);
         off('enter', handleLeave);
+        off('dataChannel', handleDataChannelOpen);
         off('error', handleError);
       }
       if (leave) leave();
@@ -101,11 +113,11 @@ const Chat = () => {
     <>
       <h2>Chat</h2>
       {error && <div className="errorText">Something went wrong</div>}
-      <p>User coount: {userCount}</p>
+      <p>Peers connected: {peers.size}</p>
       <div>
-        {messageData.map(({ id, message, metadata }) => (
+        {messageData?.map(({ id, from, message }) => (
           <div key={id}>
-            {metadata?.username}: {message}
+            {getPeerUsername(from) || from}: {message}
           </div>
         ))}
       </div>
