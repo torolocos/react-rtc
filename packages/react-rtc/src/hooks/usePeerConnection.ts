@@ -47,11 +47,13 @@ export const usePeerConnection = (
       checkPeerDisconnect(peerUuid)
     );
 
-    peerConnection.addEventListener('datachannel', (event) =>
+    peerConnection.addEventListener('datachannel', (event) => {
       Object.defineProperty(peerConnections.get(peerUuid), 'dataChannel', {
         value: event.channel,
-      })
-    );
+      });
+
+      dispatchEvent('dataChannel', peerUuid);
+    });
 
     peerConnection.addEventListener('connectionstatechange', () => {
       const peer = peerConnections.get(peerUuid);
@@ -59,10 +61,6 @@ export const usePeerConnection = (
 
       if (isConnected && !initCall) dispatchEvent('peerConnected', peer);
     });
-
-    dataChannel.addEventListener('open', () =>
-      dispatchEvent('dataChannelOpen', peerUuid)
-    );
 
     dataChannel.addEventListener('message', (event) =>
       dispatchEvent('receive', [peerUuid, event.data])

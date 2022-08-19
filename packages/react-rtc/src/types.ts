@@ -29,7 +29,7 @@ interface EventsDetail {
   peerDisconnected: Peer;
   leave: unknown;
   enter: unknown;
-  dataChannelOpen: string;
+  dataChannel: string;
 }
 
 export interface ContextType {
