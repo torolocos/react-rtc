@@ -19,8 +19,8 @@ export const RtcProvider = ({
   const {
     disconnect: leave,
     connect: enter,
+    sendToPeer,
     sendToAllPeers,
-    getAllPeers,
   } = usePeerConnection(
     localUuid.current,
     dispatchEvent,
@@ -33,8 +33,8 @@ export const RtcProvider = ({
       value={{
         enter,
         leave,
+        sendToPeer,
         sendToAllPeers,
-        getAllPeers,
         on,
         off,
       }}
