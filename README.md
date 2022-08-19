@@ -1,5 +1,7 @@
 # React-RTC
 
+[![codecov](https://codecov.io/gh/torolocos/react-rtc/branch/main/graph/badge.svg?token=CKQW0LNPDV)](https://codecov.io/gh/torolocos/react-rtc)
+
 React real-time communication library.
 
 ## About The Project
