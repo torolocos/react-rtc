@@ -10,7 +10,6 @@ Object.defineProperty(global, 'RTCPeerConnection', {
     createDataChannel = jest.fn(() => ({ send }));
     close = close;
   },
-  writable: false,
 });
 
 describe('usePeers', () => {
