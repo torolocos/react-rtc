@@ -1,23 +1,13 @@
-import {
-  Server,
-  OPEN as WebSocketOpen,
-  type RawData,
-  type WebSocket,
-} from 'ws';
+import { Server, type RawData, type WebSocket } from 'ws';
 import type { Server as HttpServer } from 'http';
 import type { Server as HttpsServer } from 'https';
-
-const sendToAllClients = (message: string, webSocket: Server<WebSocket>) => {
-  webSocket.clients.forEach((client) => {
-    if (client.readyState === WebSocketOpen) client.send(message);
-  });
-};
+import { sendToAllClients } from './send';
 
 export const createSignalingServer = (server: HttpServer | HttpsServer) => {
   const webSocket = new Server({ server });
 
   const handleMessage = (message: RawData) =>
-    sendToAllClients(message.toString('utf-8'), webSocket);
+    sendToAllClients(webSocket.clients, message.toString('utf-8'));
 
   const handleError = () => webSocket.close();
 
