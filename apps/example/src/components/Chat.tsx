@@ -9,7 +9,7 @@ interface Message {
 }
 
 interface Peer {
-  id: string;
+  id?: string;
   username: string;
 }
 
@@ -17,7 +17,19 @@ const isObject = (object: unknown): object is object =>
   typeof object === 'object';
 
 const isMessage = (message: unknown): message is Message =>
-  isObject(message) && !!message && 'id' in message && 'message' in message;
+  isObject(message) &&
+  !!message &&
+  'id' in message &&
+  typeof (message as Message).id === 'string' &&
+  'message' in message &&
+  typeof (message as Message).id === 'string';
+
+const isPeer = (peer: unknown): peer is Peer =>
+  isObject(peer) &&
+  !!peer &&
+  'id' in peer &&
+  'username' in peer &&
+  typeof (peer as Peer).id === 'string';
 
 const generateUserName = () => {
   const toUpperCaseFirstCharacter = (text: string) =>
@@ -67,10 +79,11 @@ const Chat = () => {
     const [from, payload] = event.detail;
     const data = JSON.parse(payload);
 
-    if (isMessage(data)) {
+    if (isMessage(data))
       setMessageData((messages) => [...messages, { ...data, from }]);
-    } else if (!peers.includes(data))
-      setPeers((peersMap) => [...peersMap, { id: from, ...data }]);
+
+    if (isPeer(data) && !peers.includes(data))
+      setPeers((peersMap) => [...peersMap, { ...data, id: from }]);
   };
 
   const handleMessageSend = (event: RtcEvent<'send'>) => {
@@ -91,7 +104,7 @@ const Chat = () => {
     const id = event.detail;
 
     if (sendToPeer)
-      sendToPeer(id, JSON.stringify({ username: username.current }));
+      sendToPeer(id, JSON.stringify({ id: '', username: username.current }));
   };
 
   useEffect(() => {
