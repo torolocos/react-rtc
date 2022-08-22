@@ -1,7 +1,7 @@
 {
   "name": "@torolocos/signaling-server",
   "version": "0.1.0-rc.0",
-  "main": "./dist/esm/index.mjs",
+  "main": "./dist/cjs/index.js",
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "author": "torolocos",
