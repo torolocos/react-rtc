@@ -42,23 +42,28 @@ export const usePeerConnection = (
     peerConnection.addEventListener('icecandidate', (event) =>
       onIceCandidate(event, peerUuid)
     );
+
     peerConnection.addEventListener('iceconnectionstatechange', () =>
       checkPeerDisconnect(peerUuid)
     );
-    peerConnection.addEventListener('datachannel', (event) =>
+
+    peerConnection.addEventListener('datachannel', (event) => {
       Object.defineProperty(peerConnections.get(peerUuid), 'dataChannel', {
         value: event.channel,
-      })
-    );
+      });
+
+      dispatchEvent('dataChannel', peerUuid);
+    });
+
     peerConnection.addEventListener('connectionstatechange', () => {
       const peer = peerConnections.get(peerUuid);
+      const isConnected = peer?.pc.connectionState === 'connected';
 
-      if (peer && peer.pc.connectionState === 'connected' && !initCall)
-        dispatchEvent('peerConnected', peer);
+      if (isConnected && !initCall) dispatchEvent('peerConnected', peer);
     });
 
     dataChannel.addEventListener('message', (event) =>
-      dispatchEvent('receive', event.data)
+      dispatchEvent('receive', [peerUuid, event.data])
     );
 
     if (initCall) {
@@ -186,7 +191,7 @@ export const usePeerConnection = (
   return {
     connect,
     disconnect,
+    sendToPeer: peerConnections.sendTo,
     sendToAllPeers: peerConnections.sendToAll,
-    getAllPeers: peerConnections.getAll,
   };
 };
