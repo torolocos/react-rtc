@@ -1,35 +1,33 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, type FormEvent } from 'react';
 import { type RtcEvent, useRtc } from '@torolocos/react-rtc';
-import './styles.css';
+import z from 'zod';
 
-interface Message {
-  id: string;
-  from: string;
-  message: string;
-}
+const Message = z.object({
+  id: z.string(),
+  senderId: z.string(),
+  message: z.string(),
+});
 
-interface Peer {
-  id?: string;
-  username: string;
-}
+const Peer = z.object({
+  id: z.nullable(z.string()),
+  username: z.string(),
+});
 
-const isObject = (object: unknown): object is object =>
-  typeof object === 'object';
+type Message = z.infer<typeof Message>;
 
-const isMessage = (message: unknown): message is Message =>
-  isObject(message) &&
-  !!message &&
-  'id' in message &&
-  typeof (message as Message).id === 'string' &&
-  'message' in message &&
-  typeof (message as Message).id === 'string';
+type Peer = z.infer<typeof Peer>;
 
-const isPeer = (peer: unknown): peer is Peer =>
-  isObject(peer) &&
-  !!peer &&
-  'id' in peer &&
-  'username' in peer &&
-  typeof (peer as Peer).id === 'string';
+const isMessage = (message: unknown): message is Message => {
+  const { success } = Message.safeParse(message);
+
+  return success;
+};
+
+const isPeer = (peer: unknown): peer is Peer => {
+  const { success } = Peer.safeParse(peer);
+
+  return success;
+};
 
 const generateUserName = () => {
   const toUpperCaseFirstCharacter = (text: string) =>
@@ -45,12 +43,12 @@ const generateUserName = () => {
 
 const Chat = () => {
   const { sendToPeer, sendToAllPeers, enter, leave, on, off } = useRtc();
-  const [inputValue, setInputValue] = useState('');
-  const [messageData, setMessageData] = useState<Message[]>([]);
-  const [error, setError] = useState('');
-  const [isChatOpen, setChatOpen] = useState(false);
-  const username = useRef(generateUserName());
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [error, setError] = useState<string>();
+  const [isConnected, setIsConnected] = useState(false);
   const [peers, setPeers] = useState<Peer[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const username = useRef(generateUserName());
 
   const getPeerUsername = (id: string) =>
     peers.find((peer) => peer.id === id)?.username;
@@ -63,27 +61,37 @@ const Chat = () => {
     if (leave) leave();
   };
 
-  const handleSendPress = () => {
-    const message = {
-      id: crypto.randomUUID(),
-      from: '',
-      message: inputValue,
-    };
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
 
-    if (sendToAllPeers) sendToAllPeers(JSON.stringify(message));
-    setMessageData((messages) => [...messages, message]);
-    setInputValue('');
+    const message = inputRef.current?.value;
+
+    if (message) {
+      const data = {
+        id: crypto.randomUUID(),
+        senderId: '',
+        message,
+      };
+
+      if (sendToAllPeers) sendToAllPeers(JSON.stringify(data));
+
+      setMessages((currentMessages) => [...currentMessages, data]);
+      inputRef.current.value = '';
+    }
   };
 
   const handleMessageReceived = (event: RtcEvent<'receive'>) => {
-    const [from, payload] = event.detail;
+    const [senderId, payload] = event.detail;
     const data = JSON.parse(payload);
 
     if (isMessage(data))
-      setMessageData((messages) => [...messages, { ...data, from }]);
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        { ...data, senderId },
+      ]);
 
     if (isPeer(data) && !peers.includes(data))
-      setPeers((peersMap) => [...peersMap, { ...data, id: from }]);
+      setPeers((peersMap) => [...peersMap, { ...data, id: senderId }]);
   };
 
   const handleMessageSend = (event: RtcEvent<'send'>) => {
@@ -94,9 +102,9 @@ const Chat = () => {
       console.log(`Message: "${message.message}" to ${to} was delivered.`);
   };
 
-  const handleEnter = () => setChatOpen(true);
+  const handleEnter = () => setIsConnected(true);
 
-  const handleLeave = () => setChatOpen(false);
+  const handleLeave = () => setIsConnected(false);
 
   const handleError = () => setError('Something went wrong');
 
@@ -131,30 +139,36 @@ const Chat = () => {
   }, []);
 
   return (
-    <>
-      <h2>Chat</h2>
-      {error && <div className="errorText">{error}</div>}
-      <p>Peers connected: {peers.length}</p>
-      <div>
-        {messageData?.map(({ id, from, message }) => (
+    <main>
+      <h1>Chat</h1>
+      {error && <p>{error}</p>}
+      <h2>Online: {peers.length}</h2>
+      <button onClick={isConnected ? handleLeavePress : handleJoinPress}>
+        {isConnected ? 'leave chat' : 'join'}
+      </button>
+      <ul>
+        {peers.map(({ id }) => (
+          <li key={id}>{id && getPeerUsername(id)}</li>
+        ))}
+      </ul>
+      <hr />
+      <section>
+        {messages?.map(({ id, senderId, message }) => (
           <div key={id}>
-            {from ? getPeerUsername(from) : username.current}: {message}
+            {getPeerUsername(senderId) || 'You'}: {message}
           </div>
         ))}
-      </div>
-      {isChatOpen && (
+      </section>
+      {isConnected && (
         <>
-          <input
-            value={inputValue}
-            onChange={({ target: { value } }) => setInputValue(value)}
-          />
-          <button onClick={handleSendPress}>send</button>
+          <hr />
+          <form onSubmit={handleSubmit}>
+            <input type="text" ref={inputRef} />
+            <input type="submit" value="send" />
+          </form>
         </>
       )}
-      <button onClick={!isChatOpen ? handleJoinPress : handleLeavePress}>
-        {!isChatOpen ? 'join' : 'leave chat'}
-      </button>
-    </>
+    </main>
   );
 };
 
