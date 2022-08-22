@@ -22,20 +22,21 @@ export type RtcEvent<Type extends keyof EventsDetail> = CustomEvent<
 >;
 
 interface EventsDetail {
-  receive: string;
-  send: string;
+  receive: [string, string];
+  send: [string, string];
   error: unknown;
   peerConnected: Peer;
   peerDisconnected: Peer;
   leave: unknown;
   enter: unknown;
+  dataChannel: string;
 }
 
 export interface ContextType {
   enter?: () => void;
   leave?: () => void;
+  sendToPeer?: (id: string, data: string) => void;
   sendToAllPeers?: (data: string) => void;
-  getAllPeers?: () => string[];
   on?: AddEventListener;
   off?: RemoveEventListener;
 }

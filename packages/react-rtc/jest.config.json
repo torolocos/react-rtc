@@ -1,5 +1,6 @@
 {
   "preset": "ts-jest",
   "testPathIgnorePatterns": ["dist"],
-  "coverageReporters": ["html", "lcov"]
+  "collectCoverageFrom": ["src/**/*.{ts,tsx}"],
+  "coverageReporters": ["html", "json"]
 }

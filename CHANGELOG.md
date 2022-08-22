@@ -1,5 +1,23 @@
 
 
+## [0.1.0-rc.1](https://github.com/torolocos/react-rtc/compare/0.1.0-rc.0...0.1.0-rc.1) (2022-08-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove message model (#78)
+
+### Features
+
+* add enter event ([#77](https://github.com/torolocos/react-rtc/issues/77)) ([af66c73](https://github.com/torolocos/react-rtc/commit/af66c73c8e958f9497e9d3dc9fc18ed65db7fb5b))
+* handshake ([#94](https://github.com/torolocos/react-rtc/issues/94)) ([0b3bd0e](https://github.com/torolocos/react-rtc/commit/0b3bd0efa657586a7bd6fb7eab35ee3e39e253e2))
+* peer list ([#76](https://github.com/torolocos/react-rtc/issues/76)) ([70886c7](https://github.com/torolocos/react-rtc/commit/70886c7160b0a90026f8215de6e2802de8b29e3a))
+
+
+### Code Refactoring
+
+* remove message model ([#78](https://github.com/torolocos/react-rtc/issues/78)) ([4a6cdcf](https://github.com/torolocos/react-rtc/commit/4a6cdcf147fcc1e4c3bc6cc0eca8d681858a5101))
+
 ## 0.1.0-rc.0 (2022-08-09)
 
 
