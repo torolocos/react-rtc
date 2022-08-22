@@ -1,23 +1,47 @@
 {
   "name": "@torolocos/signaling-server",
   "version": "0.1.0-rc.1",
-  "main": "./dist/cjs/index.js",
-  "types": "./dist/types/index.d.ts",
+  "description": "Signaling server for @torolocos/react-rtc package.",
+  "keywords": [
+    "webrtc",
+    "rtc",
+    "peer",
+    "P2P",
+    "real-time",
+    "websockets",
+    "signaling",
+    "communication"
+  ],
+  "homepage": "https://github.com/torolocos/react-rtc#readme",
   "license": "MIT",
   "author": "torolocos",
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/cjs/index.js",
+  "types": "./dist/types/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/torolocos/react-rtc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/torolocos/react-rtc/issues"
+  },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch --preserveWatchOutput"
+    "dev": "tsc --watch --preserveWatchOutput",
+    "tsc:check": "tsc --pretty --noEmit",
+    "lint": "eslint . --ext ts --ext tsx"
   },
-  "dependencies": {
+  "peerDependencies": {
     "ws": "^8.8.1"
   },
   "devDependencies": {
     "@types/ws": "^8.2.2",
-    "@types/node": "^17.0.40",
+    "@types/node": "^16.11.7",
     "@torolocos/eslint-config": "^0.0.6",
     "typescript": "^4.7.3"
   }
