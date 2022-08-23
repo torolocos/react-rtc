@@ -18,7 +18,7 @@ npm install @torolocos/signaling-server
 
 ## Usage
 
-1.  Create `http` or `https` server and pass it to `createSignalingServer` function.
+Create `http` or `https` server and pass it to `createSignalingServer` function. Let your server listen on the given port.
 
 ```ts
 import { createServer } from 'http';
@@ -27,11 +27,7 @@ import { createSignalingServer } from '@torolocos/signaling-server';
 const server = createServer();
 
 createSignalingServer(server);
-```
 
-2.  Start your server on the given port.
-
-```ts
 server.listen(8000);
 ```
 
