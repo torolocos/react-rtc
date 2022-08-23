@@ -32,11 +32,11 @@ export const useSignaling = (
   const sendIceCandidate = (peerId: string, ice: RTCIceCandidate) =>
     send(peerId, { ice });
 
-  // TODO Re-think name of this function
-  const sendNewPeer = (peerId: string) => send(peerId, { id, newPeer: true });
+  const sendNewPeerNotification = (peerId: string) =>
+    send(peerId, { id, newPeer: true });
 
   const handleSignalingOpen = () => {
-    sendNewPeer('all');
+    sendNewPeerNotification('all');
     dispatchEvent('enter');
   };
 
@@ -51,7 +51,7 @@ export const useSignaling = (
   return {
     sendSessionDescription,
     sendIceCandidate,
-    sendNewPeer,
+    sendNewPeerNotification,
     signaling,
     connect,
     disconnect,

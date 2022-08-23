@@ -14,7 +14,7 @@ export const usePeerConnection = (
   const {
     sendSessionDescription,
     sendIceCandidate,
-    sendNewPeer,
+    sendNewPeerNotification,
     signaling,
     connect: connectToSginaling,
     disconnect: disconnectFromSignaling,
@@ -150,7 +150,7 @@ export const usePeerConnection = (
 
       addNewPeer(peerId, isNewcomer);
 
-      if (!isNewcomer) sendNewPeer(peerId);
+      if (!isNewcomer) sendNewPeerNotification(peerId);
     }
   };
 
