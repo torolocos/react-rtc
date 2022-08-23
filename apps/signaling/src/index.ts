@@ -1,25 +1,9 @@
 import { createServer } from 'http';
-import * as WebSocket from 'ws';
+import { createSignalingServer } from '@torolocos/signaling-server';
 import 'dotenv/config';
 
-const httpServer = createServer();
-const webSocket = new WebSocket.Server({ server: httpServer });
+const server = createServer();
 
-const sendToAllClients = (message: string) => {
-  webSocket.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) client.send(message);
-  });
-};
+createSignalingServer(server);
 
-const handleMessage = (message: WebSocket.RawData) =>
-  sendToAllClients(message.toString('utf-8'));
-
-const handleError = () => webSocket.close();
-
-const handleConnection = (socket: WebSocket.WebSocket) => {
-  socket.on('message', handleMessage);
-  socket.on('error', handleError);
-};
-
-webSocket.on('connection', handleConnection);
-httpServer.listen(process.env.PORT);
+server.listen(process.env.PORT);
