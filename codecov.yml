@@ -1,17 +1,21 @@
 coverage:
   status:
     project:
-      default:
+      react-rtc:
         target: auto
         threshold: 10%
         base: auto
-        branches:
-          - main
         flags:
           - react-rtc
-          - signaling-server
         paths:
           - packages/react-rtc
+      signaling-server:
+        target: auto
+        threshold: 10%
+        base: auto
+        flags:
+          - signaling-server
+        paths:
           - packages/signaling-server
 
 comment: false
