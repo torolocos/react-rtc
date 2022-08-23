@@ -1,5 +1,3 @@
-import type Peer from './models/Peer';
-
 export type DispatchEvent = <Type extends keyof EventsDetail>(
   type: Type,
   detail?: EventsDetail[Type]
@@ -25,8 +23,8 @@ interface EventsDetail {
   receive: [string, string];
   send: [string, string];
   error: unknown;
-  peerConnected: Peer;
-  peerDisconnected: Peer;
+  peerConnected: string;
+  peerDisconnected: string;
   leave: unknown;
   enter: unknown;
   dataChannel: string;
@@ -53,4 +51,10 @@ export interface Signal {
   sdp?: RTCSessionDescriptionInit;
   ice?: RTCIceCandidateInit | undefined;
   newPeer?: boolean;
+}
+
+export interface Peer {
+  uuid: string;
+  pc: RTCPeerConnection;
+  dataChannel: RTCDataChannel;
 }

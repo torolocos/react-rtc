@@ -59,7 +59,7 @@ export const usePeerConnection = (
       const peer = peerConnections.get(peerUuid);
       const isConnected = peer?.pc.connectionState === 'connected';
 
-      if (isConnected && !initCall) dispatchEvent('peerConnected', peer);
+      if (isConnected && !initCall) dispatchEvent('peerConnected', peer.uuid);
     });
 
     dataChannel.addEventListener('message', (event) =>
@@ -176,7 +176,7 @@ export const usePeerConnection = (
         state === ConnectionState.DISCONNECT)
     ) {
       peerConnections.remove(peerUuid);
-      dispatchEvent('peerDisconnected', peer);
+      dispatchEvent('peerDisconnected', peer.uuid);
     }
   };
 

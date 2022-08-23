@@ -1,6 +1,5 @@
 import { useRef } from 'react';
-import Peer from '../models/Peer';
-import type { DispatchEvent } from '../types';
+import type { DispatchEvent, Peer } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 
 export const usePeers = (dispatchEvent: DispatchEvent) => {
@@ -12,7 +11,7 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
     peerConnection: RTCPeerConnection,
     dataChannel: RTCDataChannel
   ) => {
-    const peer = new Peer({ uuid: id, peerConnection, dataChannel });
+    const peer = { uuid: id, pc: peerConnection, dataChannel };
 
     peers.current.set(id, peer);
   };
