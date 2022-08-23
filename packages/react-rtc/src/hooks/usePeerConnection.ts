@@ -1,22 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { ConnectionState, type Signal, type DispatchEvent } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 import { usePeers } from './usePeers';
 import { useSignaling } from './useSignaling';
 
 export const usePeerConnection = (
-  localUuid: string,
   dispatchEvent: DispatchEvent,
   signalingServer: string,
   iceServers: { urls: string }[]
 ) => {
+  const id = useRef(crypto.randomUUID());
   const peerConnections = usePeers(dispatchEvent);
   const {
     sendSignalingMessage,
     signaling,
     connect: connectToSginaling,
     disconnect: disconnectFromSignaling,
-  } = useSignaling(localUuid, signalingServer, dispatchEvent);
+  } = useSignaling(id.current, signalingServer, dispatchEvent);
   const handleError = useErrorHandler(dispatchEvent);
 
   const connect = connectToSginaling;
@@ -72,9 +72,9 @@ export const usePeerConnection = (
     peerConnections.add(peerId, peerConnection, dataChannel);
   };
 
-  const sendSignalingMessageToNewcomers = (uuid: string) => {
-    sendSignalingMessage(uuid, {
-      id: localUuid,
+  const sendSignalingMessageToNewcomers = (peerId: string) => {
+    sendSignalingMessage(peerId, {
+      id: id.current,
       newPeer: true,
     });
   };
@@ -138,8 +138,8 @@ export const usePeerConnection = (
     const isIceCandidate = signal.ice;
     // Ignore messages that are not for us or from ourselves
     if (
-      peerId == localUuid ||
-      (destination != localUuid && destination != 'all')
+      peerId == id.current ||
+      (destination != id.current && destination != 'all')
     )
       return;
 
@@ -154,7 +154,7 @@ export const usePeerConnection = (
     }
 
     if (signal.newPeer) {
-      const isNewcomer = destination === localUuid;
+      const isNewcomer = destination === id.current;
       addNewPeer(peerId, isNewcomer);
       if (isNewcomer) {
       } else {
