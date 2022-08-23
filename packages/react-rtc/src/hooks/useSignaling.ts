@@ -12,21 +12,31 @@ export const useSignaling = (
 
   const disconnect = () => signaling?.close();
 
-  const sendSignalingMessage = (
-    destination: string,
-    data: Record<string, unknown>
-  ) => {
-    const message = JSON.stringify({
-      id,
-      dest: destination,
-      ...data,
-    });
-
-    signaling?.send(message);
+  const send = (destination: string, data: Record<string, unknown>) => {
+    try {
+      signaling?.send(
+        JSON.stringify({
+          id,
+          destination,
+          data,
+        })
+      );
+    } catch (error) {
+      dispatchEvent('error', error);
+    }
   };
 
+  const sendSessionDescription = (peerId: string, sdp: RTCSessionDescription) =>
+    send(peerId, { sdp });
+
+  const sendIceCandidate = (peerId: string, ice: RTCIceCandidate) =>
+    send(peerId, { ice });
+
+  // TODO Re-think name of this function
+  const sendNewPeer = (peerId: string) => send(peerId, { id, newPeer: true });
+
   const handleSignalingOpen = () => {
-    sendSignalingMessage('all', { newPeer: true });
+    sendNewPeer('all');
     dispatchEvent('enter');
   };
 
@@ -38,5 +48,12 @@ export const useSignaling = (
     };
   }, [signaling]);
 
-  return { sendSignalingMessage, signaling, connect, disconnect };
+  return {
+    sendSessionDescription,
+    sendIceCandidate,
+    sendNewPeer,
+    signaling,
+    connect,
+    disconnect,
+  };
 };

@@ -12,7 +12,9 @@ export const usePeerConnection = (
   const id = useRef(crypto.randomUUID());
   const peerConnections = usePeers(dispatchEvent);
   const {
-    sendSignalingMessage,
+    sendSessionDescription,
+    sendIceCandidate,
+    sendNewPeer,
     signaling,
     connect: connectToSginaling,
     disconnect: disconnectFromSignaling,
@@ -27,17 +29,13 @@ export const usePeerConnection = (
     dispatchEvent('leave');
   };
 
-  const onIceCandidate = (event: RTCPeerConnectionIceEvent, peerId: string) => {
-    if (event.candidate) sendSignalingMessage(peerId, { ice: event.candidate });
-  };
-
   const addNewPeer = (peerId: string, initCall = false) => {
     const peerConnection = new RTCPeerConnection({ iceServers });
     const dataChannel = peerConnection.createDataChannel(crypto.randomUUID());
 
-    peerConnection.addEventListener('icecandidate', (event) =>
-      onIceCandidate(event, peerId)
-    );
+    peerConnection.addEventListener('icecandidate', (event) => {
+      if (event.candidate) sendIceCandidate(peerId, event.candidate);
+    });
 
     peerConnection.addEventListener('iceconnectionstatechange', () =>
       checkPeerDisconnect(peerId)
@@ -65,57 +63,49 @@ export const usePeerConnection = (
     if (initCall) {
       peerConnection
         .createOffer()
-        .then((description) => createdDescription(description, peerId))
+        .then((description) => createdDescription(peerId, description))
         .catch((e) => handleError(e));
     }
 
     peerConnections.add(peerId, peerConnection, dataChannel);
   };
 
-  const sendSignalingMessageToNewcomers = (peerId: string) => {
-    sendSignalingMessage(peerId, {
-      id: id.current,
-      newPeer: true,
-    });
-  };
-
   const createdDescription = async (
-    description: RTCSessionDescriptionInit,
-    peerId: string
+    peerId: string,
+    description: RTCSessionDescriptionInit
   ) => {
     try {
       await peerConnections
         .get(peerId)
         ?.peerConnection.setLocalDescription(description);
 
-      sendSignalingMessage(peerId, {
-        sdp: peerConnections.get(peerId)?.peerConnection.localDescription,
-      });
+      const sessionDescription =
+        peerConnections.get(peerId)?.peerConnection.localDescription;
+
+      if (sessionDescription)
+        sendSessionDescription(peerId, sessionDescription);
     } catch (error) {
       handleError(error);
     }
   };
 
   const sendSessionWithDescription = async (
+    peerId: string,
     peerConnection: RTCPeerConnection,
-    signal: Signal
+    sdp: RTCSessionDescriptionInit
   ) => {
-    if (signal.sdp) {
-      try {
-        await peerConnection.setRemoteDescription(
-          new RTCSessionDescription(signal.sdp)
-        );
-        // Only create answers in response to offers
-        if (signal.sdp?.type == 'offer') {
-          const description = await peerConnections
-            .get(signal.id)
-            ?.peerConnection.createAnswer();
+    try {
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
 
-          if (description) createdDescription(description, signal.id);
-        }
-      } catch (error) {
-        handleError(error);
+      if (sdp.type == 'offer') {
+        const answer = await peerConnections
+          .get(peerId)
+          ?.peerConnection.createAnswer();
+
+        if (answer) createdDescription(peerId, answer);
       }
+    } catch (error) {
+      handleError(error);
     }
   };
 
@@ -124,7 +114,9 @@ export const usePeerConnection = (
     signal: Signal
   ) => {
     try {
-      await peerConnection.addIceCandidate(new RTCIceCandidate(signal.ice));
+      await peerConnection.addIceCandidate(
+        new RTCIceCandidate(signal.data.ice)
+      );
     } catch (error) {
       handleError(error);
     }
@@ -132,34 +124,33 @@ export const usePeerConnection = (
 
   const handleMessageFromServer = (message: MessageEvent) => {
     const signal: Signal = JSON.parse(message.data);
-    const peerId = signal.id;
-    const destination = signal.dest;
-    const isSessionDescription = signal.sdp;
-    const isIceCandidate = signal.ice;
-    // Ignore messages that are not for us or from ourselves
-    if (
+    const {
+      id: peerId,
+      destination,
+      data: { sdp, ice, newPeer },
+    } = signal;
+    const isMySignal =
       peerId == id.current ||
-      (destination != id.current && destination != 'all')
-    )
-      return;
+      (destination != id.current && destination != 'all');
 
-    const currentPeerConnection = peerConnections.get(peerId)?.peerConnection;
+    if (isMySignal) return;
 
-    if (currentPeerConnection) {
-      if (isSessionDescription) {
-        sendSessionWithDescription(currentPeerConnection, signal);
-      } else if (isIceCandidate) {
-        initIceCandidate(currentPeerConnection, signal);
+    const peerConnection = peerConnections.get(peerId)?.peerConnection;
+
+    if (peerConnection) {
+      if (!!sdp) {
+        sendSessionWithDescription(peerId, peerConnection, sdp);
+      } else if (!!ice) {
+        initIceCandidate(peerConnection, signal);
       }
     }
 
-    if (signal.newPeer) {
+    if (newPeer) {
       const isNewcomer = destination === id.current;
+
       addNewPeer(peerId, isNewcomer);
-      if (isNewcomer) {
-      } else {
-        sendSignalingMessageToNewcomers(peerId);
-      }
+
+      if (!isNewcomer) sendNewPeer(peerId);
     }
   };
 

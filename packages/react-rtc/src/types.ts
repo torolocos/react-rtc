@@ -47,10 +47,12 @@ export enum ConnectionState {
 
 export interface Signal {
   id: string;
-  dest: 'all' | string;
-  sdp?: RTCSessionDescriptionInit;
-  ice?: RTCIceCandidateInit | undefined;
-  newPeer?: boolean;
+  destination: string;
+  data: {
+    sdp?: RTCSessionDescriptionInit;
+    ice?: RTCIceCandidateInit | undefined;
+    newPeer?: boolean;
+  };
 }
 
 export interface Peer {
