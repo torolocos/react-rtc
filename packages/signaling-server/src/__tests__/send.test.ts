@@ -15,6 +15,11 @@ describe('send', () => {
 
   beforeAll(() => {
     clients.add(client());
+    clients.add(client());
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should send message to client', () => {
@@ -26,6 +31,6 @@ describe('send', () => {
   it('should send message to all clients', () => {
     sendToAllClients(clients, message);
 
-    expect(send).toBeCalledWith(message);
+    expect(send).toHaveBeenNthCalledWith(2, message);
   });
 });
