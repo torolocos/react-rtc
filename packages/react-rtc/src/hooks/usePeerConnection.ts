@@ -138,11 +138,8 @@ export const usePeerConnection = (
     const peerConnection = peerConnections.get(peerId)?.peerConnection;
 
     if (peerConnection) {
-      if (!!sdp) {
-        sendSessionWithDescription(peerId, peerConnection, sdp);
-      } else if (!!ice) {
-        initIceCandidate(peerConnection, signal);
-      }
+      if (!!sdp) sendSessionWithDescription(peerId, peerConnection, sdp);
+      if (!!ice) initIceCandidate(peerConnection, signal);
     }
 
     if (newPeer) {
@@ -155,18 +152,16 @@ export const usePeerConnection = (
   };
 
   const checkPeerDisconnect = (peerId: string) => {
-    const state =
-      peerConnections.get(peerId)?.peerConnection.iceConnectionState;
-    const peer = peerConnections.get(peerId);
+    const peerConnection = peerConnections.get(peerId)?.peerConnection;
+    const state = peerConnection?.iceConnectionState;
 
     if (
-      peer &&
-      (state === ConnectionState.FAILED ||
-        state === ConnectionState.CLOSED ||
-        state === ConnectionState.DISCONNECT)
+      state === ConnectionState.FAILED ||
+      state === ConnectionState.CLOSED ||
+      state === ConnectionState.DISCONNECT
     ) {
       peerConnections.remove(peerId);
-      dispatchEvent('peerDisconnected', peer.id);
+      dispatchEvent('peerDisconnected', peerId);
     }
   };
 
