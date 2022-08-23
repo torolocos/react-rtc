@@ -9,7 +9,9 @@ coverage:
           - main
         flags:
           - react-rtc
+          - signaling-server
         paths:
           - packages/react-rtc
+          - packages/signaling-server
 
 comment: false
