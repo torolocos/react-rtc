@@ -22,8 +22,8 @@ describe('usePeers', () => {
 
     result.current.add(id[0], peerConnection, dataChannel);
     expect(result.current.get(id[0])).toEqual({
-      uuid: id[0],
-      pc: peerConnection,
+      id: id[0],
+      peerConnection,
       dataChannel,
     });
   });

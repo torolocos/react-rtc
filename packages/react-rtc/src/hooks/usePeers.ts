@@ -11,7 +11,7 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
     peerConnection: RTCPeerConnection,
     dataChannel: RTCDataChannel
   ) => {
-    const peer = { uuid: id, pc: peerConnection, dataChannel };
+    const peer: Peer = { id, peerConnection, dataChannel };
 
     peers.current.set(id, peer);
   };
@@ -24,14 +24,14 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
     peers.current.forEach(callback);
 
   const disconnect = () => {
-    forEach((peer) => peer.pc.close());
+    forEach((peer) => peer.peerConnection.close());
     peers.current.clear();
   };
 
   const send = (peer: Peer, data: string) => {
     try {
       peer.dataChannel.send(data);
-      dispatchEvent('send', [peer.uuid, data]);
+      dispatchEvent('send', [peer.id, data]);
     } catch (error) {
       handleError(error);
     }

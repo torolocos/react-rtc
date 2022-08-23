@@ -46,7 +46,7 @@ export enum ConnectionState {
 }
 
 export interface Signal {
-  uuid: string;
+  id: string;
   dest: 'all' | string;
   sdp?: RTCSessionDescriptionInit;
   ice?: RTCIceCandidateInit | undefined;
@@ -54,7 +54,7 @@ export interface Signal {
 }
 
 export interface Peer {
-  uuid: string;
-  pc: RTCPeerConnection;
+  id: string;
+  peerConnection: RTCPeerConnection;
   dataChannel: RTCDataChannel;
 }

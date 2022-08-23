@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import type { DispatchEvent } from '../types';
 
 export const useSignaling = (
-  uuid: string,
+  id: string,
   signalingServer: string,
   dispatchEvent: DispatchEvent
 ) => {
@@ -17,7 +17,7 @@ export const useSignaling = (
     data: Record<string, unknown>
   ) => {
     const message = JSON.stringify({
-      uuid,
+      id,
       dest: destination,
       ...data,
     });

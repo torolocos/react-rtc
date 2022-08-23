@@ -15,13 +15,13 @@ Object.defineProperty(global, 'WebSocket', {
 });
 
 describe('useSignaling', () => {
-  const uuid = 'test';
+  const id = 'test';
   const signalingServer = 'ws://localhost:8001/';
   const dispatchEvent = jest.fn();
 
   it('should connect to signaling server', () => {
     const { result } = renderHook(() =>
-      useSignaling(uuid, signalingServer, dispatchEvent)
+      useSignaling(id, signalingServer, dispatchEvent)
     );
 
     act(() => {
@@ -29,12 +29,12 @@ describe('useSignaling', () => {
     });
 
     expect(dispatchEvent).toBeCalledWith('enter');
-    expect(send).toBeCalledWith(expect.stringContaining(uuid));
+    expect(send).toBeCalledWith(expect.stringContaining(id));
   });
 
   it('should disconnect from signaling server', () => {
     const { result } = renderHook(() =>
-      useSignaling(uuid, signalingServer, dispatchEvent)
+      useSignaling(id, signalingServer, dispatchEvent)
     );
 
     act(() => result.current.connect());
