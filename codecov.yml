@@ -11,5 +11,6 @@ coverage:
           - react-rtc
         paths:
           - packages/react-rtc
+    patch: off
 
 comment: false
