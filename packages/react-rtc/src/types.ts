@@ -30,6 +30,7 @@ interface EventsDetail {
   leave: unknown;
   enter: unknown;
   dataChannel: string;
+  track: RTCTrackEvent;
 }
 
 export interface ContextType {
@@ -39,6 +40,7 @@ export interface ContextType {
   sendToAllPeers?: (data: string) => void;
   on?: AddEventListener;
   off?: RemoveEventListener;
+  addTrack?: (id: string, track: MediaStreamTrack) => void;
 }
 
 export enum ConnectionState {
