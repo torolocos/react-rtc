@@ -50,7 +50,7 @@ export interface Signal {
   destination: string;
   data: {
     sdp?: RTCSessionDescriptionInit;
-    ice?: RTCIceCandidateInit | undefined;
+    ice?: RTCIceCandidateInit;
     newPeer?: boolean;
   };
 }
