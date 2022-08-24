@@ -12,7 +12,7 @@ export const useSignaling = (
 
   const disconnect = () => signaling?.close();
 
-  const send = (destination: string, data: Record<string, unknown>) => {
+  const send = (destination: string, data: unknown) => {
     try {
       signaling?.send(
         JSON.stringify({
@@ -26,17 +26,8 @@ export const useSignaling = (
     }
   };
 
-  const sendSessionDescription = (peerId: string, sdp: RTCSessionDescription) =>
-    send(peerId, { sdp });
-
-  const sendIceCandidate = (peerId: string, ice: RTCIceCandidate) =>
-    send(peerId, { ice });
-
-  const sendNewPeerNotification = (peerId: string) =>
-    send(peerId, { id, newPeer: true });
-
   const handleSignalingOpen = () => {
-    sendNewPeerNotification('all');
+    send('all', { id, newPeer: true });
     dispatchEvent('enter');
   };
 
@@ -49,9 +40,7 @@ export const useSignaling = (
   }, [signaling]);
 
   return {
-    sendSessionDescription,
-    sendIceCandidate,
-    sendNewPeerNotification,
+    send,
     signaling,
     connect,
     disconnect,

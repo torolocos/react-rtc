@@ -12,9 +12,7 @@ export const usePeerConnection = (
   const id = useRef(crypto.randomUUID());
   const peerConnections = usePeers(dispatchEvent);
   const {
-    sendSessionDescription,
-    sendIceCandidate,
-    sendNewPeerNotification,
+    send,
     signaling,
     connect: connectToSginaling,
     disconnect: disconnectFromSignaling,
@@ -34,7 +32,7 @@ export const usePeerConnection = (
     const dataChannel = peerConnection.createDataChannel(crypto.randomUUID());
 
     peerConnection.addEventListener('icecandidate', (event) => {
-      if (event.candidate) sendIceCandidate(peerId, event.candidate);
+      if (event.candidate) send(peerId, { ice: event.candidate });
     });
 
     peerConnection.addEventListener('iceconnectionstatechange', () =>
@@ -82,8 +80,7 @@ export const usePeerConnection = (
       const sessionDescription =
         peerConnections.get(peerId)?.peerConnection.localDescription;
 
-      if (sessionDescription)
-        sendSessionDescription(peerId, sessionDescription);
+      if (sessionDescription) send(peerId, { sdp: sessionDescription });
     } catch (error) {
       handleError(error);
     }
@@ -147,7 +144,7 @@ export const usePeerConnection = (
 
       addNewPeer(peerId, isNewcomer);
 
-      if (!isNewcomer) sendNewPeerNotification(peerId);
+      if (!isNewcomer) send(peerId, { id, newPeer: true });
     }
   };
 

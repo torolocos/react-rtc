@@ -48,7 +48,8 @@ describe('useSignaling', () => {
     expect(close).toBeCalled();
   });
 
-  it('should send new peer notification', () => {
+  it('should send a data', () => {
+    const data = 'test';
     const { result } = renderHook(() =>
       useSignaling(id, signalingServer, dispatchEvent)
     );
@@ -57,43 +58,11 @@ describe('useSignaling', () => {
       result.current.connect();
     });
 
-    result.current.sendNewPeerNotification(peerId);
+    result.current.send(peerId, data);
 
     expect(send).toBeCalledWith(expect.stringContaining(id));
     expect(send).toBeCalledWith(expect.stringContaining(peerId));
-    expect(send).toBeCalledWith(expect.stringContaining('newPeer'));
-  });
-
-  it('should send session description', () => {
-    const sdp = jest.fn<RTCSessionDescription, never>();
-    const { result } = renderHook(() =>
-      useSignaling(id, signalingServer, dispatchEvent)
-    );
-
-    act(() => {
-      result.current.connect();
-    });
-
-    result.current.sendSessionDescription(peerId, sdp());
-
-    expect(send).toBeCalledWith(expect.stringContaining(id));
-    expect(send).toBeCalledWith(expect.stringContaining(peerId));
-  });
-
-  it('should send ice candidate', () => {
-    const ice = jest.fn<RTCIceCandidate, never>();
-    const { result } = renderHook(() =>
-      useSignaling(id, signalingServer, dispatchEvent)
-    );
-
-    act(() => {
-      result.current.connect();
-    });
-
-    result.current.sendIceCandidate(peerId, ice());
-
-    expect(send).toBeCalledWith(expect.stringContaining(id));
-    expect(send).toBeCalledWith(expect.stringContaining(peerId));
+    expect(send).toBeCalledWith(expect.stringContaining(data));
   });
 
   it('should handle send error', () => {
