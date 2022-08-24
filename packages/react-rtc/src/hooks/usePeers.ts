@@ -48,12 +48,19 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
     forEach((peer) => send(peer, data));
   };
 
+  const addTrack = (id: string, track: MediaStreamTrack) => {
+    const peer = peers.current.get(id)?.pc;
+
+    peer?.addTrack(track);
+  };
+
   return {
     add,
     get,
     remove,
     sendTo,
     sendToAll,
+    addTrack,
     disconnect,
   };
 };
