@@ -32,6 +32,11 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./packages/react-rtc/coverage/coverage-final.json
           flags: react-rtc
+      - uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./packages/signaling-server/coverage/coverage-final.json
+          flags: signaling-server
 
   analyze:
     name: CodeQL
