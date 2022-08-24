@@ -65,7 +65,7 @@ describe('useSignaling', () => {
   });
 
   it('should send session description', () => {
-    const sdp = jest.fn<RTCSessionDescription, never>()();
+    const sdp = jest.fn<RTCSessionDescription, never>();
     const { result } = renderHook(() =>
       useSignaling(id, signalingServer, dispatchEvent)
     );
@@ -74,14 +74,14 @@ describe('useSignaling', () => {
       result.current.connect();
     });
 
-    result.current.sendSessionDescription(peerId, sdp);
+    result.current.sendSessionDescription(peerId, sdp());
 
     expect(send).toBeCalledWith(expect.stringContaining(id));
     expect(send).toBeCalledWith(expect.stringContaining(peerId));
   });
 
   it('should send ice candidate', () => {
-    const ice = jest.fn<RTCIceCandidate, never>()();
+    const ice = jest.fn<RTCIceCandidate, never>();
     const { result } = renderHook(() =>
       useSignaling(id, signalingServer, dispatchEvent)
     );
@@ -90,7 +90,7 @@ describe('useSignaling', () => {
       result.current.connect();
     });
 
-    result.current.sendIceCandidate(peerId, ice);
+    result.current.sendIceCandidate(peerId, ice());
 
     expect(send).toBeCalledWith(expect.stringContaining(id));
     expect(send).toBeCalledWith(expect.stringContaining(peerId));
