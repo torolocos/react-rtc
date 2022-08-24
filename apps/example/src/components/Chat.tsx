@@ -48,7 +48,9 @@ const Chat = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [peers, setPeers] = useState<Peer[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const username = useRef(generateUserName());
+  const mediaStream = useRef(new MediaStream());
 
   const getPeerUsername = (id: string) =>
     peers.find((peer) => peer.id === id)?.username;
@@ -123,6 +125,12 @@ const Chat = () => {
       on('leave', handleLeave);
       on('dataChannel', handleDataChannelOpen);
       on('error', handleError);
+      on('track', (event) => {
+        if (videoRef.current) {
+          mediaStream.current.addTrack(event.detail.track);
+          videoRef.current.srcObject = mediaStream.current;
+        }
+      });
     }
 
     return () => {
@@ -151,6 +159,8 @@ const Chat = () => {
           <li key={id}>{id && getPeerUsername(id)}</li>
         ))}
       </ul>
+      <hr />
+      <video ref={videoRef} autoPlay={true} width="300" height="200"></video>
       <hr />
       <section>
         {messages?.map(({ id, senderId, message }) => (
