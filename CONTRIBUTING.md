@@ -1,19 +1,19 @@
 ### Overview
 
-Repository has `main` branch.
+The Repository has `main` branch.
 
 ### Merging and review process
 
-Before merge this criteria should be met:
+Before merging these criteria should be met:
 
 - Every PR has to be approved by at least 1 other person.
 - There should be no unresolved comments in the PR.
-- PR title should adhere to "Merge message format" rules stated below.
+- PR title should adhere to the "Merge message format" rules stated below.
 - PR description template has to be filled out.
 
 After all criteria for merging are met then anyone (even the author) can merge. Please follow strictly these rules for merging:
 
-- Use "Squash and merge" option.
+- Use the "Squash and merge" option.
 - Merge message has to follow rules described below in section "Merge message format".
 
 ### Merge message format
@@ -47,4 +47,4 @@ Must be one of the following:
 
 #### Scope
 
-The scope could be anything specifying place of the commit change.
+The scope could be anything specifying the place of the commit change.
