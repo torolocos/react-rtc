@@ -14,7 +14,9 @@ Object.defineProperty(global, 'WebSocket', {
   },
 });
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 
 describe('useSignaling', () => {
   const id = 'id';
