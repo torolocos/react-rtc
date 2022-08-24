@@ -35,9 +35,12 @@ export const usePeerConnection = (
       sendSignalingMessage(peerUuid, { ice: event.candidate });
   };
 
-  const addNewPeer = (peerUuid: string, initCall = false) => {
+  const addNewPeer = async (peerUuid: string, initCall = false) => {
     const peerConnection = new RTCPeerConnection({ iceServers });
     const dataChannel = peerConnection.createDataChannel(crypto.randomUUID());
+
+    const stream = await getUserMedia();
+    stream.getTracks().forEach((track) => peerConnection.addTrack(track));
 
     peerConnection.addEventListener('icecandidate', (event) =>
       onIceCandidate(event, peerUuid)
@@ -61,6 +64,10 @@ export const usePeerConnection = (
 
       if (isConnected && !initCall) dispatchEvent('peerConnected', peer);
     });
+
+    peerConnection.addEventListener('track', (event) =>
+      dispatchEvent('track', event)
+    );
 
     dataChannel.addEventListener('message', (event) =>
       dispatchEvent('receive', [peerUuid, event.data])
@@ -97,6 +104,9 @@ export const usePeerConnection = (
       handleError(error);
     }
   };
+
+  const getUserMedia = async (audio = true, video = true) =>
+    navigator.mediaDevices.getUserMedia({ audio, video });
 
   const sendSessionWithDescription = async (
     peerConnection: RTCPeerConnection,
@@ -193,5 +203,6 @@ export const usePeerConnection = (
     disconnect,
     sendToPeer: peerConnections.sendTo,
     sendToAllPeers: peerConnections.sendToAll,
+    addTrack: peerConnections.addTrack,
   };
 };

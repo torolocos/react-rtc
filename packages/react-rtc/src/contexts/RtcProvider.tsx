@@ -21,6 +21,7 @@ export const RtcProvider = ({
     connect: enter,
     sendToPeer,
     sendToAllPeers,
+    addTrack,
   } = usePeerConnection(
     localUuid.current,
     dispatchEvent,
@@ -37,6 +38,7 @@ export const RtcProvider = ({
         sendToAllPeers,
         on,
         off,
+        addTrack,
       }}
     >
       {children}
