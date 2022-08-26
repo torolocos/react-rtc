@@ -9,11 +9,8 @@
     "plugin:cypress/recommended",
     "plugin:testing-library/react",
     "plugin:jest-dom/recommended",
-    "next/core-web-vitals",
-    "google",
-    "prettier"
+    "next/core-web-vitals"
   ],
-  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
@@ -21,7 +18,7 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "plugins": ["react", "@typescript-eslint", "testing-library", "jest-dom"],
+  "plugins": ["testing-library", "jest-dom"],
   "rules": {
     "@typescript-eslint/no-empty-function": "off",
     "no-unused-vars": "off",
@@ -38,10 +35,5 @@
         }
       }
     ]
-  },
-  "settings": {
-    "react": {
-      "version": "latest"
-    }
   }
 }
