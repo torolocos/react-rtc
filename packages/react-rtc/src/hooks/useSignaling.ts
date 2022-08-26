@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import type { DispatchEvent } from '../types';
 
 export const useSignaling = (
-  uuid: string,
+  id: string,
   signalingServer: string,
   dispatchEvent: DispatchEvent
 ) => {
@@ -12,21 +12,22 @@ export const useSignaling = (
 
   const disconnect = () => signaling?.close();
 
-  const sendSignalingMessage = (
-    destination: string,
-    data: Record<string, unknown>
-  ) => {
-    const message = JSON.stringify({
-      uuid,
-      dest: destination,
-      ...data,
-    });
-
-    signaling?.send(message);
+  const send = (destination: string, data: unknown) => {
+    try {
+      signaling?.send(
+        JSON.stringify({
+          id,
+          destination,
+          data,
+        })
+      );
+    } catch (error) {
+      dispatchEvent('error', error);
+    }
   };
 
   const handleSignalingOpen = () => {
-    sendSignalingMessage('all', { newPeer: true });
+    send('all', { id, newPeer: true });
     dispatchEvent('enter');
   };
 
@@ -38,5 +39,10 @@ export const useSignaling = (
     };
   }, [signaling]);
 
-  return { sendSignalingMessage, signaling, connect, disconnect };
+  return {
+    send,
+    signaling,
+    connect,
+    disconnect,
+  };
 };
