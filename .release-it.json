@@ -8,7 +8,27 @@
   "npm": false,
   "plugins": {
     "@release-it/conventional-changelog": {
-      "preset": "conventionalcommits",
+      "preset": {
+        "name": "conventionalcommits",
+        "types": [
+          {
+            "type": "feat",
+            "section": "Features"
+          },
+          {
+            "type": "fix",
+            "section": "Bug Fixes"
+          },
+          {
+            "type": "chore",
+            "section": "Chores"
+          },
+          { "type": "ci", "section": "Continuous Integration" },
+          { "type": "docs", "section": "Documentation" },
+          { "type": "refactor", "section": "Code Refactoring" },
+          { "type": "test", "section": "Tests" }
+        ]
+      },
       "infile": "CHANGELOG.md"
     },
     "@release-it-plugins/workspaces": {
