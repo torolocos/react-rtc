@@ -42,7 +42,8 @@ const generateUserName = () => {
 };
 
 const Chat = () => {
-  const { sendToPeer, sendToAllPeers, enter, leave, on, off } = useRtc();
+  const { sendToPeer, sendToAllPeers, enter, leave, on, off, addTrack } =
+    useRtc();
   const [messages, setMessages] = useState<Message[]>([]);
   const [error, setError] = useState<string>();
   const [isConnected, setIsConnected] = useState(false);
@@ -117,6 +118,23 @@ const Chat = () => {
       sendToPeer(id, JSON.stringify({ id: '', username: username.current }));
   };
 
+  const handleTrack = (event: RtcEvent<'track'>) => {
+    if (videoRef.current) {
+      mediaStream.current.addTrack(event.detail.track);
+      videoRef.current.srcObject = mediaStream.current;
+    }
+  };
+
+  const handleVideoClick = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: true,
+    });
+
+    if (addTrack)
+      stream.getTracks().forEach((track) => addTrack(peers[0].id, track));
+  };
+
   useEffect(() => {
     if (on) {
       on('receive', handleMessageReceived);
@@ -125,12 +143,7 @@ const Chat = () => {
       on('leave', handleLeave);
       on('dataChannel', handleDataChannelOpen);
       on('error', handleError);
-      on('track', (event) => {
-        if (videoRef.current) {
-          mediaStream.current.addTrack(event.detail.track);
-          videoRef.current.srcObject = mediaStream.current;
-        }
-      });
+      on('track', handleTrack);
     }
 
     return () => {
@@ -141,6 +154,7 @@ const Chat = () => {
         off('enter', handleLeave);
         off('dataChannel', handleDataChannelOpen);
         off('error', handleError);
+        off('track', handleTrack);
       }
       if (leave) leave();
     };
@@ -176,6 +190,7 @@ const Chat = () => {
             <input type="text" ref={inputRef} />
             <input type="submit" value="send" />
           </form>
+          <button onClick={handleVideoClick}>Video</button>
         </>
       )}
     </main>
