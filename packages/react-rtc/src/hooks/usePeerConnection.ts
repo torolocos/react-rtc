@@ -75,32 +75,31 @@ export const usePeerConnection = (
     if (initCall) {
       peerConnection
         .createOffer()
-        .then((description) => createdDescription(peerId, description))
+        .then((description) => sendOffer(peerId, description))
         .catch((e) => handleError(e));
     }
 
     peerConnections.add(peerId, peerConnection, dataChannel);
   };
 
-  const createdDescription = async (
+  const sendOffer = async (
     peerId: string,
     description: RTCSessionDescriptionInit
   ) => {
+    const peerConnection = peerConnections.get(peerId)?.peerConnection;
+
     try {
-      await peerConnections
-        .get(peerId)
-        ?.peerConnection.setLocalDescription(description);
-
-      const sessionDescription =
-        peerConnections.get(peerId)?.peerConnection.localDescription;
-
-      if (sessionDescription) send(peerId, { sdp: sessionDescription });
+      await peerConnection?.setLocalDescription(description);
     } catch (error) {
       handleError(error);
     }
+
+    const sdp = peerConnection?.localDescription;
+
+    if (sdp) send(peerId, { sdp: sdp });
   };
 
-  const sendSessionWithDescription = async (
+  const sendAnswer = async (
     peerId: string,
     peerConnection: RTCPeerConnection,
     sdp: RTCSessionDescriptionInit
@@ -109,11 +108,9 @@ export const usePeerConnection = (
       await peerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
 
       if (sdp.type == 'offer') {
-        const answer = await peerConnections
-          .get(peerId)
-          ?.peerConnection.createAnswer();
+        const answer = await peerConnection.createAnswer();
 
-        if (answer) createdDescription(peerId, answer);
+        if (answer) sendOffer(peerId, answer);
       }
     } catch (error) {
       handleError(error);
@@ -134,29 +131,33 @@ export const usePeerConnection = (
   };
 
   const handleMessageFromServer = (message: MessageEvent) => {
-    const signal: Signal = JSON.parse(message.data);
-    const {
-      id: peerId,
-      destination,
-      data: { sdp, ice },
-    } = signal;
-    const isMySignal =
-      peerId == id.current ||
-      (destination != id.current && destination != 'all');
+    try {
+      const signal: Signal = JSON.parse(message.data);
+      const {
+        id: peerId,
+        destination,
+        data: { sdp, ice },
+      } = signal;
+      const isMySignal =
+        peerId == id.current ||
+        (destination != id.current && destination != 'all');
 
-    if (isMySignal) return;
+      if (isMySignal) return;
 
-    const peerConnection = peerConnections.get(peerId)?.peerConnection;
+      const peerConnection = peerConnections.get(peerId)?.peerConnection;
 
-    if (peerConnection) {
-      if (!!sdp) sendSessionWithDescription(peerId, peerConnection, sdp);
-      if (!!ice) initIceCandidate(peerConnection, signal);
-    } else {
-      const isNewcomer = destination === id.current;
+      if (peerConnection) {
+        if (!!sdp) sendAnswer(peerId, peerConnection, sdp);
+        if (!!ice) initIceCandidate(peerConnection, signal);
+      } else {
+        const isNewPeer = destination === id.current;
 
-      addNewPeer(peerId, isNewcomer);
+        addNewPeer(peerId, isNewPeer);
 
-      if (!isNewcomer) send(peerId, { id });
+        if (!isNewPeer) send(peerId, { id });
+      }
+    } catch (error) {
+      dispatchEvent('error', error);
     }
   };
 
