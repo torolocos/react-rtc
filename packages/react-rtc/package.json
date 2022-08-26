@@ -1,6 +1,6 @@
 {
   "name": "@torolocos/react-rtc",
-  "version": "0.1.0-rc.1",
+  "version": "0.1.0-rc.2",
   "description": "React real-time communication library.",
   "keywords": [
     "webrtc",
