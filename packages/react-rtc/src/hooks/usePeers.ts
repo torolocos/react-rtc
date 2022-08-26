@@ -1,6 +1,5 @@
 import { useRef } from 'react';
-import Peer from '../models/Peer';
-import type { DispatchEvent } from '../types';
+import type { DispatchEvent, Peer } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 
 export const usePeers = (dispatchEvent: DispatchEvent) => {
@@ -12,7 +11,7 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
     peerConnection: RTCPeerConnection,
     dataChannel: RTCDataChannel
   ) => {
-    const peer = new Peer({ uuid: id, peerConnection, dataChannel });
+    const peer: Peer = { id, peerConnection, dataChannel };
 
     peers.current.set(id, peer);
   };
@@ -25,14 +24,14 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
     peers.current.forEach(callback);
 
   const disconnect = () => {
-    forEach((peer) => peer.pc.close());
+    forEach((peer) => peer.peerConnection.close());
     peers.current.clear();
   };
 
   const send = (peer: Peer, data: string) => {
     try {
       peer.dataChannel.send(data);
-      dispatchEvent('send', [peer.uuid, data]);
+      dispatchEvent('send', [peer.id, data]);
     } catch (error) {
       handleError(error);
     }
@@ -49,7 +48,7 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
   };
 
   const addTrack = (id: string, track: MediaStreamTrack) => {
-    const peer = peers.current.get(id)?.pc;
+    const peer = peers.current.get(id)?.peerConnection;
 
     peer?.addTrack(track);
   };

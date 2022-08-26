@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { RtcContext } from './RtcContext';
 import { usePubSub } from '../hooks/usePubSub';
 import { usePeerConnection } from '../hooks/usePeerConnection';
@@ -14,7 +13,6 @@ export const RtcProvider = ({
   signalingServer,
   iceServers,
 }: Props) => {
-  const localUuid = useRef(crypto.randomUUID());
   const { dispatchEvent, on, off } = usePubSub();
   const {
     disconnect: leave,
@@ -22,12 +20,7 @@ export const RtcProvider = ({
     sendToPeer,
     sendToAllPeers,
     addTrack,
-  } = usePeerConnection(
-    localUuid.current,
-    dispatchEvent,
-    signalingServer,
-    iceServers
-  );
+  } = usePeerConnection(dispatchEvent, signalingServer, iceServers);
 
   return (
     <RtcContext.Provider
