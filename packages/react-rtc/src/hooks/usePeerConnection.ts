@@ -31,9 +31,6 @@ export const usePeerConnection = (
     const peerConnection = new RTCPeerConnection({ iceServers });
     const dataChannel = peerConnection.createDataChannel(crypto.randomUUID());
 
-    const stream = await getUserMedia();
-    stream.getTracks().forEach((track) => peerConnection.addTrack(track));
-
     peerConnection.addEventListener('icecandidate', (event) => {
       if (event.candidate) send(peerId, { ice: event.candidate });
     });
@@ -60,6 +57,16 @@ export const usePeerConnection = (
     peerConnection.addEventListener('track', (event) =>
       dispatchEvent('track', event)
     );
+
+    peerConnection.addEventListener('negotiationneeded', (event) => {
+      console.log(event);
+      /*
+      peerConnection
+        .createOffer()
+        .then((description) => createdDescription(peerId, description))
+        .catch((e) => handleError(e));
+        */
+    });
 
     dataChannel.addEventListener('message', (event) =>
       dispatchEvent('receive', [peerId, event.data])
@@ -92,9 +99,6 @@ export const usePeerConnection = (
       handleError(error);
     }
   };
-
-  const getUserMedia = async (audio = true, video = true) =>
-    navigator.mediaDevices.getUserMedia({ audio, video });
 
   const sendSessionWithDescription = async (
     peerId: string,
@@ -134,7 +138,7 @@ export const usePeerConnection = (
     const {
       id: peerId,
       destination,
-      data: { sdp, ice, newPeer },
+      data: { sdp, ice },
     } = signal;
     const isMySignal =
       peerId == id.current ||
@@ -147,14 +151,12 @@ export const usePeerConnection = (
     if (peerConnection) {
       if (!!sdp) sendSessionWithDescription(peerId, peerConnection, sdp);
       if (!!ice) initIceCandidate(peerConnection, signal);
-    }
-
-    if (newPeer) {
+    } else {
       const isNewcomer = destination === id.current;
 
       addNewPeer(peerId, isNewcomer);
 
-      if (!isNewcomer) send(peerId, { id, newPeer: true });
+      if (!isNewcomer) send(peerId, { id });
     }
   };
 

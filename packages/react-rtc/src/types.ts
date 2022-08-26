@@ -53,7 +53,6 @@ export interface Signal {
   data: {
     sdp?: RTCSessionDescriptionInit;
     ice?: RTCIceCandidateInit;
-    newPeer?: boolean;
   };
 }
 
