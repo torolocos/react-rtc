@@ -1,5 +1,28 @@
 
 
+## [0.1.0-rc.2](https://github.com/torolocos/react-rtc/compare/0.1.0-rc.1...0.1.0-rc.2) (2022-08-26)
+
+
+### Features
+
+* signaling server package ([#100](https://github.com/torolocos/react-rtc/issues/100)) ([6767aab](https://github.com/torolocos/react-rtc/commit/6767aab11f3904bd5358df5d5b8da1ed6012dbaa))
+
+
+### Documentation
+
+* add contributing ([#103](https://github.com/torolocos/react-rtc/issues/103)) ([7dce8e2](https://github.com/torolocos/react-rtc/commit/7dce8e2ceec1c25411b430ce5896d4086ad155a4))
+
+
+### Code Refactoring
+
+* remove peer model ([#101](https://github.com/torolocos/react-rtc/issues/101)) ([e5aa016](https://github.com/torolocos/react-rtc/commit/e5aa016594e2552bea3072eebda813c8b50534a0))
+
+
+### Chores
+
+* add license files ([#102](https://github.com/torolocos/react-rtc/issues/102)) ([07e4525](https://github.com/torolocos/react-rtc/commit/07e4525702f1cb801bc1a775f34d7326b6cf3f25))
+* config changelog sections ([#107](https://github.com/torolocos/react-rtc/issues/107)) ([6bbe488](https://github.com/torolocos/react-rtc/commit/6bbe488f85894eebf17a049de07769afa5019fb1))
+
 ## [0.1.0-rc.1](https://github.com/torolocos/react-rtc/compare/0.1.0-rc.0...0.1.0-rc.1) (2022-08-22)
 
 
