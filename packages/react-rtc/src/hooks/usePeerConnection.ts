@@ -57,28 +57,18 @@ export const usePeerConnection = (
     });
 
     peerConnection.addEventListener('track', (event) =>
-      dispatchEvent('track', event)
+      dispatchEvent('track', [peerId, event.track])
     );
 
     peerConnection.addEventListener('negotiationneeded', async (event) => {
-      console.log('nego');
+      if (initCall || !(event.target instanceof RTCPeerConnection)) return;
 
-      if (!(event.target instanceof RTCPeerConnection)) return;
-
-      const target = event.target;
       try {
-        if (initCall) {
-          const offer = await target.createOffer();
+        const target = event.target;
+        const offer = await target.createOffer();
 
-          await target.setLocalDescription(offer);
-          send(peerId, { sdp: offer });
-        } else {
-          // console.log(target.localDescription);
-          //  const desc = new RTCSessionDescription(target.remoteDescription);
-
-          // target.setRemoteDescription(desc);
-          send(peerId, { sdp: target.localDescription });
-        }
+        await target.setLocalDescription(offer);
+        send(peerId, { sdp: offer });
       } catch (error) {
         dispatchEvent('error', error);
       }
@@ -122,7 +112,7 @@ export const usePeerConnection = (
     }
   };
 
-  const handleMessageFromServer = (message: MessageEvent) => {
+  const handleMessage = (message: MessageEvent) => {
     try {
       const signal: Signal = JSON.parse(message.data);
       const {
@@ -168,10 +158,10 @@ export const usePeerConnection = (
   };
 
   useEffect(() => {
-    signaling?.addEventListener('message', handleMessageFromServer);
+    signaling?.addEventListener('message', handleMessage);
 
     return () => {
-      signaling?.removeEventListener('message', handleMessageFromServer);
+      signaling?.removeEventListener('message', handleMessage);
     };
   }, [signaling]);
 
