@@ -166,7 +166,7 @@ const Chat = () => {
 
   return (
     <main>
-      <h1>Chat</h1>
+      <h1>Chat - Hello {username.current}!</h1>
       <h2>Online: {connections.length}</h2>
       <button onClick={isConnected ? handleLeavePress : handleJoinPress}>
         {isConnected ? 'leave chat' : 'join'}
@@ -177,10 +177,11 @@ const Chat = () => {
         ))}
       </ul>
       <hr />
-      {connections.map(({ id, username, stream }) => (
-        <Stream key={id} stream={stream} username={username} />
-      ))}
-
+      <div>
+        {connections.map(({ id, username, stream }) => (
+          <Stream key={id} stream={stream} username={username} />
+        ))}
+      </div>
       <hr />
       <section>
         {messages?.map(({ id, senderId, message }) => (
