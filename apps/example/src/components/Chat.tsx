@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef, type FormEvent } from 'react';
 import { type RtcEvent, useRtc } from '@torolocos/react-rtc';
 import z from 'zod';
+import Stream from './Stream';
+import { generateUserName } from '../utils';
 
 const Message = z.object({
   id: z.string(),
@@ -14,8 +16,7 @@ const Peer = z.object({
 });
 
 type Message = z.infer<typeof Message>;
-
-type Peer = z.infer<typeof Peer>;
+type Peer = z.infer<typeof Peer> & { stream: MediaStream };
 
 const isMessage = (message: unknown): message is Message => {
   const { success } = Message.safeParse(message);
@@ -29,32 +30,23 @@ const isPeer = (peer: unknown): peer is Peer => {
   return success;
 };
 
-const generateUserName = () => {
-  const toUpperCaseFirstCharacter = (text: string) =>
-    text.charAt(0).toUpperCase() + text.slice(1);
-
-  const filterDuplicities = (text?: string[] | null) =>
-    Array.from(new Set(text)).join('');
-
-  const name = crypto.randomUUID().match(/[a-z]/gm);
-
-  return toUpperCaseFirstCharacter(filterDuplicities(name).slice(0, 6));
-};
-
 const Chat = () => {
   const { sendToPeer, sendToAllPeers, enter, leave, on, off, addTrack } =
     useRtc();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [error, setError] = useState<string>();
+  const [connections, setConnections] = useState<Peer[]>([]);
   const [isConnected, setIsConnected] = useState(false);
-  const [peers, setPeers] = useState<Peer[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const username = useRef(generateUserName());
-  const mediaStream = useRef(new MediaStream());
 
   const getPeerUsername = (id: string) =>
-    peers.find((peer) => peer.id === id)?.username;
+    connections.find((peer) => peer.id === id)?.username;
+
+  const addPeer = (id: string, username: string) =>
+    setConnections((currentPeers) => [
+      ...currentPeers,
+      { id, username, stream: new MediaStream() },
+    ]);
 
   const handleJoinPress = () => {
     if (enter) enter();
@@ -93,8 +85,8 @@ const Chat = () => {
         { ...data, senderId },
       ]);
 
-    if (isPeer(data) && !peers.includes(data))
-      setPeers((peersMap) => [...peersMap, { ...data, id: senderId }]);
+    if (isPeer(data) && !connections.includes(data))
+      addPeer(senderId, data.username);
   };
 
   const handleMessageSend = (event: RtcEvent<'send'>) => {
@@ -109,7 +101,7 @@ const Chat = () => {
 
   const handleLeave = () => setIsConnected(false);
 
-  const handleError = () => setError('Something went wrong');
+  const handleError = (error: RtcEvent<'error'>) => console.error(error.detail);
 
   const handleDataChannelOpen = (event: RtcEvent<'dataChannel'>) => {
     const id = event.detail;
@@ -119,10 +111,19 @@ const Chat = () => {
   };
 
   const handleTrack = (event: RtcEvent<'track'>) => {
-    if (videoRef.current) {
-      mediaStream.current.addTrack(event.detail.track);
-      videoRef.current.srcObject = mediaStream.current;
-    }
+    const [peerId, track] = event.detail;
+
+    setConnections((currentPeers) => {
+      const peerToAddTrack = currentPeers.find(({ id }) => id === peerId);
+
+      if (peerToAddTrack) {
+        const index = currentPeers.indexOf(peerToAddTrack);
+
+        currentPeers[index].stream.addTrack(track);
+      }
+
+      return currentPeers;
+    });
   };
 
   const handleVideoClick = async () => {
@@ -130,9 +131,12 @@ const Chat = () => {
       audio: true,
       video: true,
     });
+    const tracks = stream.getTracks();
 
     if (addTrack)
-      stream.getTracks().forEach((track) => addTrack(peers[0].id, track));
+      connections.forEach(({ id }) => {
+        if (id) tracks.forEach((track) => addTrack(id, track));
+      });
   };
 
   useEffect(() => {
@@ -163,18 +167,20 @@ const Chat = () => {
   return (
     <main>
       <h1>Chat</h1>
-      {error && <p>{error}</p>}
-      <h2>Online: {peers.length}</h2>
+      <h2>Online: {connections.length}</h2>
       <button onClick={isConnected ? handleLeavePress : handleJoinPress}>
         {isConnected ? 'leave chat' : 'join'}
       </button>
       <ul>
-        {peers.map(({ id }) => (
+        {connections.map(({ id }) => (
           <li key={id}>{id && getPeerUsername(id)}</li>
         ))}
       </ul>
       <hr />
-      <video ref={videoRef} autoPlay={true} width="300" height="200"></video>
+      {connections.map(({ id, username, stream }) => (
+        <Stream key={id} stream={stream} username={username} />
+      ))}
+
       <hr />
       <section>
         {messages?.map(({ id, senderId, message }) => (
