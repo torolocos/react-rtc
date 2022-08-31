@@ -27,7 +27,7 @@ export const usePeerConnection = (
     dispatchEvent('leave');
   };
 
-  const addNewPeer = async (peerId: string, initCall = false) => {
+  const addNewPeer = async (peerId: string) => {
     const peerConnection = new RTCPeerConnection({ iceServers });
     const dataChannel = peerConnection.createDataChannel(crypto.randomUUID());
 
@@ -53,7 +53,7 @@ export const usePeerConnection = (
       const peer = peers.get(peerId);
       const isConnected = peer?.peerConnection.connectionState === 'connected';
 
-      if (isConnected && !initCall) dispatchEvent('peerConnected', peer.id);
+      if (isConnected) dispatchEvent('peerConnected', peer.id);
     });
 
     peerConnection.addEventListener('track', (event) =>
@@ -61,7 +61,7 @@ export const usePeerConnection = (
     );
 
     peerConnection.addEventListener('negotiationneeded', async (event) => {
-      if (initCall || !(event.target instanceof RTCPeerConnection)) return;
+      if (!(event.target instanceof RTCPeerConnection)) return;
 
       try {
         const target = event.target;
@@ -132,11 +132,8 @@ export const usePeerConnection = (
         if (!!sdp) sendAnswer(peerId, sdp);
         if (!!ice) initIceCandidate(peerConnection, signal);
       } else {
-        const isNewPeer = destination === id.current;
-
-        addNewPeer(peerId, isNewPeer);
-
-        if (!isNewPeer) send(peerId, { id });
+        addNewPeer(peerId);
+        send(peerId, { id });
       }
     } catch (error) {
       dispatchEvent('error', error);
