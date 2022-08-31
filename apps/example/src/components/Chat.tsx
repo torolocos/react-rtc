@@ -171,6 +171,9 @@ const Chat = () => {
       <button onClick={isConnected ? handleLeavePress : handleJoinPress}>
         {isConnected ? 'leave chat' : 'join'}
       </button>
+      <br />
+      <br />
+      <button onClick={handleVideoClick}>Stream</button>
       <ul>
         {connections.map(({ id }) => (
           <li key={id}>{id && getPeerUsername(id)}</li>
@@ -197,7 +200,6 @@ const Chat = () => {
             <input type="text" ref={inputRef} />
             <input type="submit" value="send" />
           </form>
-          <button onClick={handleVideoClick}>Video</button>
         </>
       )}
     </main>
