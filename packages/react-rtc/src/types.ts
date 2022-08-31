@@ -28,7 +28,7 @@ interface EventsDetail {
   leave: unknown;
   enter: unknown;
   dataChannel: string;
-  track: RTCTrackEvent;
+  track: [string, MediaStreamTrack];
 }
 
 export interface ContextType {

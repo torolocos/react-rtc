@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { ConnectionState, type Signal, type DispatchEvent } from '../types';
 import { useErrorHandler } from './useErrorHandler';
-import { usePeers } from './usePeers';
+import { useConnections } from './useConnections';
 import { useSignaling } from './useSignaling';
 
 export const usePeerConnection = (
@@ -10,7 +10,7 @@ export const usePeerConnection = (
   iceServers: { urls: string }[]
 ) => {
   const id = useRef(crypto.randomUUID());
-  const peers = usePeers(dispatchEvent);
+  const peers = useConnections(dispatchEvent);
   const {
     send,
     signaling,

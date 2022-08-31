@@ -2,8 +2,8 @@ import { useRef } from 'react';
 import type { DispatchEvent, Peer } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 
-export const usePeers = (dispatchEvent: DispatchEvent) => {
-  const peers = useRef(new Map<string, Peer>());
+export const useConnections = (dispatchEvent: DispatchEvent) => {
+  const connections = useRef(new Map<string, Peer>());
   const handleError = useErrorHandler(dispatchEvent);
 
   const add = (
@@ -13,19 +13,19 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
   ) => {
     const peer: Peer = { id, peerConnection, dataChannel };
 
-    peers.current.set(id, peer);
+    connections.current.set(id, peer);
   };
 
-  const get = (id: string) => peers.current.get(id);
+  const get = (id: string) => connections.current.get(id);
 
-  const remove = (id: string) => peers.current.delete(id);
+  const remove = (id: string) => connections.current.delete(id);
 
   const forEach = (callback: (peer: Peer, id?: string) => void) =>
-    peers.current.forEach(callback);
+    connections.current.forEach(callback);
 
   const disconnect = () => {
     forEach((peer) => peer.peerConnection.close());
-    peers.current.clear();
+    connections.current.clear();
   };
 
   const send = (peer: Peer, data: string) => {
@@ -38,7 +38,7 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
   };
 
   const sendTo = (id: string, data: string) => {
-    const peer = peers.current.get(id);
+    const peer = get(id);
 
     if (peer) send(peer, data);
   };
@@ -48,7 +48,7 @@ export const usePeers = (dispatchEvent: DispatchEvent) => {
   };
 
   const addTrack = (id: string, track: MediaStreamTrack) => {
-    const peer = peers.current.get(id)?.peerConnection;
+    const peer = get(id)?.peerConnection;
 
     peer?.addTrack(track);
   };
