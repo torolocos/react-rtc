@@ -27,7 +27,7 @@ export const useSignaling = (
   };
 
   const handleSignalingOpen = () => {
-    send('all', { id, newPeer: true });
+    send('all', { id });
     dispatchEvent('enter');
   };
 

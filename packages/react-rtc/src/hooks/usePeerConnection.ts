@@ -124,7 +124,7 @@ export const usePeerConnection = (
     const {
       id: peerId,
       destination,
-      data: { sdp, ice, newPeer },
+      data: { sdp, ice },
     } = signal;
     const isMySignal =
       peerId == id.current ||
@@ -137,14 +137,12 @@ export const usePeerConnection = (
     if (peerConnection) {
       if (!!sdp) sendSessionWithDescription(peerId, peerConnection, sdp);
       if (!!ice) initIceCandidate(peerConnection, signal);
-    }
-
-    if (newPeer) {
+    } else {
       const isNewcomer = destination === id.current;
 
       addNewPeer(peerId, isNewcomer);
 
-      if (!isNewcomer) send(peerId, { id, newPeer: true });
+      if (!isNewcomer) send(peerId, { id });
     }
   };
 
