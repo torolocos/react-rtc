@@ -61,14 +61,14 @@ export const usePeerConnection = (
     );
 
     peerConnection.addEventListener('negotiationneeded', async (event) => {
-      if (!(event.target instanceof RTCPeerConnection)) return;
+      const target = event.target;
+
+      if (!(target instanceof RTCPeerConnection)) return;
 
       try {
-        const target = event.target;
-        const offer = await target.createOffer();
-
-        await target.setLocalDescription(offer);
-        send(peerId, { sdp: offer });
+        await target.createOffer();
+        await target.setLocalDescription();
+        send(peerId, { sdp: peerConnection.localDescription });
       } catch (error) {
         dispatchEvent('error', error);
       }
@@ -89,10 +89,8 @@ export const usePeerConnection = (
       );
 
       if (sdp.type == 'offer') {
-        const answer = await peer.peerConnection.createAnswer();
-
-        await peer.peerConnection.setLocalDescription(answer);
-        send(peerId, { sdp: answer });
+        await peer.peerConnection.setLocalDescription();
+        send(peerId, { sdp: peer.peerConnection.localDescription });
       }
     } catch (error) {
       handleError(error);
