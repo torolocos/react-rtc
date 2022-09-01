@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import type { DispatchEvent, Peer } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 
-export const useConnections = (dispatchEvent: DispatchEvent) => {
+export const useConnection = (dispatchEvent: DispatchEvent) => {
   const connections = useRef(new Map<string, Peer>());
   const handleError = useErrorHandler(dispatchEvent);
 
@@ -23,7 +23,7 @@ export const useConnections = (dispatchEvent: DispatchEvent) => {
   const forEach = (callback: (peer: Peer, id?: string) => void) =>
     connections.current.forEach(callback);
 
-  const disconnect = () => {
+  const closeAllConnections = () => {
     forEach((peer) => peer.peerConnection.close());
     connections.current.clear();
   };
@@ -65,6 +65,6 @@ export const useConnections = (dispatchEvent: DispatchEvent) => {
     sendTo,
     sendToAll,
     addTrack,
-    disconnect,
+    closeAllConnections,
   };
 };

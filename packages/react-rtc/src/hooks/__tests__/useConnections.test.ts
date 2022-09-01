@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react-hooks';
-import { useConnections } from '../useConnections';
+import { useConnection } from '../useConnection';
 
 const close = jest.fn();
 const send = jest.fn();
@@ -12,13 +12,13 @@ Object.defineProperty(global, 'RTCPeerConnection', {
   },
 });
 
-describe('useConnections', () => {
+describe('useConnection', () => {
   const id = ['a', 'b'] as const;
   const peerConnection = new RTCPeerConnection();
   const dataChannel = peerConnection.createDataChannel('test');
 
   it('should add and get a connection', () => {
-    const { result } = renderHook(() => useConnections(dispatchEvent));
+    const { result } = renderHook(() => useConnection(dispatchEvent));
 
     result.current.add(id[0], peerConnection, dataChannel);
     expect(result.current.get(id[0])).toEqual({
@@ -29,7 +29,7 @@ describe('useConnections', () => {
   });
 
   it('should remove a connection', () => {
-    const { result } = renderHook(() => useConnections(dispatchEvent));
+    const { result } = renderHook(() => useConnection(dispatchEvent));
 
     result.current.add(id[0], peerConnection, dataChannel);
     result.current.remove(id[0]);
@@ -37,18 +37,18 @@ describe('useConnections', () => {
   });
 
   it('should disconnect from all peers', () => {
-    const { result } = renderHook(() => useConnections(dispatchEvent));
+    const { result } = renderHook(() => useConnection(dispatchEvent));
 
     result.current.add(id[0], peerConnection, dataChannel);
     result.current.add(id[1], peerConnection, dataChannel);
-    result.current.disconnect();
+    result.current.closeAllConnections();
 
     expect(close).toBeCalledTimes(2);
   });
 
   it('should send data to peer', () => {
     const data = 'data';
-    const { result } = renderHook(() => useConnections(dispatchEvent));
+    const { result } = renderHook(() => useConnection(dispatchEvent));
 
     result.current.add(id[0], peerConnection, dataChannel);
     result.current.sendTo(id[0], data);
@@ -62,7 +62,7 @@ describe('useConnections', () => {
       throw new Error();
     });
     const data = 'data';
-    const { result } = renderHook(() => useConnections(dispatchEvent));
+    const { result } = renderHook(() => useConnection(dispatchEvent));
 
     result.current.add(id[0], peerConnection, dataChannel);
     result.current.sendTo(id[0], data);
@@ -73,7 +73,7 @@ describe('useConnections', () => {
 
   it('should send data to all peers', () => {
     const data = 'data';
-    const { result } = renderHook(() => useConnections(dispatchEvent));
+    const { result } = renderHook(() => useConnection(dispatchEvent));
 
     result.current.add(id[0], peerConnection, dataChannel);
     result.current.add(id[1], peerConnection, dataChannel);
