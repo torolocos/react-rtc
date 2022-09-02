@@ -34,16 +34,16 @@ const Chat = () => {
   const { sendToPeer, sendToAllPeers, enter, leave, on, off, addTrack } =
     useRtc();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [connections, setConnections] = useState<Peer[]>([]);
+  const [peers, setPeers] = useState<Peer[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const username = useRef(generateUserName());
 
   const getPeerUsername = (id: string) =>
-    connections.find((peer) => peer.id === id)?.username;
+    peers.find((peer) => peer.id === id)?.username;
 
   const addPeer = (id: string, username: string) =>
-    setConnections((currentPeers) => [
+    setPeers((currentPeers) => [
       ...currentPeers,
       { id, username, stream: new MediaStream() },
     ]);
@@ -85,8 +85,7 @@ const Chat = () => {
         { ...data, senderId },
       ]);
 
-    if (isPeer(data) && !connections.includes(data))
-      addPeer(senderId, data.username);
+    if (isPeer(data) && !peers.includes(data)) addPeer(senderId, data.username);
   };
 
   const handleMessageSend = (event: RtcEvent<'send'>) => {
@@ -113,7 +112,7 @@ const Chat = () => {
   const handleTrack = (event: RtcEvent<'track'>) => {
     const [peerId, track] = event.detail;
 
-    setConnections((currentPeers) => {
+    setPeers((currentPeers) => {
       const peerToAddTrack = currentPeers.find(({ id }) => id === peerId);
 
       if (peerToAddTrack) {
@@ -134,7 +133,7 @@ const Chat = () => {
     const tracks = stream.getTracks();
 
     if (addTrack)
-      connections.forEach(({ id }) => {
+      peers.forEach(({ id }) => {
         if (id) tracks.forEach((track) => addTrack(id, track));
       });
   };
@@ -167,7 +166,7 @@ const Chat = () => {
   return (
     <main>
       <h1>Chat - Hello {username.current}!</h1>
-      <h2>Online: {connections.length}</h2>
+      <h2>Online: {peers.length}</h2>
       <button onClick={isConnected ? handleLeavePress : handleJoinPress}>
         {isConnected ? 'leave chat' : 'join'}
       </button>
@@ -175,13 +174,13 @@ const Chat = () => {
       <br />
       <button onClick={handleVideoClick}>Stream</button>
       <ul>
-        {connections.map(({ id }) => (
+        {peers.map(({ id }) => (
           <li key={id}>{id && getPeerUsername(id)}</li>
         ))}
       </ul>
       <hr />
       <div>
-        {connections.map(({ id, username, stream }) => (
+        {peers.map(({ id, username, stream }) => (
           <Stream key={id} stream={stream} username={username} />
         ))}
       </div>
