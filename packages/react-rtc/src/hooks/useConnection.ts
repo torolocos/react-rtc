@@ -1,9 +1,9 @@
 import { useRef } from 'react';
-import type { DispatchEvent, Peer } from '../types';
+import type { DispatchEvent, Connection } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 
 export const useConnection = (dispatchEvent: DispatchEvent) => {
-  const connections = useRef(new Map<string, Peer>());
+  const connections = useRef(new Map<string, Connection>());
   const handleError = useErrorHandler(dispatchEvent);
 
   const add = (
@@ -11,48 +11,50 @@ export const useConnection = (dispatchEvent: DispatchEvent) => {
     peerConnection: RTCPeerConnection,
     dataChannel: RTCDataChannel
   ) => {
-    const peer: Peer = { id, peerConnection, dataChannel };
+    const connection: Connection = { id, peerConnection, dataChannel };
 
-    connections.current.set(id, peer);
+    connections.current.set(id, connection);
   };
 
   const get = (id: string) => connections.current.get(id);
 
   const remove = (id: string) => connections.current.delete(id);
 
-  const forEach = (callback: (peer: Peer, id?: string) => void) =>
+  const forEach = (callback: (connection: Connection, id?: string) => void) =>
     connections.current.forEach(callback);
 
   const closeAllConnections = () => {
-    forEach((peer) => peer.peerConnection.close());
+    forEach(({ peerConnection }) => peerConnection.close());
     connections.current.clear();
   };
 
-  const send = (peer: Peer, data: string) => {
+  const send = ({ id, dataChannel }: Connection, data: string) => {
     try {
-      if (peer.dataChannel.readyState !== 'open') dispatchEvent('error');
+      if (dataChannel.readyState !== 'open') dispatchEvent('error');
 
-      peer.dataChannel.send(data);
-      dispatchEvent('send', [peer.id, data]);
+      dataChannel.send(data);
+      dispatchEvent('send', [id, data]);
     } catch (error) {
       handleError(error);
     }
   };
 
   const sendTo = (id: string, data: string) => {
-    const peer = get(id);
+    const connection = get(id);
 
-    if (peer) send(peer, data);
+    if (connection) send(connection, data);
+    else dispatchEvent('error');
   };
 
   const sendToAll = (data: string) => {
-    forEach((peer) => send(peer, data));
+    forEach((connection) => send(connection, data));
   };
 
   const addTrack = (id: string, track: MediaStreamTrack) => {
-    const peer = get(id)?.peerConnection;
+    const connection = get(id);
 
-    peer?.addTrack(track);
+    if (connection) connection.peerConnection.addTrack(track);
+    else dispatchEvent('error');
   };
 
   return {

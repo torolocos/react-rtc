@@ -56,7 +56,7 @@ export interface Signal {
   };
 }
 
-export interface Peer {
+export interface Connection {
   id: string;
   peerConnection: RTCPeerConnection;
   dataChannel: RTCDataChannel;
