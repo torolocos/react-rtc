@@ -43,7 +43,6 @@ export const useConnection = (dispatchEvent: DispatchEvent) => {
     const connection = get(id);
 
     if (connection) send(connection, data);
-    else dispatchEvent('error');
   };
 
   const sendToAll = (data: string) => {
@@ -54,7 +53,6 @@ export const useConnection = (dispatchEvent: DispatchEvent) => {
     const connection = get(id);
 
     if (connection) connection.peerConnection.addTrack(track);
-    else dispatchEvent('error');
   };
 
   return {

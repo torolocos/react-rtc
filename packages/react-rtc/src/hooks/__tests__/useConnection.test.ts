@@ -4,11 +4,13 @@ import { useConnection } from '../useConnection';
 const close = jest.fn();
 const send = jest.fn();
 const dispatchEvent = jest.fn();
+const addTrack = jest.fn();
 
 Object.defineProperty(global, 'RTCPeerConnection', {
   value: class {
     createDataChannel = jest.fn(() => ({ send }));
     close = close;
+    addTrack = addTrack;
   },
 });
 
@@ -36,7 +38,7 @@ describe('useConnection', () => {
     expect(result.current.get(id[0])).toBeUndefined();
   });
 
-  it('should disconnect from all peers', () => {
+  it('should close all connections', () => {
     const { result } = renderHook(() => useConnection(dispatchEvent));
 
     result.current.add(id[0], peerConnection, dataChannel);
@@ -68,7 +70,7 @@ describe('useConnection', () => {
     result.current.sendTo(id[0], data);
 
     expect(send).toBeCalledWith(data);
-    expect(dispatchEvent).toBeCalledWith('error', expect.anything());
+    expect(dispatchEvent).toBeCalledWith('error');
   });
 
   it('should send data to all peers', () => {
@@ -82,5 +84,15 @@ describe('useConnection', () => {
     expect(send).toHaveBeenNthCalledWith(2, data);
     expect(dispatchEvent).toHaveBeenCalledWith('send', [id[0], data]);
     expect(dispatchEvent).toHaveBeenCalledWith('send', [id[1], data]);
+  });
+
+  it('should add track to connection', () => {
+    const { result } = renderHook(() => useConnection(dispatchEvent));
+    const mediaStreamTrack = jest.fn<MediaStreamTrack, never>();
+
+    result.current.add(id[0], peerConnection, dataChannel);
+    result.current.addTrack(id[0], mediaStreamTrack());
+
+    expect(addTrack).toBeCalledWith(mediaStreamTrack());
   });
 });
