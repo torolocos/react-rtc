@@ -125,7 +125,7 @@ const Chat = () => {
     });
   };
 
-  const handleVideoClick = async () => {
+  const handleStreamClick = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
       video: true,
@@ -165,14 +165,14 @@ const Chat = () => {
 
   return (
     <main>
-      <h1>Chat - Hello {username.current}!</h1>
+      <h1>Hello {username.current}!</h1>
       <h2>Online: {peers.length}</h2>
       <button onClick={isConnected ? handleLeavePress : handleJoinPress}>
         {isConnected ? 'leave chat' : 'join'}
       </button>
       <br />
       <br />
-      <button onClick={handleVideoClick}>Stream</button>
+      <button onClick={handleStreamClick}>Stream</button>
       <ul>
         {peers.map(({ id }) => (
           <li key={id}>{id && getPeerUsername(id)}</li>
