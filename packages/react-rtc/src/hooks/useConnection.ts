@@ -30,10 +30,7 @@ export const useConnection = (dispatchEvent: DispatchEvent) => {
 
   const send = (peer: Peer, data: string) => {
     try {
-      if (peer.dataChannel.readyState !== 'open') {
-        // TODO: Throw custom error
-        throw new Error();
-      }
+      if (peer.dataChannel.readyState !== 'open') dispatchEvent('error');
 
       peer.dataChannel.send(data);
       dispatchEvent('send', [peer.id, data]);
