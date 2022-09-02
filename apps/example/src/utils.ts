@@ -1,11 +1,14 @@
-export const generateUserName = () => {
-  const toUpperCaseFirstCharacter = (text: string) =>
-    text.charAt(0).toUpperCase() + text.slice(1);
+export function generateUserName() {
+  const string = crypto.randomUUID().match(/[a-z]/gm);
+  const name = filterDuplicatedCharacters(string).slice(0, 6);
 
-  const filterDuplicities = (text?: string[] | null) =>
-    Array.from(new Set(text)).join('');
+  return toUpperCaseFirstCharacter(name);
+}
 
-  const name = crypto.randomUUID().match(/[a-z]/gm);
+function toUpperCaseFirstCharacter(text: string) {
+  text.charAt(0).toUpperCase() + text.slice(1);
+}
 
-  return toUpperCaseFirstCharacter(filterDuplicities(name).slice(0, 6));
-};
+function filterDuplicatedCharacters(text?: string[] | null) {
+  return Array.from(new Set(text)).join('');
+}
