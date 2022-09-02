@@ -41,7 +41,7 @@ describe('useConnection', () => {
 
     result.current.add(id[0], peerConnection, dataChannel);
     result.current.add(id[1], peerConnection, dataChannel);
-    result.current.closeAllConnections();
+    result.current.closeAll();
 
     expect(close).toBeCalledTimes(2);
   });

@@ -17,8 +17,8 @@ export const RtcProvider = ({
   const {
     disconnect: leave,
     connect: enter,
-    sendToPeer,
-    sendToAllPeers,
+    sendTo,
+    sendToAll,
     addTrackToConnection,
   } = usePeerConnection(dispatchEvent, signalingServer, iceServers);
 
@@ -27,8 +27,8 @@ export const RtcProvider = ({
       value={{
         enter,
         leave,
-        sendToPeer,
-        sendToAllPeers,
+        sendTo,
+        sendToAll,
         on,
         off,
         addTrack: addTrackToConnection,

@@ -23,7 +23,7 @@ export const useConnection = (dispatchEvent: DispatchEvent) => {
   const forEach = (callback: (connection: Connection, id?: string) => void) =>
     connections.current.forEach(callback);
 
-  const closeAllConnections = () => {
+  const closeAll = () => {
     forEach(({ peerConnection }) => peerConnection.close());
     connections.current.clear();
   };
@@ -64,6 +64,6 @@ export const useConnection = (dispatchEvent: DispatchEvent) => {
     sendTo,
     sendToAll,
     addTrack,
-    closeAllConnections,
+    closeAll,
   };
 };

@@ -11,19 +11,19 @@ export const usePeerConnection = (
 ) => {
   const id = useRef(crypto.randomUUID());
   const {
-    closeAllConnections,
     add: addConnection,
     get: getConnection,
     remove: removeConnection,
+    closeAll: closeAllConnections,
     sendTo: sendToPeer,
     sendToAll: sendToAllPeers,
     addTrack: addTrackToConnection,
   } = useConnection(dispatchEvent);
   const {
-    send,
-    signaling,
+    send: sendToSignaling,
     connect: connectToSginaling,
     disconnect: disconnectFromSignaling,
+    signaling,
   } = useSignaling(id.current, signalingServer, dispatchEvent);
   const handleError = useErrorHandler(dispatchEvent);
 
@@ -42,7 +42,7 @@ export const usePeerConnection = (
     addConnection(peerId, peerConnection, dataChannel);
 
     peerConnection.addEventListener('icecandidate', (event) => {
-      if (event.candidate) send(peerId, { ice: event.candidate });
+      if (event.candidate) sendToSignaling(peerId, { ice: event.candidate });
     });
 
     peerConnection.addEventListener('iceconnectionstatechange', () =>
@@ -69,14 +69,14 @@ export const usePeerConnection = (
     );
 
     peerConnection.addEventListener('negotiationneeded', async (event) => {
-      const target = event.target;
-
-      if (!(target instanceof RTCPeerConnection)) return;
+      if (!(event.target instanceof RTCPeerConnection)) return;
 
       try {
+        const target = event.target;
+
         await target.createOffer();
         await target.setLocalDescription();
-        send(peerId, { sdp: peerConnection.localDescription });
+        sendToSignaling(peerId, { sdp: peerConnection.localDescription });
       } catch (error) {
         dispatchEvent('error', error);
       }
@@ -98,7 +98,9 @@ export const usePeerConnection = (
 
       if (sdp.type == 'offer') {
         await connection.peerConnection.setLocalDescription();
-        send(id, { sdp: connection.peerConnection.localDescription });
+        sendToSignaling(id, {
+          sdp: connection.peerConnection.localDescription,
+        });
       }
     } catch (error) {
       handleError(error);
@@ -136,7 +138,7 @@ export const usePeerConnection = (
         if (!!ice) await initIceCandidate(peerConnection, ice);
       } else {
         await createConnection(peerId);
-        send(peerId, { id });
+        sendToSignaling(peerId, { id });
       }
     } catch (error) {
       dispatchEvent('error', error);
@@ -168,8 +170,8 @@ export const usePeerConnection = (
   return {
     connect,
     disconnect,
-    sendToPeer,
-    sendToAllPeers,
+    sendTo: sendToPeer,
+    sendToAll: sendToAllPeers,
     addTrackToConnection,
   };
 };

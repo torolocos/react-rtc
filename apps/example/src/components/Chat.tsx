@@ -31,8 +31,7 @@ const isPeer = (peer: unknown): peer is Peer => {
 };
 
 const Chat = () => {
-  const { sendToPeer, sendToAllPeers, enter, leave, on, off, addTrack } =
-    useRtc();
+  const { sendTo, sendToAll, enter, leave, on, off, addTrack } = useRtc();
   const [messages, setMessages] = useState<Message[]>([]);
   const [peers, setPeers] = useState<Peer[]>([]);
   const [isConnected, setIsConnected] = useState(false);
@@ -68,7 +67,7 @@ const Chat = () => {
         message,
       };
 
-      if (sendToAllPeers) sendToAllPeers(JSON.stringify(data));
+      if (sendToAll) sendToAll(JSON.stringify(data));
 
       setMessages((currentMessages) => [...currentMessages, data]);
       inputRef.current.value = '';
@@ -105,8 +104,8 @@ const Chat = () => {
   const handleDataChannelOpen = (event: RtcEvent<'dataChannel'>) => {
     const id = event.detail;
 
-    if (sendToPeer)
-      sendToPeer(id, JSON.stringify({ id: '', username: username.current }));
+    if (sendTo)
+      sendTo(id, JSON.stringify({ id: '', username: username.current }));
   };
 
   const handleTrack = (event: RtcEvent<'track'>) => {

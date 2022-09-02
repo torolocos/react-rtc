@@ -34,8 +34,8 @@ interface EventsDetail {
 export interface ContextType {
   enter?: () => void;
   leave?: () => void;
-  sendToPeer?: (id: string, data: string) => void;
-  sendToAllPeers?: (data: string) => void;
+  sendTo?: (id: string, data: string) => void;
+  sendToAll?: (data: string) => void;
   on?: AddEventListener;
   off?: RemoveEventListener;
   addTrack?: (id: string, track: MediaStreamTrack) => void;
