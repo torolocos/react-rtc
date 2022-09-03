@@ -28,15 +28,17 @@ interface EventsDetail {
   leave: unknown;
   enter: unknown;
   dataChannel: string;
+  track: [string, MediaStreamTrack];
 }
 
 export interface ContextType {
   enter?: () => void;
   leave?: () => void;
-  sendToPeer?: (id: string, data: string) => void;
-  sendToAllPeers?: (data: string) => void;
+  sendTo?: (id: string, data: string) => void;
+  sendToAll?: (data: string) => void;
   on?: AddEventListener;
   off?: RemoveEventListener;
+  addTrack?: (id: string, track: MediaStreamTrack) => void;
 }
 
 export enum ConnectionState {
@@ -54,7 +56,7 @@ export interface Signal {
   };
 }
 
-export interface Peer {
+export interface Connection {
   id: string;
   peerConnection: RTCPeerConnection;
   dataChannel: RTCDataChannel;

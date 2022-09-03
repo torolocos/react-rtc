@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { ConnectionState, type Signal, type DispatchEvent } from '../types';
 import { useErrorHandler } from './useErrorHandler';
-import { usePeers } from './usePeers';
+import { useConnection } from './useConnection';
 import { useSignaling } from './useSignaling';
 
 export const usePeerConnection = (
@@ -10,12 +10,20 @@ export const usePeerConnection = (
   iceServers: { urls: string }[]
 ) => {
   const id = useRef(crypto.randomUUID());
-  const peerConnections = usePeers(dispatchEvent);
   const {
-    send,
-    signaling,
+    add: addConnection,
+    get: getConnection,
+    remove: removeConnection,
+    closeAll: closeAllConnections,
+    sendTo: sendToPeer,
+    sendToAll: sendToAllPeers,
+    addTrack: addTrackToConnection,
+  } = useConnection(dispatchEvent);
+  const {
+    send: sendToSignaling,
     connect: connectToSginaling,
     disconnect: disconnectFromSignaling,
+    signaling,
   } = useSignaling(id.current, signalingServer, dispatchEvent);
   const handleError = useErrorHandler(dispatchEvent);
 
@@ -23,16 +31,18 @@ export const usePeerConnection = (
 
   const disconnect = () => {
     disconnectFromSignaling();
-    peerConnections.disconnect();
+    closeAllConnections();
     dispatchEvent('leave');
   };
 
-  const addNewPeer = (peerId: string, initCall = false) => {
+  const createConnection = async (peerId: string) => {
     const peerConnection = new RTCPeerConnection({ iceServers });
     const dataChannel = peerConnection.createDataChannel(crypto.randomUUID());
 
+    addConnection(peerId, peerConnection, dataChannel);
+
     peerConnection.addEventListener('icecandidate', (event) => {
-      if (event.candidate) send(peerId, { ice: event.candidate });
+      if (event.candidate) sendToSignaling(peerId, { ice: event.candidate });
     });
 
     peerConnection.addEventListener('iceconnectionstatechange', () =>
@@ -40,7 +50,7 @@ export const usePeerConnection = (
     );
 
     peerConnection.addEventListener('datachannel', (event) => {
-      Object.defineProperty(peerConnections.get(peerId), 'dataChannel', {
+      Object.defineProperty(getConnection(peerId), 'dataChannel', {
         value: event.channel,
       });
 
@@ -48,58 +58,49 @@ export const usePeerConnection = (
     });
 
     peerConnection.addEventListener('connectionstatechange', () => {
-      const peer = peerConnections.get(peerId);
+      const peer = getConnection(peerId);
       const isConnected = peer?.peerConnection.connectionState === 'connected';
 
-      if (isConnected && !initCall) dispatchEvent('peerConnected', peer.id);
+      if (isConnected) dispatchEvent('peerConnected', peer.id);
+    });
+
+    peerConnection.addEventListener('track', (event) =>
+      dispatchEvent('track', [peerId, event.track])
+    );
+
+    peerConnection.addEventListener('negotiationneeded', async (event) => {
+      if (!(event.target instanceof RTCPeerConnection)) return;
+
+      try {
+        const target = event.target;
+
+        await target.createOffer();
+        await target.setLocalDescription();
+        sendToSignaling(peerId, { sdp: peerConnection.localDescription });
+      } catch (error) {
+        dispatchEvent('error', error);
+      }
     });
 
     dataChannel.addEventListener('message', (event) =>
       dispatchEvent('receive', [peerId, event.data])
     );
-
-    if (initCall) {
-      peerConnection
-        .createOffer()
-        .then((description) => createdDescription(peerId, description))
-        .catch((e) => handleError(e));
-    }
-
-    peerConnections.add(peerId, peerConnection, dataChannel);
   };
 
-  const createdDescription = async (
-    peerId: string,
-    description: RTCSessionDescriptionInit
-  ) => {
+  const sendAnswer = async (id: string, sdp: RTCSessionDescriptionInit) => {
+    const connection = getConnection(id);
+
+    if (!connection) return;
     try {
-      await peerConnections
-        .get(peerId)
-        ?.peerConnection.setLocalDescription(description);
-
-      const sessionDescription =
-        peerConnections.get(peerId)?.peerConnection.localDescription;
-
-      if (sessionDescription) send(peerId, { sdp: sessionDescription });
-    } catch (error) {
-      handleError(error);
-    }
-  };
-
-  const sendSessionWithDescription = async (
-    peerId: string,
-    peerConnection: RTCPeerConnection,
-    sdp: RTCSessionDescriptionInit
-  ) => {
-    try {
-      await peerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
+      await connection.peerConnection.setRemoteDescription(
+        new RTCSessionDescription(sdp)
+      );
 
       if (sdp.type == 'offer') {
-        const answer = await peerConnections
-          .get(peerId)
-          ?.peerConnection.createAnswer();
-
-        if (answer) createdDescription(peerId, answer);
+        await connection.peerConnection.setLocalDescription();
+        sendToSignaling(id, {
+          sdp: connection.peerConnection.localDescription,
+        });
       }
     } catch (error) {
       handleError(error);
@@ -108,46 +109,44 @@ export const usePeerConnection = (
 
   const initIceCandidate = async (
     peerConnection: RTCPeerConnection,
-    signal: Signal
+    ice: RTCIceCandidateInit
   ) => {
     try {
-      await peerConnection.addIceCandidate(
-        new RTCIceCandidate(signal.data.ice)
-      );
+      await peerConnection.addIceCandidate(new RTCIceCandidate(ice));
     } catch (error) {
       handleError(error);
     }
   };
 
-  const handleMessageFromServer = (message: MessageEvent) => {
-    const signal: Signal = JSON.parse(message.data);
-    const {
-      id: peerId,
-      destination,
-      data: { sdp, ice },
-    } = signal;
-    const isMySignal =
-      peerId == id.current ||
-      (destination != id.current && destination != 'all');
+  const handleSignalingMessage = async (message: MessageEvent) => {
+    try {
+      const {
+        id: peerId,
+        destination,
+        data: { sdp, ice },
+      }: Signal = JSON.parse(message.data);
+      const isMySignal =
+        peerId == id.current ||
+        (destination != id.current && destination != 'all');
 
-    if (isMySignal) return;
+      if (isMySignal) return;
 
-    const peerConnection = peerConnections.get(peerId)?.peerConnection;
+      const peerConnection = getConnection(peerId)?.peerConnection;
 
-    if (peerConnection) {
-      if (!!sdp) sendSessionWithDescription(peerId, peerConnection, sdp);
-      if (!!ice) initIceCandidate(peerConnection, signal);
-    } else {
-      const isNewcomer = destination === id.current;
-
-      addNewPeer(peerId, isNewcomer);
-
-      if (!isNewcomer) send(peerId, { id });
+      if (peerConnection) {
+        if (!!sdp) await sendAnswer(peerId, sdp);
+        if (!!ice) await initIceCandidate(peerConnection, ice);
+      } else {
+        await createConnection(peerId);
+        sendToSignaling(peerId, { id });
+      }
+    } catch (error) {
+      dispatchEvent('error', error);
     }
   };
 
-  const checkPeerDisconnect = (peerId: string) => {
-    const peerConnection = peerConnections.get(peerId)?.peerConnection;
+  const checkPeerDisconnect = (id: string) => {
+    const peerConnection = getConnection(id)?.peerConnection;
     const state = peerConnection?.iceConnectionState;
 
     if (
@@ -155,23 +154,24 @@ export const usePeerConnection = (
       state === ConnectionState.CLOSED ||
       state === ConnectionState.DISCONNECT
     ) {
-      peerConnections.remove(peerId);
-      dispatchEvent('peerDisconnected', peerId);
+      removeConnection(id);
+      dispatchEvent('peerDisconnected', id);
     }
   };
 
   useEffect(() => {
-    signaling?.addEventListener('message', handleMessageFromServer);
+    signaling?.addEventListener('message', handleSignalingMessage);
 
     return () => {
-      signaling?.removeEventListener('message', handleMessageFromServer);
+      signaling?.removeEventListener('message', handleSignalingMessage);
     };
   }, [signaling]);
 
   return {
     connect,
     disconnect,
-    sendToPeer: peerConnections.sendTo,
-    sendToAllPeers: peerConnections.sendToAll,
+    sendTo: sendToPeer,
+    sendToAll: sendToAllPeers,
+    addTrackToConnection,
   };
 };

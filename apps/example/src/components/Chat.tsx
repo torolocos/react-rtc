@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef, type FormEvent } from 'react';
 import { type RtcEvent, useRtc } from '@torolocos/react-rtc';
 import z from 'zod';
+import Stream from './Stream';
+import { generateUserName } from '../utils';
 
 const Message = z.object({
   id: z.string(),
@@ -14,8 +16,7 @@ const Peer = z.object({
 });
 
 type Message = z.infer<typeof Message>;
-
-type Peer = z.infer<typeof Peer>;
+type Peer = z.infer<typeof Peer> & { stream: MediaStream };
 
 const isMessage = (message: unknown): message is Message => {
   const { success } = Message.safeParse(message);
@@ -29,29 +30,22 @@ const isPeer = (peer: unknown): peer is Peer => {
   return success;
 };
 
-const generateUserName = () => {
-  const toUpperCaseFirstCharacter = (text: string) =>
-    text.charAt(0).toUpperCase() + text.slice(1);
-
-  const filterDuplicities = (text?: string[] | null) =>
-    Array.from(new Set(text)).join('');
-
-  const name = crypto.randomUUID().match(/[a-z]/gm);
-
-  return toUpperCaseFirstCharacter(filterDuplicities(name).slice(0, 6));
-};
-
 const Chat = () => {
-  const { sendToPeer, sendToAllPeers, enter, leave, on, off } = useRtc();
+  const { sendTo, sendToAll, enter, leave, on, off, addTrack } = useRtc();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [error, setError] = useState<string>();
-  const [isConnected, setIsConnected] = useState(false);
   const [peers, setPeers] = useState<Peer[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const username = useRef(generateUserName());
 
   const getPeerUsername = (id: string) =>
     peers.find((peer) => peer.id === id)?.username;
+
+  const addPeer = (id: string, username: string) =>
+    setPeers((currentPeers) => [
+      ...currentPeers,
+      { id, username, stream: new MediaStream() },
+    ]);
 
   const handleJoinPress = () => {
     if (enter) enter();
@@ -73,7 +67,7 @@ const Chat = () => {
         message,
       };
 
-      if (sendToAllPeers) sendToAllPeers(JSON.stringify(data));
+      if (sendToAll) sendToAll(JSON.stringify(data));
 
       setMessages((currentMessages) => [...currentMessages, data]);
       inputRef.current.value = '';
@@ -90,8 +84,7 @@ const Chat = () => {
         { ...data, senderId },
       ]);
 
-    if (isPeer(data) && !peers.includes(data))
-      setPeers((peersMap) => [...peersMap, { ...data, id: senderId }]);
+    if (isPeer(data) && !peers.includes(data)) addPeer(senderId, data.username);
   };
 
   const handleMessageSend = (event: RtcEvent<'send'>) => {
@@ -106,13 +99,42 @@ const Chat = () => {
 
   const handleLeave = () => setIsConnected(false);
 
-  const handleError = () => setError('Something went wrong');
+  const handleError = (error: RtcEvent<'error'>) => console.error(error.detail);
 
   const handleDataChannelOpen = (event: RtcEvent<'dataChannel'>) => {
     const id = event.detail;
 
-    if (sendToPeer)
-      sendToPeer(id, JSON.stringify({ id: '', username: username.current }));
+    if (sendTo)
+      sendTo(id, JSON.stringify({ id: '', username: username.current }));
+  };
+
+  const handleTrack = (event: RtcEvent<'track'>) => {
+    const [peerId, track] = event.detail;
+
+    setPeers((currentPeers) => {
+      const peerToAddTrack = currentPeers.find(({ id }) => id === peerId);
+
+      if (peerToAddTrack) {
+        const index = currentPeers.indexOf(peerToAddTrack);
+
+        currentPeers[index].stream.addTrack(track);
+      }
+
+      return currentPeers;
+    });
+  };
+
+  const handleStreamClick = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: true,
+    });
+    const tracks = stream.getTracks();
+
+    if (addTrack)
+      peers.forEach(({ id }) => {
+        if (id) tracks.forEach((track) => addTrack(id, track));
+      });
   };
 
   useEffect(() => {
@@ -123,6 +145,7 @@ const Chat = () => {
       on('leave', handleLeave);
       on('dataChannel', handleDataChannelOpen);
       on('error', handleError);
+      on('track', handleTrack);
     }
 
     return () => {
@@ -133,6 +156,7 @@ const Chat = () => {
         off('enter', handleLeave);
         off('dataChannel', handleDataChannelOpen);
         off('error', handleError);
+        off('track', handleTrack);
       }
       if (leave) leave();
     };
@@ -140,17 +164,25 @@ const Chat = () => {
 
   return (
     <main>
-      <h1>Chat</h1>
-      {error && <p>{error}</p>}
+      <h1>Hello {username.current}!</h1>
       <h2>Online: {peers.length}</h2>
       <button onClick={isConnected ? handleLeavePress : handleJoinPress}>
         {isConnected ? 'leave chat' : 'join'}
       </button>
+      <br />
+      <br />
+      <button onClick={handleStreamClick}>Stream</button>
       <ul>
         {peers.map(({ id }) => (
           <li key={id}>{id && getPeerUsername(id)}</li>
         ))}
       </ul>
+      <hr />
+      <div>
+        {peers.map(({ id, username, stream }) => (
+          <Stream key={id} stream={stream} username={username} />
+        ))}
+      </div>
       <hr />
       <section>
         {messages?.map(({ id, senderId, message }) => (
