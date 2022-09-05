@@ -38,9 +38,8 @@ export const usePeerConnection = (
 
   const createConnection = async (peerId: string) => {
     const peerConnection = new RTCPeerConnection({ iceServers });
-    const dataChannel = peerConnection.createDataChannel(nanoid());
 
-    addConnection(peerId, peerConnection, dataChannel);
+    addConnection(peerId, peerConnection);
 
     peerConnection.addEventListener('icecandidate', (event) => {
       if (event.candidate) sendToSignaling(peerId, { ice: event.candidate });
@@ -82,10 +81,22 @@ export const usePeerConnection = (
         dispatchEvent('error', error);
       }
     });
+  };
 
-    dataChannel.addEventListener('message', (event) =>
-      dispatchEvent('receive', [peerId, event.data])
-    );
+  const addDataChannel = (id: string) => {
+    const connection = getConnection(id);
+
+    if (connection) {
+      const dataChannel = connection.peerConnection.createDataChannel(nanoid());
+
+      Object.defineProperty(connection, 'dataChannel', {
+        value: dataChannel,
+      });
+
+      dataChannel.addEventListener('message', (event) =>
+        dispatchEvent('receive', [id, event.data])
+      );
+    }
   };
 
   const sendAnswer = async (id: string, sdp: RTCSessionDescriptionInit) => {
@@ -174,5 +185,6 @@ export const usePeerConnection = (
     sendTo: sendToPeer,
     sendToAll: sendToAllPeers,
     addTrackToConnection,
+    addDataChannel,
   };
 };

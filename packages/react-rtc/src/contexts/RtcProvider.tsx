@@ -20,6 +20,7 @@ export const RtcProvider = ({
     sendTo,
     sendToAll,
     addTrackToConnection,
+    addDataChannel,
   } = usePeerConnection(dispatchEvent, signalingServer, iceServers);
 
   return (
@@ -32,6 +33,7 @@ export const RtcProvider = ({
         on,
         off,
         addTrack: addTrackToConnection,
+        addDataChannel,
       }}
     >
       {children}

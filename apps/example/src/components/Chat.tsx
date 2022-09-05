@@ -31,7 +31,8 @@ const isPeer = (peer: unknown): peer is Peer => {
 };
 
 const Chat = () => {
-  const { sendTo, sendToAll, enter, leave, on, off, addTrack } = useRtc();
+  const { sendTo, sendToAll, enter, leave, on, off, addTrack, addDataChannel } =
+    useRtc();
   const [messages, setMessages] = useState<Message[]>([]);
   const [peers, setPeers] = useState<Peer[]>([]);
   const [isConnected, setIsConnected] = useState(false);
@@ -146,6 +147,10 @@ const Chat = () => {
       on('dataChannel', handleDataChannelOpen);
       on('error', handleError);
       on('track', handleTrack);
+      on('peerConnected', (event) => {
+        console.log(event);
+        addDataChannel(event.detail);
+      });
     }
 
     return () => {

@@ -39,6 +39,7 @@ export interface ContextType {
   on?: AddEventListener;
   off?: RemoveEventListener;
   addTrack?: (id: string, track: MediaStreamTrack) => void;
+  addDataChannel?: (id: string) => void;
 }
 
 export enum ConnectionState {
@@ -59,5 +60,5 @@ export interface Signal {
 export interface Connection {
   id: string;
   peerConnection: RTCPeerConnection;
-  dataChannel: RTCDataChannel;
+  dataChannel?: RTCDataChannel;
 }

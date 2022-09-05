@@ -6,12 +6,8 @@ export const useConnection = (dispatchEvent: DispatchEvent) => {
   const connections = useRef(new Map<string, Connection>());
   const handleError = useErrorHandler(dispatchEvent);
 
-  const add = (
-    id: string,
-    peerConnection: RTCPeerConnection,
-    dataChannel: RTCDataChannel
-  ) => {
-    const connection: Connection = { id, peerConnection, dataChannel };
+  const add = (id: string, peerConnection: RTCPeerConnection) => {
+    const connection: Connection = { id, peerConnection };
 
     connections.current.set(id, connection);
   };
@@ -30,9 +26,9 @@ export const useConnection = (dispatchEvent: DispatchEvent) => {
 
   const send = ({ id, dataChannel }: Connection, data: string) => {
     try {
-      if (dataChannel.readyState !== 'open') dispatchEvent('error');
+      if (dataChannel?.readyState !== 'open') dispatchEvent('error');
 
-      dataChannel.send(data);
+      dataChannel?.send(data);
       dispatchEvent('send', [id, data]);
     } catch (error) {
       handleError(error);
