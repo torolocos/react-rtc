@@ -6,10 +6,5 @@ type Props = {
 };
 
 export const PageLayout: FC<Props> = ({ children }) => {
-  return (
-    <Layout>
-      <h1>Navigation panel</h1>
-      {children}
-    </Layout>
-  );
+  return <Layout>{children}</Layout>;
 };

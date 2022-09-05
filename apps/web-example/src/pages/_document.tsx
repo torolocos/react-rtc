@@ -14,6 +14,7 @@ export default class Document extends NextDocument {
           <link href="/fonts/index.css" type="text/css" rel="stylesheet" />
         </Head>
         <body>
+          <div id="modal"></div>
           <Main />
           <NextScript />
         </body>

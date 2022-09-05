@@ -4,22 +4,24 @@ import { PageLayout } from 'src/components/PageLayout';
 import { UserContextProvider } from 'src/features/auth/contexts/user';
 import { globalStyles } from 'src/features/ui/theme';
 import { ChatContextProvider } from 'src/features/chat/contexts/chat';
+import { ModalContextProvider } from 'src/features/ui/Modal/contexts/modal';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  // TODO: temporary
   globalStyles();
   return (
     <RtcProvider
       signalingServer="ws://localhost:8001/"
       iceServers={[{ urls: 'stun:stun.l.google.com:19302' }]}
     >
-      <UserContextProvider>
-        <ChatContextProvider>
-          <PageLayout>
-            <Component {...pageProps} />
-          </PageLayout>
-        </ChatContextProvider>
-      </UserContextProvider>
+      <ChatContextProvider>
+        <ModalContextProvider>
+          <UserContextProvider>
+            <PageLayout>
+              <Component {...pageProps} />
+            </PageLayout>
+          </UserContextProvider>
+        </ModalContextProvider>
+      </ChatContextProvider>
     </RtcProvider>
   );
 }

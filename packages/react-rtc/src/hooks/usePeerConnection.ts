@@ -4,7 +4,7 @@ import { ConnectionState, type Signal, type DispatchEvent } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 import { useConnection } from './useConnection';
 import { useSignaling } from './useSignaling';
-import { nanoid } from 'nanoid';
+
 export const usePeerConnection = (
   dispatchEvent: DispatchEvent,
   signalingServer: string,
