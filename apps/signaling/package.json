@@ -24,7 +24,7 @@
     "tsc:check": "tsc --pretty --noEmit"
   },
   "dependencies": {
-    "@torolocos/signaling-server": "0.1.0-rc.2",
+    "@torolocos/signaling-server": "0.1.0-rc.3",
     "dotenv": "^16.0.1"
   },
   "devDependencies": {
