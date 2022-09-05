@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { nanoid } from 'nanoid';
 import { ConnectionState, type Signal, type DispatchEvent } from '../types';
 import { useErrorHandler } from './useErrorHandler';
 import { useConnection } from './useConnection';
@@ -9,7 +10,7 @@ export const usePeerConnection = (
   signalingServer: string,
   iceServers: { urls: string }[]
 ) => {
-  const id = useRef(crypto.randomUUID());
+  const id = useRef(nanoid());
   const {
     add: addConnection,
     get: getConnection,
@@ -37,7 +38,7 @@ export const usePeerConnection = (
 
   const createConnection = async (peerId: string) => {
     const peerConnection = new RTCPeerConnection({ iceServers });
-    const dataChannel = peerConnection.createDataChannel(crypto.randomUUID());
+    const dataChannel = peerConnection.createDataChannel(nanoid());
 
     addConnection(peerId, peerConnection, dataChannel);
 
