@@ -1,5 +1,29 @@
 
 
+## [0.1.0-rc.3](https://github.com/torolocos/react-rtc/compare/0.1.0-rc.2...0.1.0-rc.3) (2022-09-05)
+
+
+### Features
+
+* add track to peer connection ([#104](https://github.com/torolocos/react-rtc/issues/104)) ([3e1fd2b](https://github.com/torolocos/react-rtc/commit/3e1fd2be6749f5b4c1d870340bec85e636f15098))
+
+
+### Chores
+
+* add debug config ([#108](https://github.com/torolocos/react-rtc/issues/108)) ([b00c2c8](https://github.com/torolocos/react-rtc/commit/b00c2c8db14d22a4c8e6086d28285ffa62356483))
+* **deps:** bump next from 12.2.3 to 12.2.4 ([#111](https://github.com/torolocos/react-rtc/issues/111)) ([cdd24b7](https://github.com/torolocos/react-rtc/commit/cdd24b78d755ecffcffedb8f91ffd9689f9800c8))
+* fix yarn add ([#115](https://github.com/torolocos/react-rtc/issues/115)) ([d43811f](https://github.com/torolocos/react-rtc/commit/d43811f2c4e286517430e2a8b82ec13a4e4ca5ab))
+* set ws as dependency ([#117](https://github.com/torolocos/react-rtc/issues/117)) ([8926a93](https://github.com/torolocos/react-rtc/commit/8926a93da94bacf32905d9ff4bd9b27c18e6ef51))
+* update deps ([#105](https://github.com/torolocos/react-rtc/issues/105)) ([8dab42c](https://github.com/torolocos/react-rtc/commit/8dab42c40a3659be893e9b97067b6604782d0ac2))
+* update pull request template ([#110](https://github.com/torolocos/react-rtc/issues/110)) ([51063d3](https://github.com/torolocos/react-rtc/commit/51063d39577527fdda5d668051815ed068283d8c))
+* update turbo config ([#114](https://github.com/torolocos/react-rtc/issues/114)) ([e8b99c9](https://github.com/torolocos/react-rtc/commit/e8b99c90a02733d96f4b824ca7a34a47de171064))
+
+
+### Code Refactoring
+
+* remove new peer flag ([#112](https://github.com/torolocos/react-rtc/issues/112)) ([203ead7](https://github.com/torolocos/react-rtc/commit/203ead7fc98d202ab77cbe0411b53ae3203e72a9))
+* replace random uuid with nanoid ([#116](https://github.com/torolocos/react-rtc/issues/116)) ([ae470f4](https://github.com/torolocos/react-rtc/commit/ae470f4b281be46f37ddcdb51e1cf2b8172aa0d9))
+
 ## [0.1.0-rc.2](https://github.com/torolocos/react-rtc/compare/0.1.0-rc.1...0.1.0-rc.2) (2022-08-26)
 
 

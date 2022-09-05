@@ -1,6 +1,6 @@
 {
   "name": "@torolocos/signaling-server",
-  "version": "0.1.0-rc.2",
+  "version": "0.1.0-rc.3",
   "description": "Signaling server for @torolocos/react-rtc package.",
   "keywords": [
     "webrtc",
@@ -37,7 +37,7 @@
     "lint": "eslint . --ext ts --ext tsx",
     "test": "jest"
   },
-  "peerDependencies": {
+  "dependencies": {
     "ws": "^8.8.1"
   },
   "devDependencies": {
