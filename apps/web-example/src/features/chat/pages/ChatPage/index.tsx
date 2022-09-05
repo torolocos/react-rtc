@@ -6,15 +6,17 @@ import { useChat } from '../../contexts/chat';
 import { Container } from './styled';
 
 export const ChatPage: NextPage = () => {
-  const { handleLeavePress, isConnected } = useChat();
+  const { handleLeavePress, isConnected, handleJoinPress } = useChat();
 
   useEffect(() => {
+    handleJoinPress();
     return () => {
-      if (isConnected) handleLeavePress();
+      if (isConnected) {
+        handleLeavePress();
+      }
     };
   }, []);
 
-  console.log({ isConnected });
   return (
     <Container>
       <ChatHeader />

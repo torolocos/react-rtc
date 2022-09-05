@@ -8,6 +8,7 @@ interface ContextValue {
   handleJoinPress: () => void;
   peers: Peer[];
   isConnected: boolean;
+  startStream: () => void;
 }
 
 export const ChatContext = createContext<ContextValue>({
@@ -15,6 +16,7 @@ export const ChatContext = createContext<ContextValue>({
   handleJoinPress: () => {},
   peers: [],
   isConnected: false,
+  startStream: () => {},
 });
 
 export const ChatContextProvider: FC<{ children: ReactNode }> = ({
@@ -22,11 +24,10 @@ export const ChatContextProvider: FC<{ children: ReactNode }> = ({
 }) => {
   const { sendTo, enter, leave, on, off, addTrack } = useRtc();
   const [peers, setPeers] = useState<Peer[]>([]);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const username = Math.random();
-  console.log({ peers });
-  console.log({ messages });
+
   const handleJoinPress = () => {
     if (enter) enter();
   };
@@ -44,7 +45,6 @@ export const ChatContextProvider: FC<{ children: ReactNode }> = ({
   const handleMessageReceived = (event: RtcEvent<'receive'>) => {
     const [senderId, payload] = event.detail;
     const data = JSON.parse(payload);
-    console.log({ data });
 
     setMessages((currentMessages) => [
       ...currentMessages,
@@ -97,8 +97,8 @@ export const ChatContextProvider: FC<{ children: ReactNode }> = ({
   };
 
   const handleEnter = () => {
-    setIsConnected(true);
     startStream();
+    setIsConnected(true);
   };
 
   const handleLeave = () => setIsConnected(false);
@@ -135,6 +135,7 @@ export const ChatContextProvider: FC<{ children: ReactNode }> = ({
     handleJoinPress,
     peers,
     isConnected,
+    startStream,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

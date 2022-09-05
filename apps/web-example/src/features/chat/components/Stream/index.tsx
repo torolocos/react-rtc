@@ -14,7 +14,6 @@ const Stream = ({ stream, username }: Props) => {
     }
   }, []);
 
-  console.log({ stream, username });
   return (
     <div>
       <p>{username}</p>

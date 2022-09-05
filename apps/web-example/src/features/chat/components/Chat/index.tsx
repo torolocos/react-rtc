@@ -4,7 +4,6 @@ import { Container } from './styled';
 
 export const Chat = () => {
   const { peers } = useChat();
-  console.log({ peers });
   return (
     <Container>
       {peers.map(({ id, username, stream }) => (

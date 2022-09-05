@@ -14,13 +14,13 @@ function MyApp({ Component, pageProps }: AppProps) {
       iceServers={[{ urls: 'stun:stun.l.google.com:19302' }]}
     >
       <ChatContextProvider>
-        <ModalContextProvider>
-          <UserContextProvider>
+        <UserContextProvider>
+          <ModalContextProvider>
             <PageLayout>
               <Component {...pageProps} />
             </PageLayout>
-          </UserContextProvider>
-        </ModalContextProvider>
+          </ModalContextProvider>
+        </UserContextProvider>
       </ChatContextProvider>
     </RtcProvider>
   );

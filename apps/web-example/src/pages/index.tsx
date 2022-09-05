@@ -15,10 +15,6 @@ const Home: NextPage = () => {
     }
   }, []);
 
-  if (user) {
-    return <p>Please Log in</p>;
-  }
-
   return <ChatPage />;
 };
 
