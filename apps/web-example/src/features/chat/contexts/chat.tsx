@@ -2,10 +2,11 @@ import type { FC, ReactNode } from 'react';
 import { createContext, useContext, useState, useEffect } from 'react';
 import { type RtcEvent, useRtc } from '@torolocos/react-rtc';
 import { Message, Peer } from '../types';
+import { useUser } from 'src/features/auth/contexts/user';
 
 interface ContextValue {
   handleLeavePress: () => void;
-  handleJoinPress: () => void;
+  handleJoinPress: (username: string) => void;
   peers: Peer[];
   isConnected: boolean;
   startStream: () => void;
@@ -25,10 +26,15 @@ export const ChatContextProvider: FC<{ children: ReactNode }> = ({
   const { sendTo, enter, leave, on, off, addTrack } = useRtc();
   const [peers, setPeers] = useState<Peer[]>([]);
   const [, setMessages] = useState<Message[]>([]);
+  const [username, setUsername] = useState<string | undefined>(undefined);
   const [isConnected, setIsConnected] = useState(false);
-  const username = Math.random();
+  // const username = Math.random();
 
-  const handleJoinPress = () => {
+  useEffect(() => {
+    if (isConnected) startStream();
+  }, [isConnected]);
+  const handleJoinPress = (name: string) => {
+    setUsername(name);
     if (enter) enter();
   };
 
@@ -50,7 +56,7 @@ export const ChatContextProvider: FC<{ children: ReactNode }> = ({
       ...currentMessages,
       { ...data, senderId },
     ]);
-
+    console.log({ data });
     if (!peers.includes(data)) addPeer(senderId, data.username);
   };
 
@@ -63,7 +69,6 @@ export const ChatContextProvider: FC<{ children: ReactNode }> = ({
 
   const handleDataChannelOpen = (event: RtcEvent<'dataChannel'>) => {
     const id = event.detail;
-
     if (sendTo) sendTo(id, JSON.stringify({ id: '', username: username }));
   };
 
@@ -97,7 +102,7 @@ export const ChatContextProvider: FC<{ children: ReactNode }> = ({
   };
 
   const handleEnter = () => {
-    startStream();
+    // startStream();
     setIsConnected(true);
   };
 
@@ -122,7 +127,6 @@ export const ChatContextProvider: FC<{ children: ReactNode }> = ({
         off('enter', handleEnter);
         off('send', handleMessageSend);
         off('leave', handleLeave);
-        off('dataChannel', handleDataChannelOpen);
         off('error', handleError);
         off('track', handleTrack);
       }

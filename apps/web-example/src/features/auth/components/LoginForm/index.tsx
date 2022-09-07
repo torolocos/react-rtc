@@ -1,25 +1,30 @@
 import { useChat } from 'src/features/chat/contexts/chat';
+import { useMessage } from 'src/features/chat/hooks/message';
 import { Button, TextInput } from 'src/features/ui';
 import { useCustomModal } from 'src/features/ui/Modal/contexts/modal';
-import { useUser } from '../../contexts/user';
 import { Container } from './styled';
 
 const LoginForm = () => {
-  const { setUser } = useUser();
   const { closeModal } = useCustomModal();
-  const { startStream } = useChat();
+  const { register, handleSubmit } = useMessage();
+  const { handleJoinPress } = useChat();
 
-  const onSubmit = async () => {
-    setUser({ name: Math.random().toString() });
-    startStream();
+  const onSubmit = async ({ username }: { username: string }) => {
+    handleJoinPress(username);
     closeModal();
   };
+
   return (
     <Container>
-      <TextInput label="username" />
-      <Button size="lg" bg="primary" onClick={onSubmit}>
-        Login
-      </Button>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <TextInput
+          label="username"
+          {...register('username', { required: true })}
+        />
+        <Button size="lg" bg="primary">
+          Login
+        </Button>
+      </form>
     </Container>
   );
 };

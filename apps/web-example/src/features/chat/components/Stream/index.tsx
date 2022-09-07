@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { StyledTitle, StyledVideo, VideoWrapper } from './styled';
 
 interface Props {
   stream: MediaStream;
@@ -15,10 +16,17 @@ const Stream = ({ stream, username }: Props) => {
   }, []);
 
   return (
-    <div>
-      <p>{username}</p>
-      <video ref={videoRef} width={300} autoPlay />
-    </div>
+    <VideoWrapper>
+      <StyledTitle>{username}</StyledTitle>
+      <StyledVideo
+        ref={videoRef}
+        autoPlay
+        // width={500}
+        // css={{
+        //   backgroundColor: color,
+        // }}
+      />
+    </VideoWrapper>
   );
 };
 
