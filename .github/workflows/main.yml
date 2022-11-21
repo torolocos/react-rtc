@@ -27,12 +27,12 @@ jobs:
         run: yarn lint
       - name: Run tests
         run: yarn test -- -- --coverage
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./packages/react-rtc/coverage/coverage-final.json
           flags: react-rtc
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./packages/signaling-server/coverage/coverage-final.json
