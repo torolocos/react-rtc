@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build --filter=!web-example",
     "dev": "turbo run dev",
     "lint": "turbo run lint --parallel",
     "tsc:check": "turbo run lint --parallel",
